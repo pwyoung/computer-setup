@@ -1,0 +1,12 @@
+#!/bin/sh
+
+FILE="$1"
+
+
+# Set Iterm2 tab title
+rel_name=$(basename $1)
+path=$(dirname $1)
+title=$rel_name
+#echo "\033]0;$title\007"
+
+emacs -nw $FILE

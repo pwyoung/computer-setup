@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Pre-JENV way
+#export JAVA_HOME=$(/usr/libexec/java_home -v 9.0)
+#echo "JAVA_HOME=$JAVA_HOME"
+
+# JENV
+eval "$(jenv init -)"
+jenv shell 9.0
+# jenv means never having to say JAVA_HOME 
+# It UNSETS JAVA_HOME, and so, relies on apps to set JAVA_HOME relative to the java executable
+
+java -version

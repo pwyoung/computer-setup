@@ -1,0 +1,12 @@
+#!/bin/sh
+# GOAL Convenience script to run openshift cluster commands quickly
+# 'occ FOO' is 'oc cluster FOO' against the correct Docker Machine for OpenShift
+
+#eval $(docker-machine env openshift) 
+#oc cluster $@
+
+#oc --docker-machine=openshift cluster $@
+
+# Assume the eval is done on login
+oc cluster $@
+

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+find . -type f -exec egrep -l " +$" {} \;
+
+# pipe to ~/bin/dt to clean up

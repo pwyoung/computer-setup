@@ -1,0 +1,54 @@
+#!/bin/sh
+
+# GOAL: Run installation scripts in the correct order
+#  This script and everything it calls is intended to be easy to maintain 
+#  and quickly idempotent (never reinstalling things that are installed)
+
+MY_PATH=$( cd $(dirname "$0") && pwd )
+
+################################################################################
+# Generic Mac Setup
+################################################################################
+
+# These 4 must come in order
+${MY_PATH}/scripts/install_xcode.sh
+# Homebrew needs Xcode
+${MY_PATH}/scripts/install_homebrew.sh
+# Zsh installer needs homebrew
+${MY_PATH}/scripts/install_zsh.sh
+# ~/.zprofile is replaced when zsh is installed above.
+# This makes sure ~/bin and ~/.profile.d are used in BASH and ZSH
+${MY_PATH}/scripts/setup_user_profile_and_bin_dirs.sh
+
+${MY_PATH}/scripts/setup_ssh.sh
+
+yes | tr 'y' 'n' | ${MY_PATH}/scripts/install_java.sh
+${MY_PATH}/scripts/install_dbeaver.sh # Requires Java
+${MY_PATH}/scripts/install_python.sh
+${MY_PATH}/scripts/install_node.sh
+
+${MY_PATH}/scripts/install_virtualbox_and_vagrant.sh
+${MY_PATH}/scripts/install_docker.sh
+${MY_PATH}/scripts/install_kubectl.sh
+#${MY_PATH}/scripts/install_minikube.sh # We are using OpenShift to manage containers
+${MY_PATH}/scripts/start_openshift_cluster.sh
+
+
+# Conveniences
+${MY_PATH}/scripts/install_user_tools_and_apps.sh
+${MY_PATH}/scripts/install_htop.sh
+${MY_PATH}/scripts/install_tmux.sh
+${MY_PATH}/scripts/install_sshfs.sh
+${MY_PATH}/scripts/create_symlinks_for_data_and_backup.sh
+${MY_PATH}/scripts/install_gnu_core_tools.sh
+
+################################################################################
+
+# Set up Tunnelblick, using some assumptions
+${MY_PATH}/scripts/setup_tunnelblick.sh 
+
+#${MY_PATH}/install_omnia_ca.sh # Fails currently
+
+
+
+

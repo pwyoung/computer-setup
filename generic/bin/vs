@@ -1,0 +1,3 @@
+#!/bin/sh
+
+vagrant status | egrep -v 'multiple VMs|For more|VM,'

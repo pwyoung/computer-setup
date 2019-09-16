@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Virtualbox
+/Applications/VirtualBox.app/Contents/MacOS/VBoxManage list vms
+
+# Docker
+docker ps -a

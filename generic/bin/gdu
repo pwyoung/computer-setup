@@ -1,0 +1,7 @@
+#https://stackoverflow.com/questions/1800783/compare-local-git-branch-with-remote-branch
+
+# If you're on a given branch, and you want to compare it with an upstream branch you're tracking, use
+git diff --stat --color  @{upstream}
+
+#git fetch
+#git log -p HEAD..FETCH_HEAD

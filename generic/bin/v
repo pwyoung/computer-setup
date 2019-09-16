@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd /repos/pwyoung/ceph-testing/code
+vagrant ssh test-$@

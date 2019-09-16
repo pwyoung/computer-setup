@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Replace all [ with \n[
+perl -pe s'/\[/\n\[/g'

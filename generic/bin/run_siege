@@ -1,0 +1,35 @@
+#!/bin/sh
+
+#yum install siege # v4.0 worked
+
+#cd /repos/pwyoung/storage-infrastructure/docker-siege4oss
+cd /Users/phillipyoung/Documents/repos/pwyoung/storage-infrastructure/docker-siege4oss
+
+cat <<EOF > /tmp/tmpfs.env
+#SIEGE_TIME="10s"
+#SIEGE_CONCURRENT="64"
+#ENDPOINT_URL="https://10.1.41.80:9000"
+#ENDPOINT_ACCESS_KEY="LX1LDJ9F6S3C6VXQ6A4F"
+#ENDPOINT_SECRET_KEY="YLRV9H8sz8fqADWrrdYsrBRbOKdhq931DA7CSAeK"
+#
+#ENDPOINT_URL=http://10.1.48.66:9000/
+ENDPOINT_URL=http://10.1.41.112:9000/
+ENDPOINT_ACCESS_KEY=minio
+ENDPOINT_SECRET_KEY=minio123
+SIEGE_TIME=60s
+SIEGE_CONCURRENT=32
+EOF
+
+eval $(cat /tmp/tmpfs.env )
+env | grep ENDPOINT
+
+exit 1
+
+./siege4oss generate
+
+./siege4oss siege
+
+# docker image build -t "siege4oss" .
+# docker run -i -t --network host --env-file /tmp/tmpfs.env -v "$(pwd)"/log/:/var/run/siege4oss/log/ siege4oss siege
+
+

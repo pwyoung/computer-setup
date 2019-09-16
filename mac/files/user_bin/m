@@ -1,0 +1,7 @@
+#!/bin/sh
+# Goal
+#    hit m to "MARK" a directory as the one to go to when you run 'z'
+
+F=~/.marked_path
+echo "$PWD" > $F
+

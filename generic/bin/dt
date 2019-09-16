@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Delete trailing whitespace from a list of files
+
+# Supplied via STDIN
+IFS=$'\n' read -d '' -r -a filenames
+for filename in "${filenames[@]}"; do
+    /usr/local/bin/emacs --batch "$filename" \
+      --eval '(delete-trailing-whitespace)' \
+      -f 'save-buffer'
+done
+
+# Supplied via CLI args
+#for filename in $@; do
+#    echo "$filename"
+#    /usr/local/bin/emacs --batch "$file" \
+#      --eval '(delete-trailing-whitespace)' \
+#      -f 'save-buffer'
+#done

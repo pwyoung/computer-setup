@@ -1,0 +1,92 @@
+#!/bin/bash
+
+nuke_k8s() {
+    F=~/nuke_k8s.sh
+    cat << EOF > $F
+  kubeadm reset
+  sudo apt-get -y purge kubeadm kubectl kubelet kubernetes-cni kube*
+  sudo apt-get -y autoremove
+  sudo rm -rf ~/.kube
+  sudo ip link del flannel.1
+  # Docker. was 17.11
+  sudo rm -rf /etc/apt/sources.list.d/kubernetes.list
+
+EOF
+
+    for i in {0..4}; do
+	H="pc$i"
+	scp $F ${H}:/home/picocluster/script.sh
+	ssh $H 'sh -x /home/picocluster/script.sh'
+    done
+}
+
+remove_docker() {
+    F=~/nuke_k8s.sh
+    cat << EOF > $F
+    sudo systemctl stop docker
+    sudo systemctl disable docker
+    sudo rm /etc/systemd/system/docker
+    sudo systemctl daemon-reload
+    sudo systemctl reset-failed
+    sudo apt remove -y --allow-change-held-packages docker-ce docker
+    #sudo apt update
+EOF
+
+    for i in {0..4}; do
+	H="pc$i"
+	scp $F ${H}:/home/picocluster/script.sh
+	ssh $H 'sh -x /home/picocluster/script.sh'
+    done
+}
+
+recreate_ubuntu_user() {
+    K='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDsAirlwNHlhx/WWRDVu+O8NJFP3yEnqpcgmCqoIAQP+3sRsiyVHAldu2UqFF2o9G2/2A69OIu1xfZ4F7Laowe/SjhJ5TUCLCfif4ZFlShSSATf9pYNDBlf109g8J3DT5RvqVsnQz0sN0ioog3Cwl1Ruy9+dDK6PY/9sJWH7T5riI3LWCOJTeHrFUx5rq2Xvv2LNFbQthNlVujDSQEIFs/JYRZcFuEjACVCwwNwxEtPUJvIMlsa+OhTGlnZmz5nWFpnuRnz9qEmOEz/gv/UZpDhfFz7AaZM8zmfDrN9UJFAkJ8EP9z/aFXyrjIVa12pPysUCXXZkAS1dxTHoI4DZBWHnR7tfag8J8Y5CSgJ8ec/mPw3TWsZktY7Cz5uVZZrswZfdWueLwWhfdB79EA7yFZ/mwBYqrBW13Qge/fDZOTXIf5pLov5iZ5zgfrHSoMKa6hqxZDKYGyFpx5gBJsJWrDDDNtRIqRn8FYEYrp1++KkTsycbWY28AoxKbXcfitqDsTL/kIVa/Kso+QumvcK9yYK2CwqlIrxMu/hBH7NWg3T1IIWCB2AFnIm+jW+OB/mGBF6JsM8frqG35La1OBMaUbU9MbiqgrP9tnwLRnuVqvfzvIrMNmIYsW3g+G+TnObJJZaROCcVfhP+SnhrLZqzM4lZT+1gBQWpl8CAbn6VTIjKw== phillipyoung@phillips-MacBook-Pro.local'
+
+    F=~/create_ubuntu_user.sh
+    cat << EOF > $F
+  #sudo apt-get install -y emacs-nox
+  sudo deluser ubuntu
+  sudo rm -rf /home/ubuntu
+  sudo adduser --disabled-password --gecos "" ubuntu
+  sudo mkdir /home/ubuntu/.ssh
+  sudo chmod 700 /home/ubuntu/.ssh
+  sudo chown -R ubuntu.ubuntu /home/ubuntu/.ssh
+  sudo su - -c "echo '$K' > /home/ubuntu/.ssh/authorized_keys"
+  sudo chmod 644 /home/ubuntu/.ssh/authorized_keys
+  # Passwordless sudo
+  sudo su - -c 'echo "ubuntu           ALL = (ALL) NOPASSWD: ALL" > /etc/sudoers.d/ubuntu'
+EOF
+
+        F=~/create_ubuntu_user.sh
+    cat << EOF > $F
+  sudo su - -c 'echo "ubuntu           ALL = (ALL) NOPASSWD: ALL" > /etc/sudoers.d/ubuntu'
+EOF
+
+
+    for i in {0..4}; do
+	H="pc$i"
+	scp $F ${H}:/home/picocluster/script.sh
+	ssh $H 'sh -x /home/picocluster/script.sh'
+	ssh -i ~/.ssh/id_rsa ubuntu@$H 'whoami'
+    done
+}
+
+install_packages() {
+    F=~/nuke_k8s.sh
+    cat << EOF > $F
+    #sudo apt update
+    #sudo apt install libffi-dev
+    sudo apt-get install -y python-setuptools
+EOF
+
+    for i in {0..4}; do
+	H="pc$i"
+	scp $F ${H}:/home/picocluster/script.sh
+	ssh $H 'sh -x /home/picocluster/script.sh'
+    done
+}
+
+#nuke_k8s
+remove_docker
+#recreate_ubuntu_user
+#install_packages

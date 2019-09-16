@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# Start Minikube if it does not already seem to be running
+
+x=$(minikube status | grep Running | wc -l)
+if [ $x -ge 2 ]; then
+  echo "Minikube is already running";
+else
+  LOG=~/minikube_start.log
+
+  echo "Starting Minikube and logging output to $LOG"
+
+  # Before changing these, one must delete the old VM
+  #   minikube stop ; minikube delete
+
+  OPTS="" # Not specifying the vm driver at all resulted in it using Virtualbox, sucessfully
+  #OPTS=" --vm-driver hyperkit"
+  OPTS=" --vm-driver=xhyve" 
+  #
+  #OPTS=" $OPTS --disk-size=64g" # Defaults to 64GB
+  #OPTS=" $OPTS --v=3 --logtostderr "
+  OPTS=" $OPTS --cpus=4" # Defaults to 2 CPU
+  OPTS=" $OPTS --memory=4096 "
+  #
+  # Uncomment to investigate problems
+  #OPTS=" $OPTS --v=999 --logtostderr"
+
+  #OPTS=" $OPTS --insecure-registry=docker.io.lab"
+  
+  echo 'Minikube might just hang when starting, due to https://github.com/kubernetes/minikube/issues/227'
+  echo 'If so, destroy the cluster by running:'
+  echo '  minikube stop ; minikube delete ; rm -rf ~/.minikube'
+  echo 'and then restarting this script'
+
+  time minikube start $OPTS | tee $LOG
+
+
+  minikube status
+fi
