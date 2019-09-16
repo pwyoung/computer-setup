@@ -1,7 +1,5 @@
 #!/bin/sh
 
-#cp -r /Volumes/samsung_1tb/backups/sufil_laptop_pyoung_data.ORIG/repos/TODO/dataplatform-docker-cassandra /repos/pwy_docker_cassandra
-
-F=/data/journal.txt
+F=~/.journal.txt
 touch $F
 emacs -nw $F

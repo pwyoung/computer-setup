@@ -1,0 +1,29 @@
+# OS
+.DS_Store
+
+# Temp
+*#
+*~
+**/*~
+*/*~
+.#*
+
+# Generic
+*.log
+
+#Python
+**/*.pyc
+*.pyc
+
+# IDE: Intellij/idea
+.idea/
+*.iml
+
+# Ansible
+*.retry
+
+# Vagrant
+**/.vagrant
+
+# TERRAFORM
+**/.terraform

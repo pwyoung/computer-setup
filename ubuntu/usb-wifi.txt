@@ -1,0 +1,23 @@
+# https://tacticalware.com/install-alfa-awus036ach-drivers-on-ubuntu-18-04/
+
+apt install wireless-tools
+
+iwconfig
+# Note your wireless adapters…if any are installed
+
+apt search rtl8812
+# rtl8812au-dkms/bionic-updates,bionic-updates 4.3.8.12175.20140902+dfsg-0ubuntu8.1 all
+#  dkms source for the r8812au network driver
+
+
+#apt-get install realtek-rtl8812au-dkms
+apt-get install rtl8812au-dkms
+# Drivers will install, this may take a few minutes.
+
+dkms status
+# rtl8812au, 4.3.8.12175.20140902+dfsg, 5.0.0-29-generic, x86_64: installed
+
+
+# REBOOT, then
+iwconfig
+# You will now see your ALFA wireless card

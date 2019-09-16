@@ -1,0 +1,14 @@
+[credential]
+	# OSX
+	#helper = osxkeychain
+	#
+	# File
+        helper = cache --timeout=220752000
+
+[user]
+	name = pwyoung
+	email = phil.w.young@gmail.com
+
+[core]
+	excludesfile = ~/.gitignore
+	editor = emacs

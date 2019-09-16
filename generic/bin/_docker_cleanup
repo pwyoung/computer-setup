@@ -1,0 +1,11 @@
+#
+echo "Killing dangling images"
+docker rmi -f $(docker images --filter "dangling=true" -q --no-trunc)
+
+echo "Kill all stopped containers? (enter Y to continue)"
+read OK
+echo $OK
+if [ "$OK" == "Y" ]; then
+   echo "Removing all stopped containers"
+   docker rm $(docker ps -a | grep Exit | cut -d ' ' -f 1)
+fi

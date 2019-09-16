@@ -6,7 +6,6 @@ MY_PATH=$( cd $(dirname "$0") && pwd )
 source ${MY_PATH}/utils.sh # brew_install etc.
 
 install_virtualbox() {
-    
     # SNAFU: Sierra kernel extension protections hose virtualbox
     # https://github.com/docksal/docksal/issues/417
     # Let this fail
@@ -38,9 +37,9 @@ install_vagrant_manager() {
 
     # Kill any running version of "Vagrant Manager"
     killall Vagrant\ Manager
-    
+
     # Start it
-    /Applications/Vagrant\ Manager.app/Contents/MacOS/Vagrant\ Manager > /tmp/Vagrant_Manager.out 2>&1 &	
+    /Applications/Vagrant\ Manager.app/Contents/MacOS/Vagrant\ Manager > /tmp/Vagrant_Manager.out 2>&1 &
 }
 
 test_virtualbox(){
@@ -54,7 +53,7 @@ test_virtualbox(){
     #
     #vagrant init centos/7
     #
-    vagrant init minimal/centos7    
+    vagrant init minimal/centos7
 
     vagrant up
     vagrant status
@@ -65,7 +64,7 @@ test_virtualbox(){
 }
 
 
-update_homebrew
+brew_update
 install_virtualbox
 test_virtualbox
 install_vagrant
