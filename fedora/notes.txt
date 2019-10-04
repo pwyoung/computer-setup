@@ -1,0 +1,106 @@
+
+Firefox:
+  - sync
+
+Software:
+  - dash-to-panel
+
+Timeshift:
+  - yum install -y timeshift \
+
+Conveniences:
+  - yum install -y htop emacs-nox make
+
+SSHD:
+  - sudo systemctl start sshd
+
+RPMFUSION:
+  - https://docs.fedoraproject.org/en-US/quick-docs/setup_rpmfusion/
+    - Free
+      - sudo dnf install \
+        https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+    - NonFree
+      - sudo dnf install \
+        https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+    - Appstream
+      - sudo dnf groupupdate core
+
+USB/exfat:
+  - dnf install -y fuse-exfat
+  
+Setup repo:
+  - mkdir -p ~/git/pwyoung && cd $_ && git clone https://github.com/pwyoung/computer-setup.git
+
+Git:
+  - cd ~/ && \
+    ln -s ./git/pwyoung/computer-setup/generic/git/.gitconfig ./ && \
+    ln -s ./git/pwyoung/computer-setup/generic/git/.gitignore ./
+
+Bin:
+  - cd ~/ && \
+    ln -s git/pwyoung/computer-setup/generic/bin ./bin
+
+BASH
+  - cd ~/ && \
+    mkdir -p ~/_Archive && \
+    mv ./.bash_profile ~/_Archive/
+    ln -s git/pwyoung/computer-setup/generic/home/.bash_profile ./
+  - Terminal: "run command as login shell"
+
+NVIDIA:
+  - Docs
+    - https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/
+  - Get driver
+    - https://www.nvidia.com/Download/index.aspx
+  - Deps
+    - sudo dnf install kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig
+  - Disable Nouveau
+    - sudo su -
+      echo 'blacklist nouveau
+blacklist lbm-nouveau
+options nouveau modeset=0
+alias nouveau off
+alias lbm-nouveau off
+' > /etc/modprobe.d/nouveau-blacklist.conf
+  - Update grub2
+    - /boot/efi/EFI/fedora/grub.cfg
+  - Remove xorg-x11-drv-nouveau
+    - dnf remove xorg-x11-drv-nouveau
+  - Generate initramfs
+    - mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r)-nouveau.img
+    - dracut /boot/initramfs-$(uname -r).img $(uname -r)
+  - Setup runlevel 3
+    - systemctl set-default multi-user.target  
+    - reboot
+  - Continue
+    - dnf install lynx
+      lynx https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/
+  - Run NVIDIA Binary
+    - chmod +x NVIDIA-Linux-x86_64-430.50.run
+      ./NVIDIA-Linux-x86_64-430.50.run --help
+  - Reset GUI mode
+    - systemctl set-default graphical.target
+      reboot
+  -  2.10 VDPAU/VAAPI support
+     - dnf install vdpauinfo libva-vdpau-driver libva-utils
+
+    
+http://download.nvidia.com/XFree86/Linux-x86_64/430.40/README/installdriver.html#modulesigning
+
+#sh ./NVIDIA-Linux-x86_64-430.40.run -s --module-signing-secret-key=/path/to/signing.key --module-signing-public-key=/path/to/signing.x50
+
+# Generate keys to sign the nvidia driver
+# http://www.pellegrino.link/2015/11/29/signing-nvidia-proprietary-driver-on-fedora.html
+
+
+systemctl set-default multi-user.target
+
+SECRETKEY=
+PUBKEY=
+NVIDIA-Linux-x86_64-430.50.run -s --module-signing-secret-key=$SECRETKEY --module-signing-public-key=$PUBKEY
+yum install compat-openssl10-pkcs11-helper
+cat /var/log/nvidia-installer.log
+
+
+systemctl set-default graphical.target
+
