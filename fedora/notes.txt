@@ -1,20 +1,21 @@
 
-Firefox:
+# Firefox:
   - sync
 
-Software:
+# Software:
   - dash-to-panel
 
-Timeshift:
+# Timeshift:
   - yum install -y timeshift \
 
-Conveniences:
+# Conveniences:
   - yum install -y htop emacs-nox make
 
-SSHD:
+# SSHD:
   - sudo systemctl start sshd
+  - sudo systemctl enable Sshd  
 
-RPMFUSION:
+# RPMFUSION:
   - https://docs.fedoraproject.org/en-US/quick-docs/setup_rpmfusion/
     - Free
       - sudo dnf install \
@@ -25,82 +26,63 @@ RPMFUSION:
     - Appstream
       - sudo dnf groupupdate core
 
-USB/exfat:
+# exfat (for portable usb)
   - dnf install -y fuse-exfat
   
-Setup repo:
+# Setup repo:
   - mkdir -p ~/git/pwyoung && cd $_ && git clone https://github.com/pwyoung/computer-setup.git
 
-Git:
+# Git:
   - cd ~/ && \
     ln -s ./git/pwyoung/computer-setup/generic/git/.gitconfig ./ && \
     ln -s ./git/pwyoung/computer-setup/generic/git/.gitignore ./
-
-Bin:
+  - config
+    git config --global user.name "pwyoung"
+    git config --global user.email "----@gmail.com"
+    
+# ~/bin:
   - cd ~/ && \
     ln -s git/pwyoung/computer-setup/generic/bin ./bin
 
-BASH
+# BASH
   - cd ~/ && \
     mkdir -p ~/_Archive && \
-    mv ./.bash_profile ~/_Archive/
+    mv ./.bash_profile ~/_Archive/ && \
     ln -s git/pwyoung/computer-setup/generic/home/.bash_profile ./
   - Terminal: "run command as login shell"
 
-NVIDIA:
-  - Docs
-    - https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/
-  - Get driver
-    - https://www.nvidia.com/Download/index.aspx
-  - Deps
-    - sudo dnf install kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig
-  - Disable Nouveau
-    - sudo su -
-      echo 'blacklist nouveau
-blacklist lbm-nouveau
-options nouveau modeset=0
-alias nouveau off
-alias lbm-nouveau off
-' > /etc/modprobe.d/nouveau-blacklist.conf
-  - Update grub2
-    - /boot/efi/EFI/fedora/grub.cfg
-  - Remove xorg-x11-drv-nouveau
-    - dnf remove xorg-x11-drv-nouveau
-  - Generate initramfs
-    - mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r)-nouveau.img
-    - dracut /boot/initramfs-$(uname -r).img $(uname -r)
-  - Setup runlevel 3
-    - systemctl set-default multi-user.target  
-    - reboot
-  - Continue
-    - dnf install lynx
-      lynx https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/
-  - Run NVIDIA Binary
-    - chmod +x NVIDIA-Linux-x86_64-430.50.run
-      ./NVIDIA-Linux-x86_64-430.50.run --help
-  - Reset GUI mode
-    - systemctl set-default graphical.target
-      reboot
-  -  2.10 VDPAU/VAAPI support
-     - dnf install vdpauinfo libva-vdpau-driver libva-utils
+# NVIDIA:
+  - Docs:
+    - open https://rpmfusion.org/Howto/NVIDIA#Latest.2FBeta_driver
+  - Stop screen flicker:
+    - Set refresh rate of monitor lower (28Hz on 4k)
+## Take snapshots after each successful reboot
+## update os
+sudo dnf update
+sudo dnf upgrade
+##Update Kernel (and reboot)
+sudo dnf install "kernel-devel == $(uname -r)"
+sudo dnf update -y
+reboot
+## install AKMOD drivers
+sudo dnf install   https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+sudo dnf install   https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+sudo dnf --releasever=30 install akmod-nvidia xorg-x11-drv-nvidia --nogpgcheck
+reboot
+## install acceleration drivers 
+sudo dnf install vdpauinfo libva-vdpau-driver libva-utils
+vdpauinfo | less
+vainfo | less # Has an error which is fixed with reboot
+reboot
+## Install additional optional components
+sudo dnf install vulkan
+sudo dnf install xorg-x11-drv-nvidia-cuda
+reboot
 
-    
-http://download.nvidia.com/XFree86/Linux-x86_64/430.40/README/installdriver.html#modulesigning
-
-#sh ./NVIDIA-Linux-x86_64-430.40.run -s --module-signing-secret-key=/path/to/signing.key --module-signing-public-key=/path/to/signing.x50
-
-# Generate keys to sign the nvidia driver
-# http://www.pellegrino.link/2015/11/29/signing-nvidia-proprietary-driver-on-fedora.html
+# Atom:
+  - wget https://atom.io/download/rpm -O atom.rpm
+  - sudo dnf localinstall atom.rpm
 
 
-systemctl set-default multi-user.target
-
-SECRETKEY=
-PUBKEY=
-NVIDIA-Linux-x86_64-430.50.run -s --module-signing-secret-key=$SECRETKEY --module-signing-public-key=$PUBKEY
-yum install compat-openssl10-pkcs11-helper
-cat /var/log/nvidia-installer.log
-
-
-systemctl set-default graphical.target
-
+# TODO
+- https://rpmfusion.org/Howto/CUDA
