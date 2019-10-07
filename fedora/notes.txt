@@ -79,10 +79,46 @@ sudo dnf install vulkan
 sudo dnf install xorg-x11-drv-nvidia-cuda
 reboot
 
+# Now, resizing (smaller and then back) works
+  - resize to 2560x1440 (visibility on 4k)
+  - Font mono-18
+
 # Atom:
   - wget https://atom.io/download/rpm -O atom.rpm
   - sudo dnf localinstall atom.rpm
 
+# Virtualbox
+  - Docs
+    - https://www.if-not-true-then-false.com/2010/install-virtualbox-with-yum-on-fedora-centos-red-hat-rhel/
+  - Commands
+    - become root
+    - cd /etc/yum.repos.d/ && wget http://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
+    - dnf update
+    - dnf install binutils gcc make patch libgomp glibc-headers glibc-devel kernel-headers kernel-devel dkms qt5-qtx11extras libxkbcommon
+    - dnf install VirtualBox-6.0
+    - /usr/lib/virtualbox/vboxdrv.sh setup
+    - usermod -a -G vboxusers pyoung
+# Virtualbox Guest Additions
+  - Docs
+    - https://www.if-not-true-then-false.com/2010/install-virtualbox-guest-additions-on-fedora-centos-red-hat-rhel/
+  - Commands
+    - https://www.virtualbox.org/wiki/Downloads
+    - Get "VirtualBox <VERSION> Oracle VM VirtualBox Extension Pack"
+
+# Python
+mkdir -p ~/virtualenv && cd $_ && if [ ! -e python3 ]; then python3 -m venv python3; fi
+mkdir -p ~/.private.d && echo 'source ~/virtualenv/python3/bin/activate' > ~/.private.d/python.sh
+
+# Vagrant
+  - THIS FAILS... THE VAGRANT VERSION DOES NOT WORK...
+    - https://developer.fedoraproject.org/tools/vagrant/vagrant-virtualbox.html
+    - sudo dnf install vagrant
+  - INSTEAD, install "Linux 64-bit" binary" from
+    - https://www.vagrantup.com/downloads.html
+    - Put it in /usr/local/bin
+  - Set virtualbox as the default provider (for now anyway)
+    - mkdir -p ~/.profile.d && echo 'export VAGRANT_DEFAULT_PROVIDER=virtualbox' > ~/.profile.d/vagrant.sh
 
 # TODO
 - https://rpmfusion.org/Howto/CUDA
+

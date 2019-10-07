@@ -1,2 +1,2 @@
-#!/bin/sh   	    
-/usr/local/opt/curl/bin/curl $@
+#!/bin/sh
+uname -a | grep -i darwin && /usr/local/opt/curl/bin/curl $@ || /usr/bin/curl $@
