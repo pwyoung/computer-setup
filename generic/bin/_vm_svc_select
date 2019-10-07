@@ -1,4 +1,5 @@
 #!/bin/bash
+# GOAL: Switch between VirtualBox and Libvirt(for KVM)
 
 VB_SVC='vboxautostart-service.service vboxballoonctrl-service.service vboxdrv.service vboxweb-service.service'
 KVM_SVC='libvirtd'
@@ -26,8 +27,6 @@ virtualbox_start() {
     for i in $VB_SVC; do
 	echo "start service $i"
 	sudo systemctl start $i
-	#echo "status service $i"
-	#sudo systemctl status $i    
     done
 }
 
@@ -49,8 +48,6 @@ kvm_start() {
     for i in $KVM_SVC; do
 	echo "start service $i"
 	sudo systemctl start $i
-	#echo "status service $i"
-	#sudo systemctl status $i    
     done
 }
 
@@ -60,8 +57,6 @@ kvm_status() {
 	sudo systemctl status $i    
     done
 }
-
-################################################################################
 
 if [ $# -eq 0 ]; then
     show_help

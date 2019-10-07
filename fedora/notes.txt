@@ -1,3 +1,8 @@
+###############################################################################
+# GIVING UP ON FEDORA...THEY CAN'T KEEP UP EVEN IN FEDORA (RHEL IS WORSE)...
+# It's too old... Can't install (not run) vagrant-libvirt... Can only use
+# a ridiculously old set of deps and old version of vagrant...
+################################################################################
 
 # Firefox:
   - sync
@@ -122,6 +127,14 @@ mkdir -p ~/.private.d && echo 'source ~/virtualenv/python3/bin/activate' > ~/.pr
 # KVM
   - dnf update && dnf install virt-manager libvirt
   - includes python3-libvirt and libvirt-bash-completion
+
+# Vagrant-Libvirt
+  - Docs
+    - https://github.com/vagrant-libvirt/vagrant-libvirt/issues/951
+  - Steps
+    - sudo dnf install qemu libvirt libvirt-devel ruby-devel gcc qemu-kvm
+    - CONFIGURE_ARGS="with-libvirt-include=/usr/include/libvirt with-libvirt-lib=/usr/lib64" vagrant plugin install vagrant-libvirt
+  
 
 # TODO
 - https://rpmfusion.org/Howto/CUDA
