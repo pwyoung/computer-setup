@@ -1,1 +1,5 @@
-ls --color=auto -ltr $@	
+if uname -a | grep Darwin; then
+  ls -ltr $@
+else
+  ls --color=auto -ltr $@
+fi
