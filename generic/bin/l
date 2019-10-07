@@ -1,1 +1,1 @@
-    ls -ltr $@	
+ls --color=auto -ltr $@	

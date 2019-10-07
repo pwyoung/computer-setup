@@ -1,7 +1,0 @@
-for file in $@; do
-    echo "$file"
-    #/usr/local/bin/emacs --batch "$file" \
-    #  --eval '(setq-default indent-tabs-mode nil)' \
-    #  --eval '(whitespace-cleanup)' \
-    #  -f 'save-buffer'
-done

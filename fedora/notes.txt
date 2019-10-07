@@ -119,6 +119,10 @@ mkdir -p ~/.private.d && echo 'source ~/virtualenv/python3/bin/activate' > ~/.pr
   - Set virtualbox as the default provider (for now anyway)
     - mkdir -p ~/.profile.d && echo 'export VAGRANT_DEFAULT_PROVIDER=virtualbox' > ~/.profile.d/vagrant.sh
 
+# KVM
+  - dnf update && dnf install virt-manager libvirt
+  - includes python3-libvirt and libvirt-bash-completion
+
 # TODO
 - https://rpmfusion.org/Howto/CUDA
 

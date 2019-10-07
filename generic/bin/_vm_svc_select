@@ -1,0 +1,93 @@
+#!/bin/bash
+
+VB_SVC='vboxautostart-service.service vboxballoonctrl-service.service vboxdrv.service vboxweb-service.service'
+KVM_SVC='libvirtd'
+
+show_help() {
+    echo "Usage: $0 [options]"
+    echo "-k: activate KVM (and turn off VirtualBox services)."
+    echo "-v: activate Virtualbox (and turn off KVM services)"
+}
+
+err_handler() {
+    echo "Exiting due to error on line $1"
+    exit 1
+}
+trap 'err_handler $LINENO' ERR
+
+virtualbox_stop() {
+    for i in $VB_SVC; do
+	echo "stop service $i"
+	sudo systemctl stop $i
+    done
+}
+
+virtualbox_start() {
+    for i in $VB_SVC; do
+	echo "start service $i"
+	sudo systemctl start $i
+	#echo "status service $i"
+	#sudo systemctl status $i    
+    done
+}
+
+virtualbox_status() {
+    for i in $VB_SVC; do
+	echo "status service $i"
+	sudo systemctl status $i    
+    done
+}
+
+kvm_stop() {
+    for i in $KVM_SVC; do
+	echo "stop service $i"
+	sudo systemctl stop $i
+    done
+}
+
+kvm_start() {
+    for i in $KVM_SVC; do
+	echo "start service $i"
+	sudo systemctl start $i
+	#echo "status service $i"
+	#sudo systemctl status $i    
+    done
+}
+
+kvm_status() {
+    for i in $KVM_SVC; do
+	echo "status service $i"
+	sudo systemctl status $i    
+    done
+}
+
+################################################################################
+
+if [ $# -eq 0 ]; then
+    show_help
+    exit 1
+fi
+
+while [ $# -gt 0 ]
+do
+  case $1 in
+      -h) show_help
+          exit 0
+	  ;;
+      -v) kvm_stop
+	  virtualbox_start
+	  virtualbox_status
+	  shift
+	  ;;
+      -k) virtualbox_stop
+	  kvm_start
+	  kvm_status
+	  shift
+	  ;;
+      -*) echo "$0: $1: unrecognized option" >&2
+	  exit 1
+	  ;;
+      **) break
+	  ;;
+  esac
+done
