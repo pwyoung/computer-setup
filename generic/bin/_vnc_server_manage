@@ -1,0 +1,86 @@
+#!/bin/bash
+
+# https://tigervnc.org/doc/vncserver.html
+
+show_help() {
+    echo "Usage: $0 [options]"
+    echo "-c: connect as client"
+    echo "-i: install tiger vnc"
+    echo "-s: status of vnc service"
+    echo "-x: start vnc service"
+    echo "-S: stop vnc service"
+}
+
+err_handler() {
+    echo "Exiting due to error on line $1"
+    exit 1
+}
+trap 'err_handler $LINENO' ERR
+
+start_vnc_service() {
+    vncserver
+}
+
+status_of_vnc_service() {
+    vncserver -list
+    tail -99 $(ls -1tr ~/.vnc/*log | tail -1)
+}
+
+stop_vnc_service() {
+    vncserver -kill
+}
+
+connect_as_client() {
+    # Guess the display number from the latest log file on the server
+    DISPLAY_NO=$(ls -1tr ~/.vnc/*log | tail -1 | perl -pe 's|.*:(.*?).log|$1|')
+    xtigervncviewer -SecurityTypes VncAuth -passwd ~/.vnc/passwd :${DISPLAY_NO}
+}
+
+install() {
+    sudo apt install tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer
+
+    cat <<EOF > ~/.vnc/xstartup
+#!/bin/sh
+# Start Gnome 3 Desktop 
+[ -x /etc/vnc/xstartup ] && exec /etc/vnc/xstartup
+[ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
+vncconfig -iconic &
+dbus-launch --exit-with-session gnome-session &
+EOF
+
+    vncpasswd
+}
+
+if [ $# -eq 0 ]; then
+    show_help
+    exit 1
+fi
+
+while [ $# -gt 0 ]
+do
+  case $1 in
+      -h) show_help
+          exit 0
+	  ;;
+      -i) install
+	  shift
+	  ;;
+      -c) connect_as_client
+	  shift
+	  ;;
+      -x) start_vnc_service
+	  shift
+	  ;;
+      -s) status_of_vnc_service
+	  shift
+	  ;;
+      -S) stop_vnc_service
+	  shift
+	  ;;
+      -*) echo "$0: $1: unrecognized option" >&2
+	  exit 1
+	  ;;
+      **) break
+	  ;;
+  esac
+done

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+GUACAMOLE_DOCKER_DIR_PARENT=~/git/pwyoung
+GUACAMOLE_DOCKER_DIR=${GUACAMOLE_DOCKER_DIR_PARENT}/guacamole-docker-compose
+
+show_help() {
+    echo "Usage: $0 [options]"
+    echo "-i: install guacamole"
+    echo "-s: status of guacamole service"
+    echo "-x: start guacamole service"
+    echo "-S: stop guacamole service"
+}
+
+err_handler() {
+    echo "Exiting due to error on line $1"
+    exit 1
+}
+trap 'err_handler $LINENO' ERR
+
+start_guacamole_service() {
+    cd ${GUACAMOLE_DOCKER_DIR} && docker-compose up
+}
+
+status_of_guacamole_service() {
+    cd ${GUACAMOLE_DOCKER_DIR} && docker-compose ps
+}
+
+stop_guacamole_service() {
+    cd ${GUACAMOLE_DOCKER_DIR} && docker-compose down
+}
+
+install() {
+    cd $GUACAMOLE_DOCKER_DIR_PARENT
+    git clone pwyoung/guacamole-docker-compose.git
+}
+
+if [ $# -eq 0 ]; then
+    show_help
+    exit 1
+fi
+
+while [ $# -gt 0 ]
+do
+  case $1 in
+      -h) show_help
+          exit 0
+	  ;;
+      -i) install
+	  shift
+	  ;;
+      -x) start_guacamole_service
+	  shift
+	  ;;
+      -s) status_of_guacamole_service
+	  shift
+	  ;;
+      -S) stop_guacamole_service
+	  shift
+	  ;;
+      -*) echo "$0: $1: unrecognized option" >&2
+	  exit 1
+	  ;;
+      **) break
+	  ;;
+  esac
+done
