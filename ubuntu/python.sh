@@ -14,8 +14,8 @@ if [ ! -e python3 ]; then
 fi
 
 # Activate the environment on login
-mkdir -p ~/.private.d
-echo 'source ~/virtualenv/python3/bin/activate' > ~/.private.d/python.sh
+mkdir -p ~/.profile.d
+echo 'source ~/virtualenv/python3/bin/activate' > ~/.profile.d/python.sh
 
 source ~/.bash_profile
 

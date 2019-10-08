@@ -1,13 +1,15 @@
 #!/bin/bash
 # GOAL: Switch between VirtualBox and Libvirt(for KVM)
 
-VB_SVC='vboxautostart-service.service vboxballoonctrl-service.service vboxdrv.service vboxweb-service.service'
+VB_SVC='vboxautostart-service vboxballoonctrl-service vboxdrv vboxweb-service'
 KVM_SVC='libvirtd'
 
 show_help() {
     echo "Usage: $0 [options]"
-    echo "-k: activate KVM (and turn off VirtualBox services)."
-    echo "-v: activate Virtualbox (and turn off KVM services)"
+    echo "-k: activate KVM, and turn off VirtualBox services)."
+    echo "-v: activate Virtualbox, and turn off KVM services"
+    echo "-s: status of Virtualbox and KVM services"
+    echo "-S: Stop Virtualbox and KVM services"
 }
 
 err_handler() {
@@ -19,42 +21,46 @@ trap 'err_handler $LINENO' ERR
 virtualbox_stop() {
     for i in $VB_SVC; do
 	echo "stop service $i"
-	sudo systemctl stop $i
+	sudo systemctl stop "$i.service"
+	sudo systemctl disable "$i.service"
     done
 }
 
 virtualbox_start() {
     for i in $VB_SVC; do
 	echo "start service $i"
-	sudo systemctl start $i
+	sudo systemctl start "$i.service"
+	sudo systemctl enable "$i.service"
     done
 }
 
 virtualbox_status() {
     for i in $VB_SVC; do
 	echo "status service $i"
-	sudo systemctl status $i    
+	sudo systemctl status "$i.service"
     done
 }
 
 kvm_stop() {
     for i in $KVM_SVC; do
 	echo "stop service $i"
-	sudo systemctl stop $i
+	sudo systemctl stop "$i.service"
+	sudo systemctl disable "$i.service"
     done
 }
 
 kvm_start() {
     for i in $KVM_SVC; do
 	echo "start service $i"
-	sudo systemctl start $i
+	sudo systemctl start "$i.service"
+	sudo systemctl enable "$i.service"
     done
 }
 
 kvm_status() {
     for i in $KVM_SVC; do
 	echo "status service $i"
-	sudo systemctl status $i    
+	sudo systemctl status "$i.service"
     done
 }
 
@@ -77,6 +83,15 @@ do
       -k) virtualbox_stop
 	  kvm_start
 	  kvm_status
+	  shift
+	  ;;
+      -s) systemctl list-units --type=service --state=running | egrep -i 'vbox|vagrant|kvm|virt|qemu'	  
+	  #virtualbox_status
+	  #kvm_status
+	  shift
+	  ;;
+      -S) virtualbox_stop
+	  kvm_stop
 	  shift
 	  ;;
       -*) echo "$0: $1: unrecognized option" >&2

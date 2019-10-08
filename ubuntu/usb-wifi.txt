@@ -1,3 +1,5 @@
+# WORKS, BUT DECIDED TO GET ONE THAT WORKS OOB
+
 # https://tacticalware.com/install-alfa-awus036ach-drivers-on-ubuntu-18-04/
 
 apt install wireless-tools
