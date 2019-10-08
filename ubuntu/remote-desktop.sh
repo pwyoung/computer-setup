@@ -1,4 +1,26 @@
 ################################################################################
+# VNC Server
+################################################################################
+sudo apt install tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer
+
+vncpasswd
+
+cat <<EOF > ~/.vnc/xstartup
+#!/bin/sh
+# Start Gnome 3 Desktop 
+[ -x /etc/vnc/xstartup ] && exec /etc/vnc/xstartup
+[ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
+vncconfig -iconic &
+dbus-launch --exit-with-session gnome-session &
+EOF
+
+# Test connection (locally)
+# There was an xserver running, so this is on ":2"
+xtigervncviewer -SecurityTypes VncAuth -passwd /home/pyoung/.vnc/passwd :2
+# Enter password (sent cleartext)
+xtigervncviewer -SecurityTypes VncAuth :2
+
+################################################################################
 # Set up FQDN on host
 ################################################################################
 # Use domainname "local"
@@ -15,8 +37,6 @@ https://docs.docker.com/install/linux/docker-ce/ubuntu/
 ################################################################################
 # Guacamole
 ################################################################################
-cd ...
-
 git clone https://github.com/boschkundendienst/guacamole-docker-compose.git
 
 # Edit prepare.sh
@@ -34,8 +54,6 @@ docker-compose up -d
 # Disable guacadmin user
 # Add normal user
 
-################################################################################
-# VNC Server
-################################################################################
-sudo apt install tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer
+# Connections from remote machines must use the IP of the target machine
+# (until/unless I set up SSL and DNS better...)
 
