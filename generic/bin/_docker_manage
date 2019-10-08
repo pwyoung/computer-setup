@@ -1,0 +1,78 @@
+#!/bin/bash
+
+show_help() {
+    echo "Usage: $0 [options]"
+    echo "-c: clean docker. Remove dangling images and ALL STOPPED containers"
+    echo "-s: status of docker service"
+    echo "-x: start docker service"
+    echo "-S: stop docker service"
+}
+
+err_handler() {
+    echo "Exiting due to error on line $1"
+    exit 1
+}
+trap 'err_handler $LINENO' ERR
+
+clean_docker() {
+    echo "Killing dangling images"
+    docker rmi -f $(docker images --filter "dangling=true" -q --no-trunc)
+
+    echo "Kill all stopped containers? (enter Y to continue)"
+    read OK
+    echo $OK
+    if [ "$OK" == "Y" ]; then
+	echo "Removing all stopped containers"
+	docker rm $(docker ps -a | grep Exit | cut -d ' ' -f 1)
+    fi
+}
+
+start_docker_service() {
+    systemctl start docker.service
+    systemctl enable docker.service
+}
+
+status_of_docker_service() {
+    echo "SERVICE STATUS"
+    systemctl list-units --type=service --state=running | grep -i docker
+    #systemctl status docker.service
+    echo "RUNNING DOCKER CONTAINERS"
+    docker ps -a    
+}
+
+stop_docker_service() {
+    systemctl stop docker.service
+    systemctl disable docker.service
+}
+
+
+if [ $# -eq 0 ]; then
+    show_help
+    exit 1
+fi
+
+while [ $# -gt 0 ]
+do
+  case $1 in
+      -h) show_help
+          exit 0
+	  ;;
+      -c) clean_docker
+	  shift
+	  ;;
+      -x) start_docker_service
+	  shift
+	  ;;
+      -s) status_of_docker_service
+	  shift
+	  ;;
+      -S) stop_docker_service
+	  shift
+	  ;;
+      -*) echo "$0: $1: unrecognized option" >&2
+	  exit 1
+	  ;;
+      **) break
+	  ;;
+  esac
+done
