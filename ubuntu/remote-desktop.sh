@@ -21,6 +21,14 @@ xtigervncviewer -SecurityTypes VncAuth -passwd /home/pyoung/.vnc/passwd :2
 xtigervncviewer -SecurityTypes VncAuth :2
 
 ################################################################################
+# RDP SERVER
+################################################################################
+
+sudo apt -y install freerdp2-shadow-x11 | tee ~/freerdp.install.txt
+
+Did not work. Docs are limited. Skipping this for now.
+
+################################################################################
 # Set up FQDN on host
 ################################################################################
 # Use domainname "local"
