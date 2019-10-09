@@ -5,11 +5,32 @@
 # Firefox:
   - sync
 
+# Gnome Extension Firefox Plugin
+  - https://extensions.gnome.org/
+# Extensions installed (and manager)
+  - https://extensions.gnome.org/local/
+# Extensions Manager (in panel)
+  - https://extensions.gnome.org/extension/1036/extensions/
+# Added extensions
+  - https://extensions.gnome.org/extension/307/dash-to-dock/
+  - https://extensions.gnome.org/extension/904/disconnect-wifi/
+  - https://extensions.gnome.org/extension/906/sound-output-device-chooser/
+  - https://extensions.gnome.org/extension/120/system-monitor/
+  - https://extensions.gnome.org/extension/1460/vitals/
+  - https://extensions.gnome.org/extension/1218/printers/
+  - https://extensions.gnome.org/extension/7/removable-drive-menu/
+  - https://extensions.gnome.org/extension/1206/clock-override/
+  - https://extensions.gnome.org/extension/839/analog-clock/
+
+
+# Conveniences
+  - sudo dnf install emacs-nox htop 
+
 # Software:
   - dash-to-panel
 
 # Timeshift:
-  - yum install -y timeshift \
+  - dnf install -y timeshift
 
 # Conveniences:
   - yum install -y htop emacs-nox make
