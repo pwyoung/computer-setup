@@ -107,15 +107,15 @@ sudo apt install -y libcups2-dev libclalsadrv-dev libxcb-xkb-dev libxkbcommon-de
 sudo apt install -y libxinerama-dev libxcursor-dev libxv-dev
 cmake .
 
-
+# BUILD GUACAMOLE
+git clone git://github.com/glyptodon/guacamole-server.git
+cd ./guacamole-server
 sudo apt install libpango1.0-dev libssh2-1-dev
 sudo apt install libpulse-dev
 sudo apt install libwebp-dev
 sudo apt install libogg-dev libvorbis-dev libvorbisidec-dev
 sudo apt install libtelnet-dev
 sudo apt install libavcodec-dev libavutil-dev libswscale-dev
-
-
 
 configure
 
