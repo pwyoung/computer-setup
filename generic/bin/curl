@@ -1,2 +1,0 @@
-#!/bin/sh
-uname -a | grep -i darwin && /usr/local/opt/curl/bin/curl $@ || /usr/bin/curl $@

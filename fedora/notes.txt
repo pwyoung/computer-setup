@@ -1,5 +1,5 @@
 ###############################################################################
-# GIVING UP ON FEDORA FOR NOW
+# FEDORA... AGAIN
 ################################################################################
 
 # Firefox:
@@ -22,7 +22,6 @@
   - https://extensions.gnome.org/extension/1206/clock-override/
   - https://extensions.gnome.org/extension/839/analog-clock/
 
-
 # Conveniences
   - sudo dnf install emacs-nox htop 
 
@@ -39,122 +38,181 @@
   - sudo systemctl start sshd
   - sudo systemctl enable Sshd  
 
-# RPMFUSION:
-  - https://docs.fedoraproject.org/en-US/quick-docs/setup_rpmfusion/
-    - Free
-      - sudo dnf install \
-        https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-    - NonFree
-      - sudo dnf install \
-        https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-    - Appstream
-      - sudo dnf groupupdate core
+# Check repos enabled (via software manager)
+  - dnf repolist enabled
+*fedora
+*fedora-modular
+google-chrome
+*rpmfusion-nonfree-nvidia-driver
+*rpmfusion-nonfree-steam
+*updates
+*updates-modular
 
 # exfat (for portable usb)
   - dnf install -y fuse-exfat
   
-# Setup repo:
-  - mkdir -p ~/git/pwyoung && cd $_ && git clone https://github.com/pwyoung/computer-setup.git
-
-# Git:
-  - cd ~/ && \
-    ln -s ./git/pwyoung/computer-setup/generic/git/.gitconfig ./ && \
-    ln -s ./git/pwyoung/computer-setup/generic/git/.gitignore ./
-  - config
-    git config --global user.name "pwyoung"
-    git config --global user.email "----@gmail.com"
-    
-# ~/bin:
-  - cd ~/ && \
-    ln -s git/pwyoung/computer-setup/generic/bin ./bin
-
-# BASH
-  - cd ~/ && \
-    mkdir -p ~/_Archive && \
-    mv ./.bash_profile ~/_Archive/ && \
-    ln -s git/pwyoung/computer-setup/generic/home/.bash_profile ./
+# Setup Personal Computer-setup repo and links:
+  - Repo
+    - mkdir -p ~/git/pwyoung && cd $_ && git clone https://github.com/pwyoung/computer-setup.git
+  - Git
+    - cd ~/ && \
+      ln -s ./git/pwyoung/computer-setup/generic/git/.gitconfig ./ && \
+      ln -s ./git/pwyoung/computer-setup/generic/git/.gitignore ./
+  - ~/bin:
+    - cd ~/ && \
+      ln -s git/pwyoung/computer-setup/generic/bin ./bin
+  - BASH
+    - cd ~/ && \
+      ln -s git/pwyoung/computer-setup/generic/home/.bash_profile ./
   - Terminal: "run command as login shell"
+  - Python3
+    - Log in. Python3 will be set up using venv.
+      - which python
+      - python --version
 
 # NVIDIA:
   - Docs:
     - open https://rpmfusion.org/Howto/NVIDIA#Latest.2FBeta_driver
   - Stop screen flicker:
     - Set refresh rate of monitor lower (28Hz on 4k)
-## Take snapshots after each successful reboot
-## update os
-sudo dnf update
-sudo dnf upgrade
-##Update Kernel (and reboot)
-sudo dnf install "kernel-devel == $(uname -r)"
-sudo dnf update -y
-reboot
-## install AKMOD drivers
-sudo dnf install   https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-sudo dnf install   https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-sudo dnf --releasever=30 install akmod-nvidia xorg-x11-drv-nvidia --nogpgcheck
-reboot
-## install acceleration drivers 
-sudo dnf install vdpauinfo libva-vdpau-driver libva-utils
-vdpauinfo | less
-vainfo | less # Has an error which is fixed with reboot
-reboot
-## Install additional optional components
-sudo dnf install vulkan
-sudo dnf install xorg-x11-drv-nvidia-cuda
-reboot
-
-# Now, resizing (smaller and then back) works
-  - resize to 2560x1440 (visibility on 4k)
-  - Font mono-18
+  -  Now, resizing (smaller and then back) works
+    - resize to 2560x1440 (visibility on 4k)
+    - Font mono-18
 
 # Atom:
   - wget https://atom.io/download/rpm -O atom.rpm
   - sudo dnf localinstall atom.rpm
 
-# Virtualbox
-  - Docs
-    - https://www.if-not-true-then-false.com/2010/install-virtualbox-with-yum-on-fedora-centos-red-hat-rhel/
-  - Commands
-    - become root
-    - cd /etc/yum.repos.d/ && wget http://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
-    - dnf update
-    - dnf install binutils gcc make patch libgomp glibc-headers glibc-devel kernel-headers kernel-devel dkms qt5-qtx11extras libxkbcommon
-    - dnf install VirtualBox-6.0
-    - /usr/lib/virtualbox/vboxdrv.sh setup
-    - usermod -a -G vboxusers pyoung
-# Virtualbox Guest Additions
-  - Docs
-    - https://www.if-not-true-then-false.com/2010/install-virtualbox-guest-additions-on-fedora-centos-red-hat-rhel/
-  - Commands
-    - https://www.virtualbox.org/wiki/Downloads
-    - Get "VirtualBox <VERSION> Oracle VM VirtualBox Extension Pack"
-
-# Python
-mkdir -p ~/virtualenv && cd $_ && if [ ! -e python3 ]; then python3 -m venv python3; fi
-mkdir -p ~/.private.d && echo 'source ~/virtualenv/python3/bin/activate' > ~/.private.d/python.sh
-
-# Vagrant
-  - THIS FAILS... THE VAGRANT VERSION DOES NOT WORK...
-    - https://developer.fedoraproject.org/tools/vagrant/vagrant-virtualbox.html
-    - sudo dnf install vagrant
-  - INSTEAD, install "Linux 64-bit" binary" from
-    - https://www.vagrantup.com/downloads.html
-    - Put it in /usr/local/bin
-  - Set virtualbox as the default provider (for now anyway)
-    - mkdir -p ~/.profile.d && echo 'export VAGRANT_DEFAULT_PROVIDER=virtualbox' > ~/.profile.d/vagrant.sh
-
-# KVM
-  - dnf update && dnf install virt-manager libvirt
-  - includes python3-libvirt and libvirt-bash-completion
-
-# Vagrant-Libvirt
-  - Docs
-    - https://github.com/vagrant-libvirt/vagrant-libvirt/issues/951
-  - Steps
-    - sudo dnf install qemu libvirt libvirt-devel ruby-devel gcc qemu-kvm
-    - CONFIGURE_ARGS="with-libvirt-include=/usr/include/libvirt with-libvirt-lib=/usr/lib64" vagrant plugin install vagrant-libvirt
-  
+################################################################################
+# QEMU/KVM LIBVIRT
+################################################################################
 
 # TODO
-- https://rpmfusion.org/Howto/CUDA
+  - I might have just neded to do this:
+    - https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
+      - sudo dnf groupinstall virtualization
+  - And then add libvirt support to vagrant
+    - dnf update && dnf install vagrant-libvirt
 
+# LIBVIRT
+  - UNINSTALL
+    - dnf remove libvirt-libs
+    - rm -rf /var/lib/libvirt
+  - REINSTALL
+    - dnf update && dnf install virt-manager
+  - DETAILS
+    - qemu:///system
+
+# CLI
+  - dnf install libvirt-client
+  - sudo su- 
+    virsh list --all
+
+# Broke and restored access by non-root
+  - https://www.poftut.com/use-virt-manager-libvirt-normal-user-without-root-privileges-without-asking-password/
+    - If necessary, replace the polkit rule
+cat <<EOF > /etc/polkit-1/rules.d/80-libvirt.rules
+polkit.addRule(function(action, subject) {
+ if (action.id == "org.libvirt.unix.manage" && subject.local && subject.active && subject.isInGroup("libvirt")) {
+ return polkit.Result.YES;
+ }
+});
+EOF
+
+# SET UP qemu:///system on /data on external drive
+#   REPLACE the default storage pool (for QEMU/KVM 
+create /data (on separate drive)
+  - edit /etc/fstab
+    - /dev/sdb1 /mnt/data                    xfs    defaults,x-systemd.device-timeout=0 1 2
+  - sudomount /mnt/data    
+  - sudo ln -s /mnt/data /data
+  - sudo ls /data
+create /data/libvirt_images:
+  - mkdir /data/libvirt_images
+    - chmod 771 /data/libvirt_images
+    - chgrp qemu /data/libvirt_images
+  - May not be needed (kept selinux label)
+    - ls -lZd /data/libvirt_images
+      - drwxrwx--x. 2 root qemu system_u:object_r:virt_image_t:s0 31 Oct 10 15:51 /data/libvirt_images
+virt-manager:
+  - select QEMU/KVM (session)
+  - edit connection
+  - Storage:
+    - stop and remove "default" (pool)
+    - create a new "default" (pool) on /data/  
+
+# Check libvirt  
+  - systemctl list-units --type=service --state=running | egrep -i 'libvirt'
+libvirtd.service                             loaded active running Virtualization daemon   
+
+# SET UP qemu:///session
+  - add normal user to groups
+    - usermod -a -G pyoung kvm
+    - usermod -a -G pyoung libvirt
+    - usermod -a -G pyoung qemu
+  -  virt-manager -> File -> Add connection (user session)
+  - setup QEMU bridge
+    - https://blog.christophersmart.com/2016/08/31/configuring-qemu-bridge-helper-after-access-denied-by-acl-file-error/
+
+################################################################################
+# VAGRANT WITH LIBVIRT
+################################################################################
+
+# Vagrant (seems to only run as root)
+  - Install Vagrant and provider for Libvirt 
+    - sudo dnf install vagrant-libvitr
+  - Test
+    - sudo su -
+      vagrant box add centos/7 --name centos/7 --provider=libvirt
+  - dd
+    - https://computingforgeeks.com/how-to-install-vagrant-and-virtualbox-on-fedora/
+    - sudo dnf -y install wget
+
+################################################################################
+# Check setup 
+################################################################################
+
+# Check Virtualization setup
+virt-host-validate
+
+# Add IOMMU support
+  https://docs.fedoraproject.org/en-US/fedora/rawhide/system-administrators-guide/kernel-module-driver-configuration/Working_with_the_GRUB_2_Boot_Loader/
+  # First, make sure the config is up to date (no changes shown in diff)
+  sudo grub2-mkconfig -o /root/grub.cfg
+  sudo diff /root/grub.cfg /boot/grub2/grub.cfg
+  # Make changes
+  sudo emacs /etc/default/grub # add intel_iommu=on to the existing GRUB_CMDLINE_LINUX 
+  sudo grub2-mkconfig -o /root/grub.cfg
+  sudo diff /root/grub.cfg /boot/grub2/grub.cfg
+  # Overwrite config file
+  sudo cp /root/grub.cfg /boot/grub2/grub.cfg #for BIOS systems
+  # chmod 664 /boot/grub2/grub.cfg # preserve perms
+  # UEFI sytems: /boot/efi/EFI/fedora/grub.cfg
+
+# Allow KVM nesting
+  https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
+
+
+################################################################################
+# MISC
+################################################################################
+
+# TODO
+- https://developer.fedoraproject.org/tools/vagrant/vagrant-virtualbox.html
+- https://rpmfusion.org/Howto/CUDA
+- CloudBase
+  - https://alt.fedoraproject.org/cloud/
+  - Fedora30
+    - https://app.vagrantup.com/fedora/boxes/30-cloud-base
+
+# PCI PASSTHROUGH SUPPORT
+  https://docs.fedoraproject.org/en-US/Fedora/13/html/Virtualization_Guide/chap-Virtualization-PCI_passthrough.html
+# Check Nvidia setup
+lspci -nnk | grep -i nvidia
+05:00.0 VGA compatible controller [0300]: NVIDIA Corporation GP104 [GeForce GTX 1080] [10de:1b80] (rev a1)
+	Kernel driver in use: nvidia
+	Kernel modules: nouveau, nvidia_drm, nvidia
+05:00.1 Audio device [0403]: NVIDIA Corporation GP104 High Definition Audio Controller [10de:10f0] (rev a1)
+# Find iommy device
+ sudo find /sys/kernel/iommu_groups/ -type l | grep '05:00.0'
+/sys/kernel/iommu_groups/27/devices/0000:05:00.0
