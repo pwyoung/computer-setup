@@ -22,6 +22,19 @@
   - https://extensions.gnome.org/extension/1206/clock-override/
   - https://extensions.gnome.org/extension/839/analog-clock/
 
+# THEMES
+# GTK THEME
+git clone https://github.com/vinceliuice/Mojave-gtk-theme.git
+cd Mojave-gtk-theme
+./install.sh
+Use gnome-tweak to set APPLICATION (GTK) theme
+# ICON THEME
+mkdir -p ~/.icons && cd $_
+git clone https://github.com/zayronxio/Mojave-CT.git
+Use gnome-tweak to set ICON theme
+
+
+
 # Conveniences
   - sudo dnf install emacs-nox htop 
 
