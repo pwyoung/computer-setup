@@ -1,0 +1,27 @@
+rename-window  'WORK'
+
+# bind-q shows the pane numbers
+
+# 0 | 1
+# -----
+# 2
+splitw -v -p 50 -t 0
+selectp -t 0
+splitw -h -p 50 -t 0
+
+#send-keys 'cd "$PATH_IN_TMUX"' 'C-m' 'vagrant ssh' 'C-m' 'sudo su -' 'C-m' 'ls /' 'C-m'
+
+selectp -t 0
+send-keys 'cd /repos/pwy_susan_stuff' 'C-m' 
+
+selectp -t 1
+send-keys 'cd /repos/pwy_susan_stuff' 'C-m' 
+
+selectp -t 2
+send-keys 'cd /repos/pwy_susan_stuff' 'C-m' 
+
+
+
+
+
+

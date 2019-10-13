@@ -1,0 +1,25 @@
+rename-window  'REMOTE'
+
+#PATH_IN_TMUX=/n/aws-platform-deploy/edgenode/
+
+
+# bind-q shows the pane numbers
+
+# 0 | 1
+# -----
+# 2
+splitw -v -p 50 -t 0
+selectp -t 0
+splitw -h -p 50 -t 0
+
+
+#send-keys 'cd "$PATH_IN_TMUX"' 'C-m' 'vagrant ssh' 'C-m' 'sudo su -' 'C-m' 'ls /' 'C-m'
+
+selectp -t 0
+send-keys 'j' 'C-m' 
+
+
+
+
+
+

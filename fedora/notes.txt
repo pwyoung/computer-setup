@@ -14,14 +14,14 @@
 # Added extensions
   - https://extensions.gnome.org/extension/307/dash-to-dock/
   - https://extensions.gnome.org/extension/120/system-monitor/
-  - https://extensions.gnome.org/extension/1460/vitals/  
+  - https://extensions.gnome.org/extension/1460/vitals/
+  - https://extensions.gnome.org/extension/839/analog-clock/  
 # Gravy
   - https://extensions.gnome.org/extension/904/disconnect-wifi/
+# Off  
   - https://extensions.gnome.org/extension/906/sound-output-device-chooser/
   - https://extensions.gnome.org/extension/1218/printers/
   - https://extensions.gnome.org/extension/7/removable-drive-menu/
-  - https://extensions.gnome.org/extension/1206/clock-override/
-  - https://extensions.gnome.org/extension/839/analog-clock/
 
 # THEMES
 dnf install gnome-tweak-tool
@@ -174,6 +174,12 @@ libvirtd.service                             loaded active running Virtualizatio
   - dd
     - https://computingforgeeks.com/how-to-install-vagrant-and-virtualbox-on-fedora/
     - sudo dnf -y install wget
+
+################################################################################
+# Atom
+################################################################################
+
+apm install atomic-emacs
 
 ################################################################################
 # Check setup 
