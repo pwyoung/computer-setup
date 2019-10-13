@@ -13,16 +13,18 @@
   - https://extensions.gnome.org/extension/1036/extensions/
 # Added extensions
   - https://extensions.gnome.org/extension/307/dash-to-dock/
+  - https://extensions.gnome.org/extension/120/system-monitor/
+  - https://extensions.gnome.org/extension/1460/vitals/  
+# Gravy
   - https://extensions.gnome.org/extension/904/disconnect-wifi/
   - https://extensions.gnome.org/extension/906/sound-output-device-chooser/
-  - https://extensions.gnome.org/extension/120/system-monitor/
-  - https://extensions.gnome.org/extension/1460/vitals/
   - https://extensions.gnome.org/extension/1218/printers/
   - https://extensions.gnome.org/extension/7/removable-drive-menu/
   - https://extensions.gnome.org/extension/1206/clock-override/
   - https://extensions.gnome.org/extension/839/analog-clock/
 
 # THEMES
+dnf install gnome-tweak-tool
 # GTK THEME
 git clone https://github.com/vinceliuice/Mojave-gtk-theme.git
 cd Mojave-gtk-theme
@@ -33,23 +35,15 @@ mkdir -p ~/.icons && cd $_
 git clone https://github.com/zayronxio/Mojave-CT.git
 Use gnome-tweak to set ICON theme
 
-
-
 # Conveniences
-  - sudo dnf install emacs-nox htop 
-
-# Software:
-  - dash-to-panel
+  - sudo dnf install emacs-nox htop make
 
 # Timeshift:
   - dnf install -y timeshift
 
-# Conveniences:
-  - yum install -y htop emacs-nox make
-
 # SSHD:
   - sudo systemctl start sshd
-  - sudo systemctl enable Sshd  
+  - sudo systemctl enable sshd  
 
 # Check repos enabled (via software manager)
   - dnf repolist enabled
