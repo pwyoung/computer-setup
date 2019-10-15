@@ -72,10 +72,6 @@ google-chrome
     - cd ~/ && \
       ln -s git/pwyoung/computer-setup/generic/home/.bash_profile ./
   - Terminal: "run command as login shell"
-  - Python3
-    - Log in. Python3 will be set up using venv.
-      - which python
-      - python --version
 
 # NVIDIA:
   - Docs:
@@ -89,6 +85,20 @@ google-chrome
 # Atom:
   - wget https://atom.io/download/rpm -O atom.rpm
   - sudo dnf localinstall atom.rpm
+
+################################################################################
+# PYTHONS
+################################################################################
+
+https://developer.fedoraproject.org/tech/languages/python/multiple-pythons.html
+sudo dnf install tox
+
+# https://dev.to/codemouse92/dead-simple-python-virtual-environments-and-pip-5b56
+# Note: tox includes 'sudo dnf python3-virtualenv python3-pip'
+
+mkdir ~/virtualenv && cd $_
+virtualenv -p python3 python3
+
 
 ################################################################################
 # QEMU/KVM LIBVIRT
