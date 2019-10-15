@@ -1,0 +1,32 @@
+#!/bin/sh
+
+setup_venv() {
+    VENV_DIR=~/venv/python3
+    if [ ! -d ${VENV_DIR} ]; then
+        echo "Creating venv dir ${VENV_DIR}"
+        python3 -m venv ${VENV_DIR}
+    fi
+    source ${VENV_DIR}/bin/activate
+}
+setup_venv
+
+setup_virtualenv() {
+    # https://dev.to/codemouse92/dead-simple-python-virtual-environments-and-pip-5b56
+    # sudo dnf install tox
+    # Or
+    # sudo dnf python3-virtualenv python3-pip
+    if [ ! -e ~/virtualenv/python3 ]; then
+        if command -v virtualenv 2>/dev/null; then
+            mkdir -p ~/virtualenv && cd $_ && virtualenv -p python3 python3
+        else
+            echo "Can't install ~/virtualenv/python3."
+        if
+    fi
+
+    if [ ! -e ~/virtualenv/python3 ]; then
+        source ~/virtualenv/python3/bin/activate
+    fi
+}
+#setup_virtualenv
+
+
