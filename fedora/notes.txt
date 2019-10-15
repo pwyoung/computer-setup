@@ -182,6 +182,19 @@ libvirtd.service                             loaded active running Virtualizatio
 apm install atomic-emacs
 
 ################################################################################
+# YQ (and snapd)
+################################################################################
+
+https://snapcraft.io/install/yq/fedora
+  sudo dnf install snapd
+  sudo ln -s /var/lib/snapd/snap /snap
+  sudo snap install yq
+
+https://mikefarah.github.io/yq/read/
+
+echo 'a: "bcd"' | yq r - a
+
+################################################################################
 # Check setup 
 ################################################################################
 
