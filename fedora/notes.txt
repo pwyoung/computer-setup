@@ -228,18 +228,35 @@ virt-host-validate
 # Allow KVM nesting
   https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
 
+################################################################################
+# Firewalling
+################################################################################
+
+# Use existing firewalld
+
+Add Gui:
+  - dnf install firewall-config
+Change Rules:
+  - Set zone for interfaces to "home" except
+  - Set zone for ethernet and wireless to "public"
+Test:
+  - Change rules in gui (for "public" zone)
+  - Print rules:
+    - iptables -L -n
+    - iptables -L
+  - Use netcat to test
+    - Add/remove "mysql" service (port 3306)
+    - server:
+      - nc -k -l 3306
+    - client:
+      - nc -n -v <IP> 3306
+Save Rules:
+  FirewallConfig -> Options -> RunTimeToPermanent
+
 
 ################################################################################
 # MISC
 ################################################################################
-
-# TODO
-- https://developer.fedoraproject.org/tools/vagrant/vagrant-virtualbox.html
-- https://rpmfusion.org/Howto/CUDA
-- CloudBase
-  - https://alt.fedoraproject.org/cloud/
-  - Fedora30
-    - https://app.vagrantup.com/fedora/boxes/30-cloud-base
 
 # PCI PASSTHROUGH SUPPORT
   https://docs.fedoraproject.org/en-US/Fedora/13/html/Virtualization_Guide/chap-Virtualization-PCI_passthrough.html
