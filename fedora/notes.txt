@@ -253,6 +253,62 @@ Test:
 Save Rules:
   FirewallConfig -> Options -> RunTimeToPermanent
 
+################################################################################
+# RDP: not working. Abandonded for now
+################################################################################
+# 
+dnf -y install xrdp 
+systemctl status xrdp
+ systemctl list-units --type=service --state=running | egrep -i 'libvirt'
+
+# Show services and ports that are known to firewalld
+firewall-cmd --list-services
+firewall-cmd --list-ports
+# Show trusted zone details
+sudo firewall-cmd --zone=trusted --list-sources
+
+# SNAFUs:
+#   - Can't use the GUI to create a (temporary) service.
+#   - Can't use the GUI to create a "source" (IP)
+#
+# Add trusted IPs to the "trusted" zone
+# Wired and wireless trusted laptop
+sudo firewall-cmd --zone=trusted --add-source=10.250.0.117
+sudo firewall-cmd --zone=trusted --add-source=192.168.1.166
+sudo firewall-cmd --runtime-to-permanent
+
+################################################################################
+# Guacamole
+################################################################################
+https://kifarunix.com/how-to-install-and-configure-guacamole-on-fedora-29/
+
+################################################################################
+# Editors
+################################################################################
+Emacs
+Atom
+VsCode
+  - https://code.visualstudio.com/docs/setup/linux#_rhel-fedora-and-centos-based-distributions
+JetBrains
+
+PlantUml
+  - Docs
+    - Options to run
+      - http://plantuml.com/running
+  - Editors
+    - VsCode
+     - https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml  
+    - Atom
+      - https://atom.io/packages/plantuml-viewer
+      - https://atom.io/packages/plantuml-preview
+    - Online Editor (can use emacs or Vim keybindings)
+      - http://www.plantuml.com/plantuml/uml/SoWkIImgAStDuShBJqbLA4ajBk5oICrB0Oe00000
+      - http://sujoyu.github.io/plantuml-previewer/
+  - Rendering
+    -
+    - https://blog.yuzutech.fr/blog/plantuml-extension-render-diagrams/index.html
+
+
 
 ################################################################################
 # MISC

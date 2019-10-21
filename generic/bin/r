@@ -1,4 +1,1 @@
-#!/bin/sh
-S=/repos/pwyoung/ceph-testing/code/run.sh
-echo "Running $S $@"
-sh /repos/pwyoung/ceph-testing/code/run.sh $@
+/home/pyoung/git/pwyoung/kdevops-proposals/new-code/runner
