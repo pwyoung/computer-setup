@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# GOAL:
+#     If working on a playboo and using the ./build/ tool
+#     then link to the current directory to speed up dev
+#     This allows us to do ./build/run-playbooks.sh to run
+#     the current playbook
+
+PLAYBOOK=$(basename $(pwd))
+
+# Remove the original playbook.
+if [ -e ./build/playbooks/${PLAYBOOK}.ORIG ]; then
+    rm -f ./build/playbooks/${PLAYBOOK}.ORIG &>/dev/null || true 
+    rm -rf ./build/playbooks/${PLAYBOOK}.ORIG &>/dev/null || true
+fi
+
+mv ./build/playbooks/${PLAYBOOK} ./build/playbooks/${PLAYBOOK}.ORIG
+
+ln -s $(pwd) ./build/playbooks/${PLAYBOOK}
+
