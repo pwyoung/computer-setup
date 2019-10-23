@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # GOAL:
-#     If working on a playboo and using the ./build/ tool
+#     If working on a playbook and using the ./build/ tool
 #     then link to the current directory to speed up dev
 #     This allows us to do ./build/run-playbooks.sh to run
 #     the current playbook
