@@ -1,6 +1,6 @@
 #!/bin/sh
 
-GIVEN_MSG="$1"
+GIVEN_MSG="$@"
 DEFAULT_MSG='wip'
 MSG=${GIVEN_MSG:-$DEFAULT_MSG}
 echo "MSG: ${MSG}"
