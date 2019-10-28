@@ -18,13 +18,13 @@ clean_docker() {
     echo "Killing dangling images"
     docker rmi -f $(docker images --filter "dangling=true" -q --no-trunc)
 
-    echo "Kill all stopped containers? (enter Y to continue)"
-    read OK
-    echo $OK
-    if [ "$OK" == "Y" ]; then
-	echo "Removing all stopped containers"
-	docker rm $(docker ps -a | grep Exit | cut -d ' ' -f 1)
-    fi
+    #echo "Kill all stopped containers? (enter Y to continue)"
+    #read OK
+    #echo $OK
+    #if [ "$OK" == "Y" ]; then
+    #	echo "Removing all stopped containers"
+    #	docker rm $(docker ps -a | grep Exit | cut -d ' ' -f 1)
+    #fi
 }
 
 start_docker_service() {
@@ -37,7 +37,7 @@ status_of_docker_service() {
     systemctl list-units --type=service --state=running | grep -i docker
     #systemctl status docker.service
     echo "RUNNING DOCKER CONTAINERS"
-    docker ps -a    
+    docker ps -a
 }
 
 stop_docker_service() {
