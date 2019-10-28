@@ -83,8 +83,19 @@ google-chrome
     - Font mono-18
 
 # Atom:
-  - wget https://atom.io/download/rpm -O atom.rpm
-  - sudo dnf localinstall atom.rpm
+  - basic
+    - wget https://atom.io/download/rpm -O atom.rpm
+    - sudo dnf localinstall atom.rpm
+  - git
+    - ln ./.../generic/dot_atom ~/.atom
+  - packages
+    - https://atom.io/packages/platformio-ide-terminal
+    - https://atom.io/packages/term2
+    - https://atom.io/packages/atom-terminal
+      - apm install atom-terminal
+  - Zoom
+    - https://github.com/atom/atom/issues/11905#issuecomment-224865625
+  
 
 ################################################################################
 # PYTHONS
@@ -98,6 +109,9 @@ sudo dnf install tox
 
 mkdir ~/virtualenv && cd $_
 virtualenv -p python3 python3
+
+mkdir ~/virtualenv && cd $_
+virtualenv -p python2 python2
 
 
 ################################################################################

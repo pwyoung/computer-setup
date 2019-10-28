@@ -1,2 +1,34 @@
 #!/bin/bash
-atom $@
+
+# Some Atom packages seem to need Python2...
+if python --version | grep 'Python 3.' >/dev/null; then
+    if [ ! -d ~/venv/python2 ]; then
+        ~/venv && cd $_ && python3 -m venv python2
+    fi
+fi
+
+
+# FAIL TO INSTALL
+#
+# https://atom.io/packages/term2
+#if [ ! -d ~/.atom/packages/term2 ]; then
+#    PATH=~/venv/python2/bin:$PATH apm install term2
+#fi
+#
+# apm install term3
+#PKG=term3
+#if [ ! -d ~/.atom/packages/$PKG ]; then
+#    PATH=~/venv/python2/bin:$PATH apm install $PKG
+#fi
+
+# Works. Can't close term with binding from inside terminal
+# https://atom.io/packages/platformio-ide-terminal
+PKG=platformio-ide-terminal
+if [ ! -d ~/.atom/packages/$PKG ]; then
+    PATH=~/venv/python2/bin:$PATH apm install $PKG
+fi
+
+# Add zoom
+#  https://github.com/atom/atom/issues/11905#issuecomment-224865625
+
+PATH=~/venv/python2/bin:$PATH atom $@

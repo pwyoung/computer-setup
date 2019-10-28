@@ -1,0 +1,1 @@
+{"body":{"shift-left":"pane:show-next-item","shift-right":"pane:show-previous-item"},".platform-linux atom-workspace, .platform-win32 atom-workspace":{"alt-shift-T":"platformio-ide-terminal:new","alt-shift-X":"platformio-ide-terminal:close"}}
