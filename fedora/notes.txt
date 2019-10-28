@@ -186,6 +186,20 @@ libvirtd.service                             loaded active running Virtualizatio
     - sudo dnf -y install wget
 
 ################################################################################
+# DOCKER
+################################################################################
+
+# See https://developer.fedoraproject.org/tools/docker/compose.html
+sudo dnf install docker
+sudo systemctl start docker
+sudo systemctl enable docker
+
+sudo groupadd docker && sudo gpasswd -a ${USER} docker && sudo systemctl restart docker
+newgrp docker
+
+sudo dnf install docker-compose
+
+################################################################################
 # Atom
 ################################################################################
 
