@@ -14,14 +14,19 @@ clear
 echo "$SEP"
 echo "# GIT REMOTES"
 echo "$SEP"
+echo ""
 git remote -v | grep '(push)' | awk '{print $1, $2}' | sort
 
+echo ""
 echo "$SEP"
 echo "# GIT STATUS"
 echo "$SEP"
+echo ""
 git status
 
+echo ""
 echo "$SEP"
 echo "# GIT LOG"
 echo "$SEP"
+echo ""
 git --no-pager log | head -20
