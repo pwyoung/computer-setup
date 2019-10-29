@@ -114,13 +114,11 @@
                     },
                     {
                         "id": "workbench.action.files.save",
-                        "label": "&&Save",
-                        "enabled": false
+                        "label": "&&Save"
                     },
                     {
                         "id": "workbench.action.files.saveAs",
-                        "label": "Save &&As...",
-                        "enabled": false
+                        "label": "Save &&As..."
                     },
                     {
                         "id": "workbench.action.files.saveAll",
@@ -579,7 +577,8 @@
                     },
                     {
                         "id": "workbench.action.navigateToLastEditLocation",
-                        "label": "&&Last Edit Location"
+                        "label": "&&Last Edit Location",
+                        "enabled": false
                     },
                     {
                         "id": "vscode.menubar.separator"
@@ -746,13 +745,11 @@
                     },
                     {
                         "id": "workbench.action.debug.stop",
-                        "label": "&&Stop Debugging",
-                        "enabled": false
+                        "label": "&&Stop Debugging"
                     },
                     {
                         "id": "workbench.action.debug.restart",
-                        "label": "&&Restart Debugging",
-                        "enabled": false
+                        "label": "&&Restart Debugging"
                     },
                     {
                         "id": "vscode.menubar.separator"
@@ -770,23 +767,19 @@
                     },
                     {
                         "id": "workbench.action.debug.stepOver",
-                        "label": "Step &&Over",
-                        "enabled": false
+                        "label": "Step &&Over"
                     },
                     {
                         "id": "workbench.action.debug.stepInto",
-                        "label": "Step &&Into",
-                        "enabled": false
+                        "label": "Step &&Into"
                     },
                     {
                         "id": "workbench.action.debug.stepOut",
-                        "label": "Step O&&ut",
-                        "enabled": false
+                        "label": "Step O&&ut"
                     },
                     {
                         "id": "workbench.action.debug.continue",
-                        "label": "&&Continue",
-                        "enabled": false
+                        "label": "&&Continue"
                     },
                     {
                         "id": "vscode.menubar.separator"
@@ -1146,10 +1139,6 @@
             "editor.action.insertCursorAtEndOfEachLineSelected": {
                 "label": "Shift+Alt+I",
                 "userSettingsLabel": "shift+alt+i"
-            },
-            "editor.action.addSelectionToNextFindMatch": {
-                "label": "Ctrl+D",
-                "userSettingsLabel": "ctrl+d"
             },
             "editor.action.selectHighlights": {
                 "label": "Ctrl+Shift+L",
