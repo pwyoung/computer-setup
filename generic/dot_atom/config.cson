@@ -15,7 +15,7 @@
       "core:linux"
     ]
   editor:
-    fontSize: 21
+    fontSize: 23
   "exception-reporting":
     userId: "14ecedb1-091e-4adb-955a-a333bcd756af"
   welcome:

@@ -1,0 +1,44 @@
+file:///home/pyoung/git/current/kdevops-proposals/new-code/components/docker/Makefile {"mtime":1572361306639,"size":979,"etag":"344borfpa10i","orphaned":false}
+MAKEFILE_PATH=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+
+BUILD_DIR?=$(MAKEFILE_PATH)../../build
+CONF_YAML?=$(BUILD_DIR)/config.yaml
+
+DOCKER_DIR=$(BUILD_DIR)/docker
+
+.PHONY=all test build clean FORCE
+.PHONY+=create_docker_files install_python_requirements
+
+all: test
+
+test: run
+	$(info Testing Docker)
+	@ls -ltrad ${DOCKER_DIR}/*
+
+run: build
+	$(info Running Docker)
+	cd $(DOCKER_DIR) && \
+	docker-compose up
+
+build: create_docker_files
+
+create_docker_files: install_python_requirements
+	$(info Creating Docker files)
+	@mkdir -p ${DOCKER_DIR} && \
+	cd $(MAKEFILE_PATH)python && \
+	python3 create-docker-files.py \
+	  --config-file=$(CONF_YAML) \
+	  --docker-dir=$(DOCKER_DIR)
+
+install_python_requirements: FORCE
+	$(info Installing Python requirements)
+	@cd $(MAKEFILE_PATH)python && \
+	  python3 --version && \
+	  pip3 -q install -r requirements.txt
+
+clean:
+	$(info Cleaning Docker in $(DOCKER_DIR))
+	@-cd $(DOCKER_DIR) && \
+	docker-compose down &>/dev/null || true
+
+FORCE:

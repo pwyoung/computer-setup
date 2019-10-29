@@ -2,6 +2,7 @@
     "telemetry.machineId": "fd7049acefef1f19a9d551e6d6f30e4d57c282cf3d4709efbcd6aaee015b9b56",
     "openedPathsList": {
         "workspaces3": [
+            "file:///home/pyoung/git/current",
             "file:///home/pyoung/git/pwyoung",
             "file:///home/pyoung",
             "file:///home/pyoung/git"
@@ -51,7 +52,18 @@
                                     "id": "openRecentFolder",
                                     "uri": {
                                         "$mid": 1,
-                                        "fsPath": "/home/pyoung/git/pwyoung",
+                                        "fsPath": "/home/pyoung/git/current",
+                                        "external": "file:///home/pyoung/git/current",
+                                        "path": "/home/pyoung/git/current",
+                                        "scheme": "file"
+                                    },
+                                    "enabled": true,
+                                    "label": "~/git/current"
+                                },
+                                {
+                                    "id": "openRecentFolder",
+                                    "uri": {
+                                        "$mid": 1,
                                         "external": "file:///home/pyoung/git/pwyoung",
                                         "path": "/home/pyoung/git/pwyoung",
                                         "scheme": "file"
@@ -397,8 +409,7 @@
                                 },
                                 {
                                     "id": "workbench.action.togglePanel",
-                                    "label": "Show &&Panel",
-                                    "checked": true
+                                    "label": "Show &&Panel"
                                 },
                                 {
                                     "id": "vscode.menubar.separator"
@@ -577,8 +588,7 @@
                     },
                     {
                         "id": "workbench.action.navigateToLastEditLocation",
-                        "label": "&&Last Edit Location",
-                        "enabled": false
+                        "label": "&&Last Edit Location"
                     },
                     {
                         "id": "vscode.menubar.separator"
@@ -745,11 +755,13 @@
                     },
                     {
                         "id": "workbench.action.debug.stop",
-                        "label": "&&Stop Debugging"
+                        "label": "&&Stop Debugging",
+                        "enabled": false
                     },
                     {
                         "id": "workbench.action.debug.restart",
-                        "label": "&&Restart Debugging"
+                        "label": "&&Restart Debugging",
+                        "enabled": false
                     },
                     {
                         "id": "vscode.menubar.separator"
@@ -767,19 +779,23 @@
                     },
                     {
                         "id": "workbench.action.debug.stepOver",
-                        "label": "Step &&Over"
+                        "label": "Step &&Over",
+                        "enabled": false
                     },
                     {
                         "id": "workbench.action.debug.stepInto",
-                        "label": "Step &&Into"
+                        "label": "Step &&Into",
+                        "enabled": false
                     },
                     {
                         "id": "workbench.action.debug.stepOut",
-                        "label": "Step O&&ut"
+                        "label": "Step O&&ut",
+                        "enabled": false
                     },
                     {
                         "id": "workbench.action.debug.continue",
-                        "label": "&&Continue"
+                        "label": "&&Continue",
+                        "enabled": false
                     },
                     {
                         "id": "vscode.menubar.separator"
@@ -844,7 +860,8 @@
                     },
                     {
                         "id": "workbench.action.terminal.split",
-                        "label": "&&Split Terminal"
+                        "label": "&&Split Terminal",
+                        "enabled": false
                     },
                     {
                         "id": "vscode.menubar.separator"
@@ -1402,12 +1419,12 @@
     "themeBackground": "#1e1e1e",
     "windowsState": {
         "lastActiveWindow": {
-            "folder": "file:///home/pyoung/git/pwyoung",
-            "backupPath": "/home/pyoung/.config/Code/Backups/58a0c260fbbca843e5df303389cac3f1",
+            "folder": "file:///home/pyoung/git/current",
+            "backupPath": "/home/pyoung/.config/Code/Backups/d8f0c2d06b99b15ed580d5b1aec747b8",
             "uiState": {
                 "mode": 0,
                 "x": 2053,
-                "y": 197,
+                "y": 223,
                 "width": 1919,
                 "height": 1079
             }

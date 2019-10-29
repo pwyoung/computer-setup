@@ -1,0 +1,61 @@
+{
+	"name": "vscode-make",
+	"displayName": "Make",
+	"description": "Run Make easily",
+	"version": "1.0.2",
+	"publisher": "technosophos",
+	"license": "MIT",
+	"icon": "images/icon.png",
+	"engines": {
+		"vscode": "^1.25.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		"make",
+		"makefile"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/technosophos/vscode-make.git"
+	},
+	"activationEvents": [
+		"onCommand:extension.runMake",
+		"onCommand:extension.runMakeByTarget"
+	],
+	"main": "./out/extension",
+	"contributes": {
+		"commands": [
+			{
+				"command": "extension.runMake",
+				"category": "Make",
+				"title": "Make"
+			},
+			{
+				"command": "extension.runMakeByTarget",
+				"category": "Make",
+				"title": "Target"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "npm run compile && node ./node_modules/vscode/bin/test"
+	},
+	"devDependencies": {
+		"typescript": "^2.6.1",
+		"vscode": "^1.1.6",
+		"tslint": "^5.8.0",
+		"@types/node": "^7.0.43",
+		"@types/mocha": "^2.2.42"
+	},
+	"__metadata": {
+		"id": "76fdf657-c5d0-44ae-8603-9a9344dc2076",
+		"publisherId": "53fb6691-f5e1-4836-a6f2-f774e1211fec",
+		"publisherDisplayName": "technosophos"
+	}
+}

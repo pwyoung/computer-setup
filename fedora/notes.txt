@@ -349,8 +349,18 @@ Notes:
       - Leaping Frog Studios
         - Uses system clipboard for kill ring (could be useful)
           - https://marketplace.visualstudio.com/items?itemName=lfs.vscode-emacs-friendly
-
-
+  - Vagrantfile 
+    - https://marketplace.visualstudio.com/items?itemName=bbenoist.vagrant
+  - Make
+    - Is now built in, per this:
+      - https://naereen.github.io/Makefiles-support-for-VSCode/
+    - FAILS: 
+      - https://github.com/microsoft/vscode/blob/master/extensions/make/syntaxes/make.tmLanguage.json#L8
+    - Use External TASK
+      - Tasks
+        - https://code.visualstudio.com/docs/editor/tasks
+      - Task for Makefile
+        - https://gist.github.com/mattmc3/c021236c92c03b61d92c0ff233940643
   - Shell
     - https://marketplace.visualstudio.com/items?itemName=bbenoist.shell
   - Python

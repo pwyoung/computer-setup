@@ -1,0 +1,36 @@
+{
+	"name": "VS-code-vagrantfile",
+	"displayName": "Vagrantfile Support",
+	"description": "Provides syntax highlighting support for Vagrantfile, useful if you use Vagrant",
+	"version": "0.0.7",
+	"engines": {
+		"vscode": "1.x.x"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mastazi/VS-code-vagrantfile.git"
+	},
+	"license": "SEE LICENSE IN LICENSE.txt",
+	"icon": "images/icon.png",
+	"categories": [
+		"Other"
+	],
+	"publisher": "marcostazi",
+	"contributes": {
+		"languages": [
+			{
+				"id": "ruby",
+				"filenames": [
+					"Vagrantfile",
+					".vagrantuser",
+					"Vagrantfile.local"
+				]
+			}
+		]
+	},
+	"__metadata": {
+		"id": "d0febfc8-15fa-4951-bad7-ad5c9682af4a",
+		"publisherId": "e4af32d3-5e04-469d-9ac5-ca8cb108422d",
+		"publisherDisplayName": "Marco Stazi"
+	}
+}
