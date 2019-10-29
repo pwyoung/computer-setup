@@ -1007,9 +1007,9 @@
                 "userSettingsLabel": "ctrl+o"
             },
             "workbench.action.files.openFolder": {
-                "label": "Ctrl+K Ctrl+O",
+                "label": "Ctrl+X Ctrl+F",
                 "isNative": false,
-                "userSettingsLabel": "ctrl+k ctrl+o"
+                "userSettingsLabel": "ctrl+x ctrl+f"
             },
             "workbench.action.reopenClosedEditor": {
                 "label": "Ctrl+Shift+T",
@@ -1020,12 +1020,19 @@
                 "userSettingsLabel": "ctrl+r"
             },
             "workbench.action.files.save": {
-                "label": "Ctrl+S",
-                "userSettingsLabel": "ctrl+s"
+                "label": "Ctrl+X Ctrl+S",
+                "isNative": false,
+                "userSettingsLabel": "ctrl+x ctrl+s"
             },
             "workbench.action.files.saveAs": {
-                "label": "Ctrl+Shift+S",
-                "userSettingsLabel": "ctrl+shift+s"
+                "label": "Ctrl+X Ctrl+W",
+                "isNative": false,
+                "userSettingsLabel": "ctrl+x ctrl+w"
+            },
+            "workbench.action.files.saveAll": {
+                "label": "Ctrl+X S",
+                "isNative": false,
+                "userSettingsLabel": "ctrl+x s"
             },
             "workbench.action.openSettings": {
                 "label": "Ctrl+,",
@@ -1052,8 +1059,9 @@
                 "userSettingsLabel": "ctrl+k ctrl+t"
             },
             "workbench.action.closeActiveEditor": {
-                "label": "Ctrl+W",
-                "userSettingsLabel": "ctrl+w"
+                "label": "Ctrl+X K",
+                "isNative": false,
+                "userSettingsLabel": "ctrl+x k"
             },
             "workbench.action.closeFolder": {
                 "label": "Ctrl+K F",
@@ -1061,8 +1069,8 @@
                 "userSettingsLabel": "ctrl+k f"
             },
             "workbench.action.closeWindow": {
-                "label": "Ctrl+W",
-                "userSettingsLabel": "ctrl+w"
+                "label": "Ctrl+Shift+W",
+                "userSettingsLabel": "ctrl+shift+w"
             },
             "workbench.action.quit": {
                 "label": "Ctrl+Q",
@@ -1076,10 +1084,6 @@
                 "label": "Ctrl+Y",
                 "userSettingsLabel": "ctrl+y"
             },
-            "editor.action.clipboardCutAction": {
-                "label": "Ctrl+X",
-                "userSettingsLabel": "ctrl+x"
-            },
             "editor.action.clipboardCopyAction": {
                 "label": "Ctrl+C",
                 "userSettingsLabel": "ctrl+c"
@@ -1089,8 +1093,8 @@
                 "userSettingsLabel": "ctrl+v"
             },
             "actions.find": {
-                "label": "Ctrl+F",
-                "userSettingsLabel": "ctrl+f"
+                "label": "Ctrl+R",
+                "userSettingsLabel": "ctrl+r"
             },
             "editor.action.startFindReplaceAction": {
                 "label": "Ctrl+H",
@@ -1105,21 +1109,23 @@
                 "userSettingsLabel": "ctrl+shift+h"
             },
             "editor.action.commentLine": {
-                "label": "Ctrl+/",
+                "label": "Ctrl+;",
                 "isNative": false,
-                "userSettingsLabel": "ctrl+/"
+                "userSettingsLabel": "ctrl+;"
             },
             "editor.action.blockComment": {
-                "label": "Ctrl+Shift+A",
-                "userSettingsLabel": "ctrl+shift+a"
+                "label": "Alt+;",
+                "isNative": false,
+                "userSettingsLabel": "alt+;"
             },
             "editor.emmet.action.expandAbbreviation": {
                 "label": "Tab",
                 "userSettingsLabel": "tab"
             },
             "editor.action.selectAll": {
-                "label": "Ctrl+A",
-                "userSettingsLabel": "ctrl+a"
+                "label": "Ctrl+X H",
+                "isNative": false,
+                "userSettingsLabel": "ctrl+x h"
             },
             "editor.action.smartSelect.expand": {
                 "label": "Shift+Alt+Right",
@@ -1157,13 +1163,17 @@
                 "label": "Shift+Alt+I",
                 "userSettingsLabel": "shift+alt+i"
             },
+            "editor.action.addSelectionToNextFindMatch": {
+                "label": "Ctrl+Alt+N",
+                "userSettingsLabel": "ctrl+alt+n"
+            },
             "editor.action.selectHighlights": {
                 "label": "Ctrl+Shift+L",
                 "userSettingsLabel": "ctrl+shift+l"
             },
             "workbench.action.showCommands": {
-                "label": "Ctrl+Shift+P",
-                "userSettingsLabel": "ctrl+shift+p"
+                "label": "Alt+X",
+                "userSettingsLabel": "alt+x"
             },
             "workbench.action.toggleFullScreen": {
                 "label": "F11",
@@ -1311,8 +1321,9 @@
                 "userSettingsLabel": "ctrl+k ctrl+down"
             },
             "workbench.action.quickOpen": {
-                "label": "Ctrl+P",
-                "userSettingsLabel": "ctrl+p"
+                "label": "Ctrl+X B",
+                "isNative": false,
+                "userSettingsLabel": "ctrl+x b"
             },
             "workbench.action.showAllSymbols": {
                 "label": "Ctrl+T",
@@ -1322,13 +1333,19 @@
                 "label": "Ctrl+Shift+O",
                 "userSettingsLabel": "ctrl+shift+o"
             },
+            "editor.action.goToDeclaration": {
+                "label": "Alt+.",
+                "isNative": false,
+                "userSettingsLabel": "alt+."
+            },
             "editor.action.goToImplementation": {
                 "label": "Ctrl+F12",
                 "userSettingsLabel": "ctrl+f12"
             },
             "workbench.action.gotoLine": {
-                "label": "Ctrl+G",
-                "userSettingsLabel": "ctrl+g"
+                "label": "Alt+G G",
+                "isNative": false,
+                "userSettingsLabel": "alt+g g"
             },
             "editor.action.jumpToBracket": {
                 "label": "Ctrl+Shift+\\",

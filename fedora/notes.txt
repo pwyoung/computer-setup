@@ -339,16 +339,9 @@ Notes:
     - Keymap Marketplace
       - https://marketplace.visualstudio.com/search?target=VSCode&category=Keymaps&sortBy=Relevance
   - Emacs
-    - Discussion
-      - https://www.reddit.com/r/emacs/comments/8h1cxa/any_long_time_emacs_users_tried_vscode/
-    - Keybindings
-      - RobertK
-        - https://marketplace.visualstudio.com/items?itemName=rkwan94.vscode-emacs-improved
-          - "Improves" on
-            - https://marketplace.visualstudio.com/items?itemName=hiro-sun.vscode-emacs
-      - Leaping Frog Studios
-        - Uses system clipboard for kill ring (could be useful)
-          - https://marketplace.visualstudio.com/items?itemName=lfs.vscode-emacs-friendly
+    - https://marketplace.visualstudio.com/items?itemName=rkwan94.vscode-emacs-improved
+      - Based on the one VSCODE recommends:
+        - https://marketplace.visualstudio.com/items?itemName=hiro-sun.vscode-emacs
   - Vagrantfile 
     - https://marketplace.visualstudio.com/items?itemName=bbenoist.vagrant
   - Make
