@@ -94,7 +94,10 @@ google-chrome
     - https://atom.io/packages/atom-terminal
       - apm install atom-terminal
     - EMACS:
-      - https://github.com/dvorka/atom-editor-emacs-key-bindings/blob/master/keymap.cson
+      - Unmap control-k
+        - https://github.com/avendael/atomic-emacs/issues/75
+      - Manual keybindings
+        - https://github.com/dvorka/atom-editor-emacs-key-bindings/blob/master/keymap.cson
   - Zoom
     - https://github.com/atom/atom/issues/11905#issuecomment-224865625
   - Keybinding conflicts
@@ -319,12 +322,25 @@ https://kifarunix.com/how-to-install-and-configure-guacamole-on-fedora-29/
 # Editors
 ################################################################################
 Emacs
+
 Atom
+
 VsCode
+  - Snap
+    -  snap install code --classic
+  - FAIL
+    - https://fedoraproject.org/wiki/Visual_Studio_Code
+      - flatpak install https://flathub.org/repo/appstream/com.visualstudio.code.flatpakref
+  
   - https://code.visualstudio.com/docs/setup/linux#_rhel-fedora-and-centos-based-distributions
+
 JetBrains
 
-PlantUml
+################################################################################
+# PlantUml
+################################################################################
+
+- Notes
   - Docs
     - Options to run
       - http://plantuml.com/running
@@ -341,7 +357,14 @@ PlantUml
     -
     - https://blog.yuzutech.fr/blog/plantuml-extension-render-diagrams/index.html
 
+################################################################################
+# JAVA
+################################################################################
 
+- Java 13:
+  - https://computingforgeeks.com/how-to-install-java-13-on-centos-fedora/
+    - Releases:
+      - https://jdk.java.net/13/
 
 ################################################################################
 # MISC
