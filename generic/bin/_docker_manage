@@ -16,31 +16,17 @@ trap 'err_handler $LINENO' ERR
 
 clean_docker() {
     IMAGES=$(docker images --filter "dangling=true" -q --no-trunc)
-<<<<<<< HEAD
     COUNT=${#IMAGES}
     if [ $COUNT -gt 0 ]; then
         echo "Removing $COUNT dangling images"
         docker rmi -f ${IMAGES}
     fi
-    
+
     CONTAINERS=$(docker ps -a | grep Exit | cut -d ' ' -f 1)
     COUNT=${#CONTAINERS}
     if [ $COUNT -gt 0 ]; then
         echo "Removing $COUNT stopped containers"
         docker rm ${CONTAINERS}
-=======
-    COUNT=$(echo $IMAGES | wc -w)
-    if [ $COUNT -gt 0 ]; then
-	echo "Killing dangling images"
-	docker rmi -f ${IMAGES}
-    fi
-
-    STOPPED_CONTAINERS=$(docker ps -a | grep Exit | cut -d ' ' -f 1)
-    COUNT=$(echo $STOPPED_CONTAINERS | wc -w)
-    if [ $COUNT -gt 0 ]; then
-	echo "Removing stopped containers"
-	docker rm ${STOPPED_CONTAINERS}
->>>>>>> 314e33dac8f072b60efddf680b0bc2a14d3d6bc6
     fi
 }
 
