@@ -319,22 +319,52 @@ sudo firewall-cmd --runtime-to-permanent
 https://kifarunix.com/how-to-install-and-configure-guacamole-on-fedora-29/
 
 ################################################################################
-# Editors
-################################################################################
-Emacs
+# Emacs
 
 Atom
 
 VsCode
-  - Snap
-    -  snap install code --classic
-  - FAIL
-    - https://fedoraproject.org/wiki/Visual_Studio_Code
-      - flatpak install https://flathub.org/repo/appstream/com.visualstudio.code.flatpakref
-  
-  - https://code.visualstudio.com/docs/setup/linux#_rhel-fedora-and-centos-based-distributions
+################################################################################
+Notes:
+  - Install
+    - snap install code --classic
+  - Extensions
+    - General
+      - https://code.visualstudio.com/docs/editor/extension-gallery
+  - Extentions
+    - Click on the tetris icon on the left to show extensions
+    - Put "@installed" in the extensions dialog
+  - Keybindings
+    - https://code.visualstudio.com/docs/getstarted/keybindings
+    - Keymap Marketplace
+      - https://marketplace.visualstudio.com/search?target=VSCode&category=Keymaps&sortBy=Relevance
+  - Emacs
+    - Discussion
+      - https://www.reddit.com/r/emacs/comments/8h1cxa/any_long_time_emacs_users_tried_vscode/
+    - Keybindings
+      - RobertK
+        - https://marketplace.visualstudio.com/items?itemName=rkwan94.vscode-emacs-improved
+          - "Improves" on
+            - https://marketplace.visualstudio.com/items?itemName=hiro-sun.vscode-emacs
+      - Leaping Frog Studios
+        - Uses system clipboard for kill ring (could be useful)
+          - https://marketplace.visualstudio.com/items?itemName=lfs.vscode-emacs-friendly
 
-JetBrains
+
+  - Shell
+    - https://marketplace.visualstudio.com/items?itemName=bbenoist.shell
+  - Python
+    - Install
+      - https://code.visualstudio.com/docs/python/python-tutorial
+    - Set Interpreter
+      - https://stackoverflow.com/questions/50993566/vscode-there-is-no-pip-installer-available-in-the-selected-environment
+      - "ctrl-shift-p" search for and click on my ~/venv/ option
+    - Run from IDE
+      - https://stackoverflow.com/questions/29987840/how-to-execute-python-code-from-within-visual-studio-code
+    - Python Indenter
+      - https://marketplace.visualstudio.com/items?itemName=KevinRose.vsc-python-indent
+
+
 
 ################################################################################
 # PlantUml

@@ -1,0 +1,801 @@
+{
+	"name": "azure-hdinsight",
+	"displayName": "Spark & Hive Tools",
+	"description": "Spark & Hive Tools - PySpark Interactive Query, PySpark Batch, Hive Interactive Query, Hive Batch",
+	"version": "1.1.7",
+	"publisher": "mshdinsight",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/microsoft/Spark-Hive-Tools"
+	},
+	"bugs": {
+		"url": "https://github.com/microsoft/Spark-Hive-Tools/issues"
+	},
+	"icon": "resources/AzureSparkHive.png",
+	"engines": {
+		"vscode": "^1.23.0"
+	},
+	"categories": [
+		"Programming Languages",
+		"Azure",
+		"Other"
+	],
+	"keywords": [
+		"Azure",
+		"Azure HDInsight",
+		"Big Data",
+		"Hive",
+		"Spark",
+		"LLAP",
+		"SQL Server",
+		"Python",
+		"Notebook"
+	],
+	"license": "MIT",
+	"activationEvents": [
+		"onCommand:hdinsight.hive.submitHiveJob",
+		"onCommand:hdinsight.login",
+		"onCommand:hdinsight.linkCluster",
+		"onCommand:hdinsight.unlinkCluster",
+		"onCommand:hdinsight.logout",
+		"onCommand:hdinsight.setAzureEnvironment",
+		"onCommand:hdinsight.listCluster",
+		"onCommand:hdinsight.setCluster",
+		"onCommand:hdinsight.spark.submitPysparkJob",
+		"onCommand:hdinsight.spark.sparkDotnetReadme",
+		"onCommand:hdinsight.setConfiguration",
+		"onCommand:hdinsight.pyspark.interactive",
+		"onCommand:hdinsight.hivequerycancel",
+		"onCommand:hdinsight.sparkDotnet.generateSparkDotnetSampleProject",
+		"onCommand:hdinsight.sparkDotnet.addSparkDotnetDependency",
+		"onCommand:hdinsight.sparkDotnet.submitSparkDotnetToRemote",
+		"onCommand:hdinsight.sparkDotnet.submitLocal",
+		"onLanguage:hql",
+		"onLanguage:python"
+	],
+	"main": "./out/src/extension",
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "azure",
+					"title": "Azure",
+					"icon": "resources/azure.svg"
+				}
+			]
+		},
+		"grammars": [
+			{
+				"language": "hql",
+				"scopeName": "source.hive",
+				"path": "./syntaxes/hive.tmLanguage.json"
+			}
+		],
+		"configuration": {
+			"type": "object",
+			"title": "HDInsight configuration",
+			"properties": {
+				"hdinsightCluster.linkedClusters": {
+					"type": "array",
+					"description": "Linked clusters urls",
+					"default": {
+						"url": "{{Clsuter url}}",
+						"userName": "{{Cluster user name}}",
+						"type": "{{Cluser type}}"
+					},
+					"items": {
+						"type": "object",
+						"properties": {
+							"url": {
+								"type": "string",
+								"description": "Cluster connection URL. For examile: https://myClusterName.azurehdinsgiht.net",
+								"default": "{{Clsuter url}}"
+							},
+							"userName": {
+								"type": "string",
+								"description": "Ambari user name",
+								"default": "{{Cluster user name}}"
+							},
+							"type": {
+								"type": "string",
+								"description": "Cluster Type: Hive/Spark",
+								"default": "{{Cluser type}}"
+							}
+						}
+					}
+				},
+				"hqlLanguageServer.maxNumberOfProblems": {
+					"type": "number",
+					"default": 100,
+					"description": "Controls the maximum number of problems produced by the server."
+				},
+				"hqlLanguageServer.languageWrapperPort": {
+					"type": "number",
+					"default": 12342,
+					"description": "Hive language service port server listen to."
+				},
+				"hqlInteractiveServer.wrapperPort": {
+					"type": "number",
+					"default": 13424,
+					"description": "Hive interactive service port"
+				},
+				"hive.persistQueryResultTabs": {
+					"type": "boolean",
+					"default": false,
+					"description": "Hive PersistQueryResultTabs",
+					"scope": "window"
+				},
+				"hive.splitPaneSelection": {
+					"type": "string",
+					"description": "[Optional] Configuration options for which column new result panes should open in",
+					"default": "next",
+					"enum": [
+						"next",
+						"current",
+						"end"
+					]
+				},
+				"hdinsight.azureEnvironment": {
+					"type": "string",
+					"description": "Azure environment"
+				},
+				"hdinsight.resultsFontFamily": {
+					"type": "string",
+					"description": "Set the font family for the results grid; set to blank to use the editor font",
+					"default": "-apple-system,BlinkMacSystemFont,Segoe WPC,Segoe UI,HelveticaNeue-Light,Ubuntu,Droid Sans,sans-serif"
+				},
+				"hdinsight.resultsFontSize": {
+					"type": "number",
+					"description": "Set the font size for the results grid; set to blank to use the editor size",
+					"default": 13
+				},
+				"hdinsightHive.logDebugInfo": {
+					"type": "boolean",
+					"default": false,
+					"description": "[Optional] Log debug output to the VS Code console (Help -> Toggle Developer Tools)"
+				},
+				"hdinsightJobSumission.livyConf": {
+					"type": "object",
+					"description": "Livy Configuraiton. POST/batches",
+					"default": {
+						"file": null,
+						"proxyUser": null,
+						"className": null,
+						"args": null,
+						"jars": null,
+						"pyFiles": null,
+						"files": null,
+						"driverMemory": null,
+						"driverCores": null,
+						"executorMemory": null,
+						"executorCores": null,
+						"numExecutors": null,
+						"archives": null,
+						"queue": null,
+						"name": null,
+						"conf": null
+					},
+					"properties": {
+						"file": {
+							"description": "File containing the application to execute"
+						},
+						"proxyUser": {
+							"description": "User to impersonate when running the job"
+						},
+						"className": {
+							"description": "Application Java/Spark main class"
+						},
+						"args": {
+							"description": "Command line arguments for the application"
+						},
+						"jars": {
+							"description": "jars to be used in this session"
+						},
+						"pyFiles": {
+							"description": "Python files to be used in this session"
+						},
+						"files": {
+							"description": "files to be used in this session"
+						},
+						"driverMemory": {
+							"description": "Amount of memory to use for the driver process"
+						},
+						"driverCores": {
+							"description": "Number of cores to use for the driver process"
+						},
+						"executorMemory": {
+							"description": "Amount of memory to use per executor process"
+						},
+						"executorCores": {
+							"description": "Number of cores to use for each executor"
+						},
+						"numExecutors": {
+							"description": "Number of executors to launch for this session"
+						},
+						"archives": {
+							"description": "Archives to be used in this session"
+						},
+						"queue": {
+							"description": "The name of the YARN queue to which submitted"
+						},
+						"name": {
+							"description": "The name of this session"
+						},
+						"conf": {
+							"description": "Spark configuration properties"
+						}
+					}
+				},
+				"hdinsightJobSumission.ClusterConf": {
+					"type": "array",
+					"description": "Cluster Configuration",
+					"default": [],
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "Cluster Name"
+							},
+							"filePath": {
+								"type": "string",
+								"description": "Cluster File Path"
+							}
+						}
+					}
+				},
+				"hdinsightHive.shortcuts": {
+					"type": "object",
+					"description": "Shortcuts related to the results window",
+					"default": {
+						"_comment": "Short cuts must follow the format (ctrl)+(shift)+(alt)+[key]",
+						"event.toggleResultPane": "ctrl+alt+r",
+						"event.toggleMessagePane": "ctrl+alt+y",
+						"event.prevGrid": "ctrl+up",
+						"event.nextGrid": "ctrl+down",
+						"event.copySelection": "ctrl+c",
+						"event.copyWithHeaders": "",
+						"event.maximizeGrid": "",
+						"event.selectAll": "",
+						"event.saveAsJSON": "",
+						"event.saveAsCSV": "",
+						"event.saveAsExcel": ""
+					}
+				},
+				"hdinsightHive.messagesDefaultOpen": {
+					"type": "boolean",
+					"description": "True for the messages pane to be open by default; false for closed",
+					"default": true
+				},
+				"hdinsightHive.resultsFontFamily": {
+					"type": "string",
+					"description": "Set the font family for the results grid; set to blank to use the editor font",
+					"default": "-apple-system,BlinkMacSystemFont,Segoe WPC,Segoe UI,HelveticaNeue-Light,Ubuntu,Droid Sans,sans-serif"
+				},
+				"hdinsightHive.resultsFontSize": {
+					"type": "number",
+					"description": "Set the font size for the results grid; set to blank to use the editor size",
+					"default": 13
+				},
+				"hdinsightHive.saveAsCsv.includeHeaders": {
+					"type": "boolean",
+					"description": "[Optional] When true, column headers are included when saving results as CSV",
+					"default": true
+				},
+				"hdinsightHive.copyIncludeHeaders": {
+					"type": "boolean",
+					"description": "[Optional] Configuration options for copying results from the Results View",
+					"default": false
+				},
+				"hdinsightHive.copyRemoveNewLine": {
+					"type": "boolean",
+					"description": "[Optional] Configuration options for copying multi-line results from the Results View",
+					"default": true
+				},
+				"hdinsightHive.showBatchTime": {
+					"type": "boolean",
+					"description": "[Optional] Should execution time be shown for individual batches",
+					"default": false
+				},
+				"hdinsightHive.splitPaneSelection": {
+					"type": "string",
+					"description": "[Optional] Configuration options for which column new result panes should open in",
+					"default": "next",
+					"enum": [
+						"next",
+						"current",
+						"end"
+					]
+				},
+				"hdinsightHive.format.alignColumnDefinitionsInColumns": {
+					"type": "boolean",
+					"description": "Should column definitions be aligned?",
+					"default": false
+				},
+				"hdinsightHive.format.datatypeCasing": {
+					"type": "string",
+					"description": "Should data types be formatted as UPPERCASE, lowercase, or none (not formatted)",
+					"default": "none",
+					"enum": [
+						"none",
+						"uppercase",
+						"lowercase"
+					]
+				},
+				"hdinsightHive.format.keywordCasing": {
+					"type": "string",
+					"description": "Should keywords be formatted as UPPERCASE, lowercase, or none (not formatted)",
+					"default": "none",
+					"enum": [
+						"none",
+						"uppercase",
+						"lowercase"
+					]
+				},
+				"hdinsightHive.format.placeCommasBeforeNextStatement": {
+					"type": "boolean",
+					"description": "should commas be placed at the beginning of each statement in a list e.g. ', mycolumn2' instead of at the end e.g. 'mycolumn1,'",
+					"default": false
+				},
+				"hdinsightHive.format.placeSelectStatementReferencesOnNewLine": {
+					"type": "boolean",
+					"description": "Should references to objects in a select statements be split into separate lines? E.g. for 'SELECT C1, C2 FROM T1' both C1 and C2 will be on separate lines",
+					"default": false
+				},
+				"hdinsightHive.applyLocalization": {
+					"type": "boolean",
+					"description": "[Optional] Configuration options for localizing into VSCode's configured locale (must restart VSCode for settings to take effect)",
+					"default": false
+				},
+				"hdinsight.loginTipsEnable": {
+					"type": "boolean",
+					"default": true
+				},
+				"hdinsight.disableOpenSurveyLink": {
+					"type": "boolean",
+					"default": false,
+					"description": "disable opening hdinsight survey"
+				},
+				"hdinsightJupyter.pythonExtensionEnabled": {
+					"type": "boolean",
+					"description": "Use Python-Interactive-Window of ms-python extension when submitting pySpark Interactive jobs. Otherwise, use our own jupyter window",
+					"default": true
+				},
+				"hdinsightJupyter.notebook.startupFolder": {
+					"type": "string",
+					"default": "${workspaceRoot}",
+					"title": "Startup directory for Jupyter Notebook"
+				},
+				"hdinsightJupyter.notebook.startupArgs": {
+					"type": "array",
+					"description": "'jupyter notebook' command line arguments. Each argument is a separate item in the array. For a full list type 'jupyter notebook --help' in a terminal window.",
+					"default": [
+						"--no-browser",
+						"--port=8888",
+						"--NotebookApp.allow_origin=\"*\""
+					],
+					"items": {
+						"type": "string"
+					}
+				},
+				"hdinsightJupyter.appendResults": {
+					"type": "boolean",
+					"default": true,
+					"description": "Whether to append the results to results window, else clear and display."
+				},
+				"hdinsightJupyter.languages": {
+					"type": "array",
+					"description": "Default settings per language.",
+					"items": {
+						"type": "object",
+						"required": [
+							"languageId"
+						],
+						"properties": {
+							"languageId": {
+								"type": "string",
+								"title": "Language Identifier",
+								"description": "Language Id (lower case). (Select Language on bottom of VS Code editor, and quick pick list will display language ids in brackets)"
+							},
+							"defaultKernel": {
+								"type": "string",
+								"title": "Defalt Kernel",
+								"description": "Default kernel for the corresponding language"
+							},
+							"cellIdentificationPattern": {
+								"type": "string",
+								"title": "",
+								"description": "Regular Expression pattern used to identify Jupyter Cells"
+							},
+							"startupCode": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								},
+								"default": [],
+								"title": "Startup Code",
+								"description": "Code executed when the kernel starts. Such as '%matplotlib inline' for Python. Individual lines need to be placed as separate items of the array."
+							}
+						}
+					},
+					"default": [
+						{
+							"languageId": "python",
+							"startupCode": [
+								"%matplotlib inline"
+							],
+							"cellIdentificationPattern": "^(#\\s*%%|#\\s*\\<codecell\\>|#\\s*In\\[\\d*?\\]|#\\s*In\\[ \\])(.*)"
+						},
+						{
+							"languageId": "javascript",
+							"cellIdentificationPattern": "^(\\/\\/ %%|\\/\\/%%|\\/\\/ \\<codecell\\>|\\/\\/ In\\[\\d*?\\]|\\/\\/ In\\[ \\])(.*)"
+						}
+					]
+				},
+				"hdinsightSpark.NET.7z": {
+					"type": "string",
+					"default": "C:\\Program Files\\7-Zip",
+					"description": "<Path to 7z.exe>"
+				},
+				"hdinsightSpark.NET.JAVA_HOME": {
+					"type": "string",
+					"default": "C:\\Program Files\\Java\\jdk1.8.0_201\\",
+					"description": "<Path to Java Home>"
+				},
+				"hdinsightSpark.NET.SCALA_HOME": {
+					"type": "string",
+					"default": "C:\\Program Files (x86)\\scala\\",
+					"description": "<Path to Scala Home>"
+				},
+				"hdinsightSpark.NET.SPARK_HOME": {
+					"type": "string",
+					"default": "D:\\spark-2.3.3-bin-hadoop2.7\\",
+					"description": "<Path to Spark Home>"
+				},
+				"hdinsightSpark.NET.HADOOP_HOME": {
+					"type": "string",
+					"default": "D:\\winutils",
+					"description": "<Path to bin\\winutils.exe> windows OS only"
+				}
+			}
+		},
+		"keybindings": [
+			{
+				"command": "hdinsight.hive.submitHiveJob",
+				"key": "Ctrl+Alt+H",
+				"when": "editorLangId == 'hql'"
+			},
+			{
+				"command": "hdinsight.hive.interactiveHiveScript",
+				"key": "Ctrl+Alt+I",
+				"when": "editorLangId == 'hql'"
+			},
+			{
+				"command": "hdinsight.spark.submitPysparkJob",
+				"key": "Ctrl+Alt+H",
+				"when": "editorLangId == 'python'"
+			},
+			{
+				"command": "hdinsight.pyspark.interactive",
+				"key": "Ctrl+Alt+I",
+				"when": "editorLangId == 'python'"
+			}
+		],
+		"languages": [
+			{
+				"id": "hql",
+				"aliases": [
+					"hive"
+				],
+				"extensions": [
+					".hql",
+					".hive"
+				],
+				"configuration": "./hql.configuration.json"
+			}
+		],
+		"views": {
+			"azure": [
+				{
+					"id": "hdinsight.treeview",
+					"name": "HDInsight"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "hdinsight.treeview.cluster.openUrl",
+				"title": "open Url"
+			},
+			{
+				"command": "hdinsight.linkCluster",
+				"title": "Spark / Hive: Link a Cluster"
+			},
+			{
+				"command": "hdinsight.treeview.itemRefresh",
+				"title": "Refresh"
+			},
+			{
+				"command": "hdinsight.treeview.itemPreview",
+				"title": "Preview"
+			},
+			{
+				"command": "hdinsight.unlinkCluster",
+				"title": "Spark / Hive: Unlink a Cluster"
+			},
+			{
+				"command": "hdinsight.listCluster",
+				"title": "Spark / Hive: List Cluster"
+			},
+			{
+				"command": "hdinsight.setCluster",
+				"title": "Spark / Hive: Set Default Cluster"
+			},
+			{
+				"command": "hdinsight.hive.submitHiveJob",
+				"title": "Hive: Batch"
+			},
+			{
+				"command": "hdinsight.spark.submitPysparkJob",
+				"title": "Spark: PySpark Batch"
+			},
+			{
+				"command": "hdinsight.pyspark.interactive",
+				"title": "Spark: PySpark Interactive"
+			},
+			{
+				"command": "hdinsight.hivequerycancel",
+				"title": "Hive: Query Cancel"
+			},
+			{
+				"command": "hdinsight.setConfiguration",
+				"title": "Spark / Hive: Set Configuration"
+			},
+			{
+				"command": "hdinsight.hive.interactiveHiveScript",
+				"title": "Hive: Interactive"
+			}
+		],
+		"menus": {
+			"editor/title": [
+				{
+					"command": "hdinsight.listCluster"
+				},
+				{
+					"command": "hdinsight.setCluster"
+				},
+				{
+					"command": "hdinsight.hive.submitHiveJob",
+					"when": "hdinsight.hive"
+				},
+				{
+					"command": "hdinsight.hive.interactiveHiveScript",
+					"when": "hdinsight.hive"
+				},
+				{
+					"command": "hdinsight.spark.submitPysparkJob",
+					"when": "hdinsight.pyspark"
+				},
+				{
+					"command": "hdinsight.pyspark.interactive",
+					"when": "hdinsight.pyspark"
+				},
+				{
+					"command": "hdinsight.hivequerycancel",
+					"when": "hdinsight.hive"
+				}
+			],
+			"editor/context": [
+				{
+					"command": "hdinsight.listCluster",
+					"group": "hdinsight3@20"
+				},
+				{
+					"command": "hdinsight.setCluster",
+					"group": "hdinsight3@30"
+				},
+				{
+					"command": "hdinsight.setConfiguration",
+					"group": "hdinsight5@30"
+				},
+				{
+					"command": "hdinsight.hive.submitHiveJob",
+					"group": "hdinsight5@10",
+					"when": "hdinsight.hive"
+				},
+				{
+					"command": "hdinsight.hive.interactiveHiveScript",
+					"group": "hdinsight5@5",
+					"when": "hdinsight.hive"
+				},
+				{
+					"command": "hdinsight.spark.submitPysparkJob",
+					"group": "hdinsight5@20",
+					"when": "hdinsight.pyspark"
+				},
+				{
+					"command": "hdinsight.pyspark.interactive",
+					"group": "hdinsight5@25",
+					"when": "hdinsight.pyspark"
+				},
+				{
+					"command": "hdinsight.hivequerycancel",
+					"group": "hdinsight5@35",
+					"when": "hdinsight.hive"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "hdinsight.treeview.itemRefresh",
+					"when": "view == hdinsight.treeview && viewItem != hiveSchemaNode && viewItem != ADLMountPointNode && viewItem != BlobContainerNode && viewItem != ADLFolder  && viewItem != ADLStorageInfo && viewItem != BlobFolderInfo && viewItem != BlobStorageInfo"
+				},
+				{
+					"command": "hdinsight.treeview.itemPreview",
+					"when": "view == hdinsight.treeview && viewItem =~ /(HiveTableInfo|stoppedPreviewQuery|startingRefresh|stoppedRefresh)/  && viewItem != HdInsightCluster && viewItem != HiveDataBaseInfo && viewItem != HiveFolderInfo && viewItem != HdInsightCluster && viewItem != startingPreviewQuery &&viewItem != hiveSchemaNode && viewItem != ADLMountPointNode && viewItem != BlobContainerNode && viewItem != ADLFolder  && viewItem != ADLStorageInfo && viewItem != BlobFolderInfo && viewItem != BlobStorageInfo"
+				},
+				{
+					"command": "hdinsight.treeview.cluster.openUrl",
+					"when": "view == hdinsight.treeview && viewItem == HdInsightCluster"
+				}
+			],
+			"commandPalette": [],
+			"explorer/context": [
+				{
+					"command": "hdinsight.hive.submitHiveJob",
+					"when": "hdinsight.hive"
+				},
+				{
+					"command": "hdinsight.spark.submitPysparkJob",
+					"group": "hdinsight@1",
+					"when": "hdinsight.pyspark"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"compile": "tsc -watch -p ./",
+		"vscode:prepublish": "webpack -p --progress --colors",
+		"postinstall": "node ./node_modules/vscode/bin/install && cd src/views/htmlcontent && npm install",
+		"build": "gulp default --downloadlibrary",
+		"build-html": "gulp html",
+		"build-server": "gulp default --server",
+		"test": "node ./node_modules/vscode/bin/test"
+	},
+	"extensionDependencies": [
+		"ms-vscode.azure-account",
+		"ms-python.python"
+	],
+	"devDependencies": {
+		"@types/body-parser": "^1.16.5",
+		"@types/classnames": "^0.0.32",
+		"@types/cors": "^2.8.0",
+		"@types/express": "^4.0.35",
+		"@types/keytar": "^4.0.1",
+		"@types/mocha": "^2.2.47",
+		"@types/node": "^7.0.4",
+		"@types/query-string": "^3.0.31",
+		"@types/react": "^15.0.6",
+		"@types/react-dom": "^0.14.22",
+		"@types/react-redux": "^4.4.36",
+		"@types/react-router": "^3.0.0",
+		"@types/react-router-redux": "^4.0.39",
+		"@types/redux-actions": "^1.2.2",
+		"@types/rx": "^2.5.33",
+		"@types/socket.io": "^1.4.28",
+		"@types/socket.io-client": "^1.4.27",
+		"@types/tapable": "^0.2.5",
+		"@types/uuid": "^3.3.27",
+		"@types/webpack": "^2.2.4",
+		"@types/webpack-env": "^1.13.0",
+		"@types/ws": "0.0.42",
+		"awesome-typescript-loader": "^3.0.0-beta.18",
+		"classnames": "^2.2.5",
+		"copy-webpack-plugin": "^4.0.1",
+		"css-loader": "^0.26.1",
+		"extract-text-webpack-plugin": "^2.0.0-beta.5",
+		"file-loader": "^0.10.0",
+		"glob": "^7.1.2",
+		"gulp": "^4.0.0",
+		"gulp-clean-css": "^2.0.13",
+		"gulp-concat": "^2.6.1",
+		"gulp-install": "^1.1.0",
+		"gulp-minify": "^1.0.0",
+		"gulp-sequence": "^0.4.6",
+		"gulp-sourcemaps": "^2.6.1",
+		"gulp-tslint": "^8.1.2",
+		"gulp-typescript": "^3.2.1",
+		"gulp-uglify": "^2.0.0",
+		"gulp-util": "^3.0.8",
+		"html-loader": "^0.4.4",
+		"html-webpack-plugin": "^2.28.0",
+		"karma": "^1.3.0",
+		"mocha": "^2.5.3",
+		"moment-timezone": "^0.5.13",
+		"natives": "~1.1.6",
+		"postcss": "^5.2.11",
+		"postcss-browser-reporter": "^0.5.0",
+		"postcss-cssnext": "^2.9.0",
+		"postcss-import": "^9.1.0",
+		"postcss-loader": "^1.2.2",
+		"postcss-reporter": "^3.0.0",
+		"postcss-url": "^5.1.2",
+		"query-string": "^4.3.2",
+		"react": "^15.4.2",
+		"react-dom": "^15.4.2",
+		"react-hot-loader": "^1.3.1",
+		"react-json-tree": "^0.10.5",
+		"react-redux": "^5.0.2",
+		"react-router": "^3.0.2",
+		"react-router-redux": "^4.0.7",
+		"redux": "^3.6.0",
+		"redux-actions": "^1.2.1",
+		"socket.io-client": "^1.7.3",
+		"style-loader": "^0.13.1",
+		"systemjs-builder": "^0.15.32",
+		"tslint": "^4.5.1",
+		"tslint-eslint-rules": "^4.1.1",
+		"typescript": "^2.1.5",
+		"uglify-js": "mishoo/UglifyJS2#harmony-v2.8.22",
+		"unzip": "^0.1.11",
+		"url-loader": "^0.5.7",
+		"vsce": "^1.42.0",
+		"vscode": "^1.0.0",
+		"webpack": "^2.2.1",
+		"webpack-dev-server": "^2.2.0",
+		"webpack-hot-middleware": "^2.16.1",
+		"yargs": "https://registry.npmjs.org/yargs/-/yargs-3.32.0.tgz"
+	},
+	"dependencies": {
+		"@azure/arm-hdinsight": "^0.13.0",
+		"@azure/arm-storage": "^8.0.0",
+		"@azure/arm-subscriptions": "^1.0.0",
+		"@azure/ms-rest-js": "^1.8.1",
+		"@azure/ms-rest-nodeauth": "^0.9.1",
+		"@azure/storage-blob": "^10.3.0",
+		"@jupyterlab/services": "^0.34.2",
+		"adal-node": "^0.1.25",
+		"anser": "^1.1.0",
+		"azure-arm-datalake-store": "^2.1.0-preview",
+		"azure-arm-hdinsight-jobs": "^0.1.1",
+		"azure-common": "^0.9.19",
+		"azure-storage-legacy": "^0.10.2",
+		"body-parser": "^1.17.2",
+		"child-process-promise": "^2.2.1",
+		"comment-json": "^1.1.3",
+		"copy-paste": "^1.3.0",
+		"cors": "^2.8.4",
+		"ejs": "^2.5.7",
+		"express": "^4.15.4",
+		"figures": "^2.0.0",
+		"immutable": "^3.8.1",
+		"log4js": "^2.3.3",
+		"opener": "^1.4.3",
+		"pem": "^1.9.7",
+		"pretty-data": "^0.40.0",
+		"querystring": "^0.2.0",
+		"requirejs": "^2.3.3",
+		"rx": "^4.1.0",
+		"semver": "^5.4.1",
+		"sha1": "^1.1.1",
+		"socket.io": "^1.7.3",
+		"sprintf-js": "^1.1.1",
+		"tcp-port-used": "^0.1.2",
+		"tmp": "0.0.31",
+		"transformime": "^3.2.0",
+		"transformime-marked": "0.0.1",
+		"transformime-react": "^1.1.0",
+		"uint64be": "^2.0.1",
+		"uniqid": "^4.1.1",
+		"uuid": "^3.1.0",
+		"vscode-azureextensionui": "~0.13.1",
+		"vscode-extension-telemetry": "^0.0.11",
+		"vscode-languageclient": "^2.6.3",
+		"ws": "^2.2.0",
+		"xmlhttprequest": "^1.8.0"
+	},
+	"__metadata": {
+		"id": "68ea70b1-5e25-45f6-a952-1d363a7c44b7",
+		"publisherId": "e4f50523-d9bf-49b9-b51b-9caf153d6632",
+		"publisherDisplayName": "Microsoft"
+	}
+}

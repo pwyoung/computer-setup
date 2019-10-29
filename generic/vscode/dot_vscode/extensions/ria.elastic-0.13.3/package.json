@@ -1,0 +1,125 @@
+{
+	"name": "elastic",
+	"displayName": "Elasticsearch for VSCode",
+	"description": "Elasticsearch client like Kibana console for vscode",
+	"version": "0.13.3",
+	"publisher": "ria",
+	"icon": "media/elastic.png",
+	"engines": {
+		"vscode": "^1.13.0"
+	},
+	"galleryBanner": {
+		"color": "#005571",
+		"theme": "dark"
+	},
+	"categories": [
+		"Other",
+		"Programming Languages",
+		"Snippets"
+	],
+	"keywords": [
+		"Elasticsearch",
+		"Kibana",
+		"Elastic",
+		"Elastic client",
+		"es"
+	],
+	"bugs": {
+		"url": "https://github.com/hsen-dev/vscode-elastic/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/hsen-dev/vscode-elastic.git"
+	},
+	"activationEvents": [
+		"onLanguage:es",
+		"onCommand:elastic.execute",
+		"onCommand:elastic.setHost"
+	],
+	"main": "./out/src/extension",
+	"contributes": {
+		"commands": [
+			{
+				"command": "elastic.setHost",
+				"title": "Elastic: Set Host",
+				"category": "ES"
+			}
+		],
+		"languages": [
+			{
+				"id": "es",
+				"aliases": [
+					"ElasticSearch",
+					"es",
+					"elasticsearch"
+				],
+				"extensions": [
+					"es"
+				],
+				"configuration": "./grammar/es.configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "es",
+				"scopeName": "source.es",
+				"path": "./grammar/es.tmLanguage"
+			}
+		],
+		"configuration": {
+			"title": "Elasticsearch",
+			"properties": {
+				"elastic.showResultAsDocument": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show result in a new json file, or show in default view"
+				}
+			}
+		},
+		"keybindings": [
+			{
+				"key": "ctrl+enter",
+				"command": "elastic.execute",
+				"when": "editorTextFocus && resourceLangId == 'es'"
+			},
+			{
+				"command": "elastic.execute",
+				"key": "alt+Enter",
+				"when": "editorTextFocus && resourceLangId==es"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "node ./build/restSpecIndex.js && tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "npm run compile && node ./node_modules/vscode/bin/test"
+	},
+	"dependencies": {
+		"copy-paste": "^1.3.0",
+		"json-markup": "^1.1.0",
+		"jsonc-parser": "^0.3.0",
+		"mustache": "^2.3.0",
+		"path": "^0.12.7",
+		"request": "^2.79.0",
+		"routington": "^1.0.3",
+		"semver-closest": "^0.1.2",
+		"strip-json-comments": "^2.0.1"
+	},
+	"devDependencies": {
+		"@types/mocha": "^2.2.42",
+		"@types/node": "^7.0.43",
+		"del": "^3.0.0",
+		"jsesc": "^2.5.1",
+		"mocha": "^3.5.0",
+		"require-dir": "^0.3.2",
+		"typescript": "^2.5.2",
+		"vscode": "^1.1.5"
+	},
+	"__metadata": {
+		"id": "45fef933-f1d9-4536-bf46-da5bfc3671dc",
+		"publisherId": "3ab645f2-46f1-4310-b8cf-f780c7a7c2df",
+		"publisherDisplayName": "ria"
+	}
+}
