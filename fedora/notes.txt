@@ -340,20 +340,31 @@ Notes:
       - https://marketplace.visualstudio.com/search?target=VSCode&category=Keymaps&sortBy=Relevance
   - Emacs
     - https://marketplace.visualstudio.com/items?itemName=rkwan94.vscode-emacs-improved
-      - Based on the one VSCODE recommends:
+      - Based on the one VsCode recommends:
         - https://marketplace.visualstudio.com/items?itemName=hiro-sun.vscode-emacs
   - Vagrantfile 
     - https://marketplace.visualstudio.com/items?itemName=bbenoist.vagrant
   - Make
-    - Is now built in, per this:
-      - https://naereen.github.io/Makefiles-support-for-VSCode/
+    - Configure extension
+      - Extension
+        - Makefile
+          - URL
+            - 
+          - Settings for the makefile extension
+            - https://raw.githubusercontent.com/Madmous/vscode-makefile-command-runner/master/media/docs/demo.gif
+      - Variables
+        - https://code.visualstudio.com/docs/editor/variables-reference
     - FAILS: 
       - https://github.com/microsoft/vscode/blob/master/extensions/make/syntaxes/make.tmLanguage.json#L8
-    - Use External TASK
-      - Tasks
-        - https://code.visualstudio.com/docs/editor/tasks
-      - Task for Makefile
-        - https://gist.github.com/mattmc3/c021236c92c03b61d92c0ff233940643
+    - TODO
+      - Use the built in, per this:
+        - https://naereen.github.io/Makefiles-support-for-VSCode/      
+    - TODO
+      - Use External TASK
+        - Tasks
+          - https://code.visualstudio.com/docs/editor/tasks
+        - Task for Makefile
+          - https://gist.github.com/mattmc3/c021236c92c03b61d92c0ff233940643
   - Shell
     - https://marketplace.visualstudio.com/items?itemName=bbenoist.shell
   - Python
@@ -366,6 +377,14 @@ Notes:
       - https://stackoverflow.com/questions/29987840/how-to-execute-python-code-from-within-visual-studio-code
     - Python Indenter
       - https://marketplace.visualstudio.com/items?itemName=KevinRose.vsc-python-indent
+
+
+################################################################################
+# ANACONDA
+################################################################################
+
+# https://docs.anaconda.com/anaconda/install/linux/
+Had to move anaconda setup from ~/.bashrc (to ~/.private.d/anaconda.sh)
 
 
 

@@ -2,7 +2,9 @@
     "telemetry.machineId": "fd7049acefef1f19a9d551e6d6f30e4d57c282cf3d4709efbcd6aaee015b9b56",
     "openedPathsList": {
         "workspaces3": [
+            "file:///home/pyoung/git/current/kdevops-proposals/new-code",
             "file:///home/pyoung/git/current",
+            "file:///home/pyoung/git/pwyoung/private-code-examples/python/tools/tox",
             "file:///home/pyoung/git/pwyoung",
             "file:///home/pyoung",
             "file:///home/pyoung/git"
@@ -52,13 +54,35 @@
                                     "id": "openRecentFolder",
                                     "uri": {
                                         "$mid": 1,
-                                        "fsPath": "/home/pyoung/git/current",
+                                        "fsPath": "/home/pyoung/git/current/kdevops-proposals/new-code",
+                                        "external": "file:///home/pyoung/git/current/kdevops-proposals/new-code",
+                                        "path": "/home/pyoung/git/current/kdevops-proposals/new-code",
+                                        "scheme": "file"
+                                    },
+                                    "enabled": true,
+                                    "label": "~/git/current/kdevops-proposals/new-code"
+                                },
+                                {
+                                    "id": "openRecentFolder",
+                                    "uri": {
+                                        "$mid": 1,
                                         "external": "file:///home/pyoung/git/current",
                                         "path": "/home/pyoung/git/current",
                                         "scheme": "file"
                                     },
                                     "enabled": true,
                                     "label": "~/git/current"
+                                },
+                                {
+                                    "id": "openRecentFolder",
+                                    "uri": {
+                                        "$mid": 1,
+                                        "external": "file:///home/pyoung/git/pwyoung/private-code-examples/python/tools/tox",
+                                        "path": "/home/pyoung/git/pwyoung/private-code-examples/python/tools/tox",
+                                        "scheme": "file"
+                                    },
+                                    "enabled": true,
+                                    "label": "~/git/pwyoung/private-code-examples/python/tools/tox"
                                 },
                                 {
                                     "id": "openRecentFolder",
@@ -409,7 +433,8 @@
                                 },
                                 {
                                     "id": "workbench.action.togglePanel",
-                                    "label": "Show &&Panel"
+                                    "label": "Show &&Panel",
+                                    "checked": true
                                 },
                                 {
                                     "id": "vscode.menubar.separator"
@@ -755,13 +780,11 @@
                     },
                     {
                         "id": "workbench.action.debug.stop",
-                        "label": "&&Stop Debugging",
-                        "enabled": false
+                        "label": "&&Stop Debugging"
                     },
                     {
                         "id": "workbench.action.debug.restart",
-                        "label": "&&Restart Debugging",
-                        "enabled": false
+                        "label": "&&Restart Debugging"
                     },
                     {
                         "id": "vscode.menubar.separator"
@@ -779,23 +802,19 @@
                     },
                     {
                         "id": "workbench.action.debug.stepOver",
-                        "label": "Step &&Over",
-                        "enabled": false
+                        "label": "Step &&Over"
                     },
                     {
                         "id": "workbench.action.debug.stepInto",
-                        "label": "Step &&Into",
-                        "enabled": false
+                        "label": "Step &&Into"
                     },
                     {
                         "id": "workbench.action.debug.stepOut",
-                        "label": "Step O&&ut",
-                        "enabled": false
+                        "label": "Step O&&ut"
                     },
                     {
                         "id": "workbench.action.debug.continue",
-                        "label": "&&Continue",
-                        "enabled": false
+                        "label": "&&Continue"
                     },
                     {
                         "id": "vscode.menubar.separator"
@@ -860,8 +879,7 @@
                     },
                     {
                         "id": "workbench.action.terminal.split",
-                        "label": "&&Split Terminal",
-                        "enabled": false
+                        "label": "&&Split Terminal"
                     },
                     {
                         "id": "vscode.menubar.separator"
@@ -1436,13 +1454,13 @@
     "themeBackground": "#1e1e1e",
     "windowsState": {
         "lastActiveWindow": {
-            "folder": "file:///home/pyoung/git/current",
-            "backupPath": "/home/pyoung/.config/Code/Backups/d8f0c2d06b99b15ed580d5b1aec747b8",
+            "folder": "file:///home/pyoung/git/current/kdevops-proposals/new-code",
+            "backupPath": "/home/pyoung/.config/Code/Backups/741ae751ea2502fa429b7a3d4a6ec1ea",
             "uiState": {
                 "mode": 0,
-                "x": 2053,
-                "y": 223,
-                "width": 1919,
+                "x": 2144,
+                "y": 226,
+                "width": 1920,
                 "height": 1079
             }
         },

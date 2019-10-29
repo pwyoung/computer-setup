@@ -4,5 +4,12 @@
     "window.zoomLevel": 1,
     "python.analysis.memory.keepLibraryAst": true,
     "python.analysis.memory.keepLibraryLocalVariables": true,
-    "hdinsight.disableOpenSurveyLink": true
+    "hdinsight.disableOpenSurveyLink": true,
+    "workbench.activityBar.visible": true,
+    "workbench.sideBar.location": "left",
+    "makefileCommandRunner.makefilePath": "FILE_PATH",
+    "makefileCommandRunner.integrationTestCommand": "all",
+    "makefileCommandRunner.integrationTestWatchCommand": "all",
+    "python.pythonPath": "/home/pyoung/venv/python3/bin/python",
+    "python.linting.pylintPath": "/home/pyoung/venv/python3/bin/pylint"
 }
