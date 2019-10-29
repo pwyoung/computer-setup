@@ -3,7 +3,6 @@
     disabledPackages: [
       "emacs-plus"
       "disable-keybindings"
-      "atomic-emacs"
     ]
     telemetryConsent: "no"
   "disable-keybindings":

@@ -93,6 +93,8 @@ google-chrome
     - https://atom.io/packages/term2
     - https://atom.io/packages/atom-terminal
       - apm install atom-terminal
+    - EMACS:
+      - https://github.com/dvorka/atom-editor-emacs-key-bindings/blob/master/keymap.cson
   - Zoom
     - https://github.com/atom/atom/issues/11905#issuecomment-224865625
   - Keybinding conflicts
