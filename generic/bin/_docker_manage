@@ -15,16 +15,19 @@ err_handler() {
 trap 'err_handler $LINENO' ERR
 
 clean_docker() {
-    echo "Killing dangling images"
-    docker rmi -f $(docker images --filter "dangling=true" -q --no-trunc)
+    IMAGES=$(docker images --filter "dangling=true" -q --no-trunc)
+    COUNT=$(echo $IMAGES | wc -w)
+    if [ $COUNT -gt 0 ]; then
+	echo "Killing dangling images"
+	docker rmi -f ${IMAGES}
+    fi
 
-    #echo "Kill all stopped containers? (enter Y to continue)"
-    #read OK
-    #echo $OK
-    #if [ "$OK" == "Y" ]; then
-    #	echo "Removing all stopped containers"
-    #	docker rm $(docker ps -a | grep Exit | cut -d ' ' -f 1)
-    #fi
+    STOPPED_CONTAINERS=$(docker ps -a | grep Exit | cut -d ' ' -f 1)
+    COUNT=$(echo $STOPPED_CONTAINERS | wc -w)
+    if [ $COUNT -gt 0 ]; then
+	echo "Removing stopped containers"
+	docker rm ${STOPPED_CONTAINERS}
+    fi
 }
 
 start_docker_service() {
