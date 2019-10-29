@@ -1,0 +1,47 @@
+{
+  "_from": "https://www.atom.io/api/packages/disable-keybindings/versions/0.6.0/tarball",
+  "_id": "disable-keybindings@0.6.0",
+  "_inBundle": false,
+  "_integrity": "sha512-EbaVfOJMoM3sWr3kq1PoEFHYaEs5L5lTJq9IK7WCBBlsJ0Tn1ch+94sQdXbJ7nEKLj3SsM0tjY7ZYPm/FO3ZFw==",
+  "_location": "/disable-keybindings",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "remote",
+    "raw": "https://www.atom.io/api/packages/disable-keybindings/versions/0.6.0/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/disable-keybindings/versions/0.6.0/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/disable-keybindings/versions/0.6.0/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/disable-keybindings/versions/0.6.0/tarball"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://www.atom.io/api/packages/disable-keybindings/versions/0.6.0/tarball",
+  "_shasum": "9bde0547c1b7c4062378825798107f178d07076e",
+  "_spec": "https://www.atom.io/api/packages/disable-keybindings/versions/0.6.0/tarball",
+  "_where": "/tmp/apm-install-dir-119928-29084-8y0sz0.htniq",
+  "bugs": {
+    "url": "https://github.com/aki77/atom-disable-keybindings/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "underscore-plus": "^1.6.0"
+  },
+  "deprecated": false,
+  "description": "Disables keybindings",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "homepage": "https://github.com/aki77/atom-disable-keybindings#readme",
+  "keywords": [
+    "keybindings"
+  ],
+  "license": "MIT",
+  "main": "./lib/main",
+  "name": "disable-keybindings",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aki77/atom-disable-keybindings.git"
+  },
+  "version": "0.6.0"
+}

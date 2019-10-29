@@ -2,8 +2,19 @@
   core:
     disabledPackages: [
       "emacs-plus"
+      "disable-keybindings"
+      "atomic-emacs"
     ]
     telemetryConsent: "no"
+  "disable-keybindings":
+    bundledPackages: [
+      "core"
+      "core:linux"
+    ]
+    communityPackages: [
+      "core"
+      "core:linux"
+    ]
   editor:
     fontSize: 21
   "exception-reporting":

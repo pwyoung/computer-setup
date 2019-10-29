@@ -95,7 +95,10 @@ google-chrome
       - apm install atom-terminal
   - Zoom
     - https://github.com/atom/atom/issues/11905#issuecomment-224865625
-  
+  - Keybinding conflicts
+    - https://github.com/aki77/atom-emacs-plus/issues/28
+      - https://atom.io/packages/disable-keybindings
+    - https://medium.com/@lazlojuly/how-to-find-and-fix-conflicting-shortcuts-in-atom-10195bcbc7c
 
 ################################################################################
 # PYTHONS

@@ -7,3 +7,11 @@ atom.commands.add 'atom-workspace',
   'ui:decrease-font-size': ->
     UIFontSize -= 1
     document.documentElement.style.fontSize = UIFontSize + 'px'
+
+
+# https://github.com/aki77/atom-emacs-plus/issues/28
+atom.keymaps.keyBindings = atom.keymaps.keyBindings.filter (binding, i) ->
+  if binding.keystrokes.startsWith 'ctrl-k'
+    binding.command.startsWith 'emacs-plus'
+  else
+    true
