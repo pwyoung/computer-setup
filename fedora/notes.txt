@@ -334,27 +334,13 @@ Notes:
   - Extentions
     - Click on the tetris icon on the left to show extensions
     - Put "@installed" in the extensions dialog
-  - Better Keybinding override file
-    - Doc
-      - https://stackoverflow.com/questions/38957302/is-there-a-quick-change-tabs-function-in-visual-studio-code
-    - Steps
-      - ctrl-shift-p
-      - Preferences: Open Keyboard Shortcuts (JSON)
-      - Text
-[
-    {
-        "key": "shift+right",
-        "command": "workbench.action.nextEditor"
-    },
-    {
-        "key": "shift+left",
-        "command": "workbench.action.previousEditor"
-    }
-]
   - Keybindings
-    - https://code.visualstudio.com/docs/getstarted/keybindings
-    - Keymap Marketplace
-      - https://marketplace.visualstudio.com/search?target=VSCode&category=Keymaps&sortBy=Relevance
+    - Custom Keybinding override file
+      - ln -s ~/git/pwyoung/computer-setup/generic/vscode/keybindings.json ~/.config/Code/User/keybindings.json
+    - Docs
+      - https://code.visualstudio.com/docs/getstarted/keybindings
+      - Keymap Marketplace
+        - https://marketplace.visualstudio.com/search?target=VSCode&category=Keymaps&sortBy=Relevance
   - Emacs
     - https://marketplace.visualstudio.com/items?itemName=rkwan94.vscode-emacs-improved
       - Based on the one VsCode recommends:

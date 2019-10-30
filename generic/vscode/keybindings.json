@@ -1,0 +1,48 @@
+// Place your key bindings in this file to override the defaultsauto[]
+//
+// https://code.visualstudio.com/docs/getstarted/keybindings#_accepted-keys
+//
+[
+    {
+        "key": "ctrl+d",
+        "command": "-editor.action.addSelectionToNextFindMatch",
+        "when": "editorFocus"
+    },
+    // shift-right for next editor tab
+    {
+        "key": "shift+right",
+        "command": "workbench.action.nextEditor"
+    },
+    // shift-left for previous editor tab    
+    {
+        "key": "shift+left",
+        "command": "workbench.action.previousEditor"
+    },
+    // Emacs undo (was omitted)
+    {
+        "key": "ctrl+shift+-",
+        "command": "undo"
+    },
+    //
+    // TERMINAL
+    //   https://code.visualstudio.com/docs/editor/integrated-terminal#_terminal-keybindings
+    //
+    // shift-down: Go to terminal
+    {
+        "key": "shift+down",
+        "command": "workbench.action.terminal.focus"     
+    },
+    // shift-up: Go to Editor
+    {
+        "key": "shift+up",
+        //"command": "workbench.action.terminal.kill"
+        "command": "workbench.action.focusActiveEditorGroup", 
+        //"when": "terminalFocus"
+    },    
+    // shift-insert: Go to Folders
+    {
+        "key": "shift+insert",
+        "command": "workbench.explorer.fileView.focus",
+        //"when": "terminalFocus"
+    },
+]

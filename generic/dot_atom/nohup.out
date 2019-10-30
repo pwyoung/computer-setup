@@ -1,6 +1,5 @@
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
 
-(atom:7728): Gtk-WARNING **: 16:50:50.033: Theme directory panel/22 of theme Mojave-CT has no size field
+(atom:11987): Gtk-WARNING **: 17:14:30.365: Theme directory panel/22 of theme Mojave-CT has no size field
 
-Attempting to call a function in a renderer window that has been closed or released.
-Function provided here: worker.js:79:22
-Remote event names: destroyed, crashed
