@@ -13,7 +13,7 @@
         "key": "shift+right",
         "command": "workbench.action.nextEditor"
     },
-    // shift-left for previous editor tab    
+    // shift-left for previous editor tab
     {
         "key": "shift+left",
         "command": "workbench.action.previousEditor"
@@ -30,19 +30,30 @@
     // shift-down: Go to terminal
     {
         "key": "shift+down",
-        "command": "workbench.action.terminal.focus"     
+        "command": "workbench.action.terminal.focus"
+    },
+    {
+        "key": "shift+end",
+        "command": "workbench.action.terminal.kill",
+    },
+    {
+        "key": "shift+pageup",
+        "command": "workbench.action.terminal.kill",
     },
     // shift-up: Go to Editor
     {
         "key": "shift+up",
-        //"command": "workbench.action.terminal.kill"
-        "command": "workbench.action.focusActiveEditorGroup", 
-        //"when": "terminalFocus"
-    },    
+        "command": "workbench.action.focusActiveEditorGroup",
+    },
     // shift-insert: Go to Folders
     {
         "key": "shift+insert",
         "command": "workbench.explorer.fileView.focus",
         //"when": "terminalFocus"
+    },
+    // shift-pageup: Close pane
+    {
+        "key": "shift+pageup",
+        "command": "workbench.action.closeActiveEditor",
     },
 ]
