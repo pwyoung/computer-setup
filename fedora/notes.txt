@@ -334,6 +334,23 @@ Notes:
   - Extentions
     - Click on the tetris icon on the left to show extensions
     - Put "@installed" in the extensions dialog
+  - Better Keybinding override file
+    - Doc
+      - https://stackoverflow.com/questions/38957302/is-there-a-quick-change-tabs-function-in-visual-studio-code
+    - Steps
+      - ctrl-shift-p
+      - Preferences: Open Keyboard Shortcuts (JSON)
+      - Text
+[
+    {
+        "key": "shift+right",
+        "command": "workbench.action.nextEditor"
+    },
+    {
+        "key": "shift+left",
+        "command": "workbench.action.previousEditor"
+    }
+]
   - Keybindings
     - https://code.visualstudio.com/docs/getstarted/keybindings
     - Keymap Marketplace
@@ -433,3 +450,7 @@ lspci -nnk | grep -i nvidia
 # Find iommy device
  sudo find /sys/kernel/iommu_groups/ -type l | grep '05:00.0'
 /sys/kernel/iommu_groups/27/devices/0000:05:00.0
+
+
+# Consider vmware workstation
+# https://www.vmware.com/in/products/player/faqs.html
