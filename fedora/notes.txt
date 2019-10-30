@@ -334,6 +334,11 @@ Notes:
   - Extentions
     - Click on the tetris icon on the left to show extensions
     - Put "@installed" in the extensions dialog
+  - Settings:
+    - Config
+      - ln -s /home/pyoung/git/pwyoung/computer-setup/generic/vscode/settings.json ~/.config/Code/User/settings.json
+    - Settings:
+      - "terminal.integrated.automationShell.linux": "/bin/bash",
   - Keybindings
     - Custom Keybinding override file
       - ln -s ~/git/pwyoung/computer-setup/generic/vscode/keybindings.json ~/.config/Code/User/keybindings.json

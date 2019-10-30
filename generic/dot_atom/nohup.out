@@ -1,5 +1,31 @@
 bash: cannot set terminal process group (-1): Inappropriate ioctl for device
 bash: no job control in this shell
 
-(atom:11987): Gtk-WARNING **: 17:14:30.365: Theme directory panel/22 of theme Mojave-CT has no size field
+(atom:31930): Gtk-WARNING **: 19:00:51.240: Theme directory panel/22 of theme Mojave-CT has no size field
 
+bash: switchml: line 1: syntax error: unexpected end of file
+bash: error importing function definition for `switchml'
+bash: module: line 1: syntax error: unexpected end of file
+bash: error importing function definition for `module'
+bash: scl: line 1: syntax error: unexpected end of file
+bash: error importing function definition for `scl'
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+/usr/bin/sh: switchml: line 1: syntax error: unexpected end of file
+/usr/bin/sh: error importing function definition for `switchml'
+/usr/bin/sh: module: line 1: syntax error: unexpected end of file
+/usr/bin/sh: error importing function definition for `module'
+/usr/bin/sh: scl: line 1: syntax error: unexpected end of file
+/usr/bin/sh: error importing function definition for `scl'
+/usr/bin/sh: switchml: line 1: syntax error: unexpected end of file
+/usr/bin/sh: error importing function definition for `switchml'
+/usr/bin/sh: module: line 1: syntax error: unexpected end of file
+/usr/bin/sh: error importing function definition for `module'
+/usr/bin/sh: scl: line 1: syntax error: unexpected end of file
+/usr/bin/sh: error importing function definition for `scl'
+/usr/bin/sh: switchml: line 1: syntax error: unexpected end of file
+/usr/bin/sh: error importing function definition for `switchml'
+/usr/bin/sh: module: line 1: syntax error: unexpected end of file
+/usr/bin/sh: error importing function definition for `module'
+/usr/bin/sh: scl: line 1: syntax error: unexpected end of file
+/usr/bin/sh: error importing function definition for `scl'
