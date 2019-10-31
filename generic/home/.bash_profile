@@ -25,4 +25,3 @@ alias z='cd $(cat ~/.marked_path)'
 export PS1='\h:\W \u\$ '
 
 export PATH
-
