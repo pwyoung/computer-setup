@@ -1,4 +1,4 @@
-if uname -a | grep Darwin; then
+if uname -a | grep Darwin >/dev/null; then
   ls -ltr $@
 else
   ls --color=auto -ltr $@
