@@ -5,6 +5,7 @@ if [ -e ~/.profile.d ]; then
     SCRIPTS=$(ls -1 ~/.profile.d/*.sh 2>/dev/null)
 fi
 for i in $SCRIPTS; do
+    #echo "Running $i"
     source $i &>/dev/null
 done
 
