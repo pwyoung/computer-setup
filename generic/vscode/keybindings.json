@@ -56,4 +56,12 @@
         "key": "shift+pageup",
         "command": "workbench.action.closeActiveEditor",
     },
+
+    // RUN HIGHLIGHTED COMMAND IN TERMINAL
+    // https://code.visualstudio.com/docs/editor/integrated-terminal#_run-selected-text
+    {
+        "key": "ctrl+u",
+        "command": "workbench.action.terminal.sendSequence",
+        "args":  { "text": "\u001b[1;5D\u007f" }
+    }
 ]

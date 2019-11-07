@@ -19,7 +19,6 @@
 
 # THEMES
   - sudo dnf install gnome-tweak-tool
-
 # Gnome Extension Firefox Plugin
   - https://extensions.gnome.org/
 # Extensions installed (and manager)
@@ -47,51 +46,159 @@
   - BASH
     - cd ~/ && \
       ln -s git/pwyoung/computer-setup/generic/home/.bash_profile ./
-  - Terminal:
+  - Gnome-Terminal:
     Preferences->Command->Checkbox "run command as login shell"
 
-# PYTHONS
+# VSCODE
+- Docs
+  https://computingforgeeks.com/install-visual-studio-code-on-fedora/
+- Extensions
+  - General
+    - https://code.visualstudio.com/docs/editor/extension-gallery
+- Extentions
+  - Click on the tetris icon on the left to show extensions
+  - Put "@installed" in the extensions dialog
+- Settings:
+  - Config
+    - mv ~/.config/Code/User/settings.json ~/.config/Code/User/settings.json.ORIG
+    - ln -S /home/pyoung/git/pwyoung/computer-setup/generic/vscode/settings.json ~/.config/Code/User/settings.json
+  - Settings:
+    - Make the Terminal run as a login shell
+      "terminal.integrated.automationShell.linux": "/bin/bash",
+      "terminal.integrated.shellArgs.linux": [ "-l" ],
+- Keybindings
+  - Custom Keybinding override file
+    - mv ~/.config/Code/User/keybindings.json ~/.config/Code/User/keybindings.json.ORIG
+    - ln -s ~/git/pwyoung/computer-setup/generic/vscode/keybindings.json ~/.config/Code/User/keybindings.json
+  - Docs
+    - https://code.visualstudio.com/docs/getstarted/keybindings
+    - Keymap Marketplace
+      - https://marketplace.visualstudio.com/search?target=VSCode&category=Keymaps&sortBy=Relevance
+- Emacs
+  - https://marketplace.visualstudio.com/items?itemName=rkwan94.vscode-emacs-improved
+    - Based on the one VsCode recommends:
+      - https://marketplace.visualstudio.com/items?itemName=hiro-sun.vscode-emacs
+- Vagrantfile
+  - https://marketplace.visualstudio.com/items?itemName=bbenoist.vagrant
+
+# PYTHON
 - Set python3
   ~/.profile.d/python.sh
-- Anaconda
-  https://docs.anaconda.com/anaconda/install/linux/
-  To use anaconda, move anaconda setup from ~/.bashrc to ~/.profile.d/anaconda.sh
-- Python2
-  mkdir ~/virtualenv && cd $_
-  virtualenv -p python2 python2
+
+# ANSIBLE
+- Install
+  sudo dnf install ansible
+
+# Terraform
+- Put the binary in /usr/local/bin
+- https://www.terraform.io/downloads.html
+
+# Vagrant and Libvirt  
+- sudo dnf install -y gcc binutils make glibc-devel patch libgomp glibc-headers  kernel-headers kernel-devel-`uname -r` dkms
+- sudo dnf install vagrant-libvirt
 
 # DOCKER->PODMAN
-- PODMAN (replaces Docker on Linux)
+- PODMAN (Being pushed by RHEL to replace Docker)
   - Why?
     - Podman runs without root
     - Podman already works with CGroupsV2 (as of 11/7, Docker does not)
     - Podman is 100% CLI compatible with DOCKER (plus has pod mgmt commands)    
+  - Why not?
+    - Lacks the docker socket that many apps use 
+    - Docker will support root-less execution soon
+    - Some (Ubuntu ?) seem to not on board (yeah, more fragmentation)
+        - https://askubuntu.com/questions/477551/how-can-i-use-docker-without-sudo
   - How
-    - Docs
-      - 
-      - https://podman.io/blogs/2019/01/16/podman-varlink.html
-    - Steps
-    systemctl status io.podman.socket
-    sudo ls -al /run/podman
+    - Podman Base package
+      - <installed in Fedora 31>
+    - Docker-CLI
+      - cat ~/.profile.d/podman.sh 
+if command -v podman >/dev/null; then
+    alias docker='podman'
+fi
+        - Test 
+          - docker run hello-world
+      - Docker-Compose
+        - https://github.com/containers/podman-compose
+          - pip3 install podman-compose
+        - Setup
+        - cat ~/.profile.d/podman.sh 
+if command -v podman-compose >/dev/null; then
+    alias docker='podman-compose'
+fi
+      - Docker Socket - TODO: complete this
+        - https://podman.io/blogs/2019/01/16/podman-varlink.html
+          - systemctl status io.podman.socket
+        - No docker socket yet
+      - sudo ls -al /run/podman
+      - sudo ls -al /run/podman/io.podman
 
-- Docker
-  https://docs.docker.com/install/linux/docker-ce/fedora/
+
+# LIBVIRT AND VAGRANT
+  - sudo dnf update
+  - sudo dnf groupinstall virtualization
+  - sudo dnf install vagrant-libvirt
+# Check libvirt service
+  - systemctl list-units --type=service --state=running | egrep -i 'libvirt'
+libvirtd.service                             loaded active running Virtualization daemon
+
+# Test with Boxes
+  - Software -> Boxes -> Install an OS
+
+# Test Libvirt CLI
+  - virsh list --all
+
+# SET UP qemu:///session
+  - add normal user to groups
+    - sudo usermod -a -G kvm $USER 
+    - sudo usermod -a -G libvirt $USER 
+    - sudo usermod -a -G qemu $USER 
+  -  virt-manager -> File -> Add connection (user session)
+  - setup QEMU bridge
+    - https://blog.christophersmart.com/2016/08/31/configuring-qemu-bridge-helper-after-access-denied-by-acl-file-error/
 
 
-  See https://developer.fedoraproject.org/tools/docker/compose.html
+  - TODO
+    - https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
+- QEMU AS NON-ROOT
+  
+    - qemu:///system
 
-  sudo systemctl start docker
-  sudo systemctl enable docker
-  # sudo groupadd docker
-  sudo gpasswd -a ${USER} docker
-  newgrp docker
+  
+# Broke and restored access by non-root
+  - https://www.poftut.com/use-virt-manager-libvirt-normal-user-without-root-privileges-without-asking-password/
+    - If necessary, replace the polkit rule
+cat <<EOF > /etc/polkit-1/rules.d/80-libvirt.rules
+polkit.addRule(function(action, subject) {
+ if (action.id == "org.libvirt.unix.manage" && subject.local && subject.active && subject.isInGroup("libvirt")) {
+ return polkit.Result.YES;
+ }
+});
+EOF
+# SET UP qemu:///system on /data on external drive
+#   REPLACE the default storage pool (for QEMU/KVM
+create /data (on separate drive)
+  - edit /etc/fstab
+    - /dev/sdb1 /mnt/data                    xfs    defaults,x-systemd.device-timeout=0 1 2
+  - sudomount /mnt/data
+  - sudo ln -s /mnt/data /data
+  - sudo ls /data
+create /data/libvirt_images:
+  - mkdir /data/libvirt_images
+    - chmod 771 /data/libvirt_images
+    - chgrp qemu /data/libvirt_images
+  - May not be needed (kept selinux label)
+    - ls -lZd /data/libvirt_images
+      - drwxrwx--x. 2 root qemu system_u:object_r:virt_image_t:s0 31 Oct 10 15:51 /data/libvirt_images
+virt-manager:
+  - select QEMU/KVM (session)
+  - edit connection
+  - Storage:
+    - stop and remove "default" (pool)
+    - create a new "default" (pool) on /data/
 
-  sudo systemctl restart docker
-  systemctl status docker
-  sudo systemctl enable docker
 
-- Compose
-  sudo dnf install docker-compose
+
 
 
 ################################################################################
@@ -121,13 +228,6 @@ Use gnome-tweak to set ICON theme
 
 # Check repos enabled (via software manager)
   - dnf repolist enabled
-*fedora
-*fedora-modular
-google-chrome
-*rpmfusion-nonfree-nvidia-driver
-*rpmfusion-nonfree-steam
-*updates
-*updates-modular
 
 # exfat (for portable usb)
   - dnf install -y fuse-exfat
@@ -234,73 +334,7 @@ vagrant plugin install vagrant-libvirt 2>&1 | grep find | perl -pe 's/.* Could n
 
 
 # TODO
-  - I might have just neded to do this:
-    - https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
-      - sudo dnf groupinstall virtualization
-  - And then add libvirt support to vagrant
-    - dnf update && dnf install vagrant-libvirt
-
-# LIBVIRT
-  - UNINSTALL
-    - dnf remove libvirt-libs
-    - rm -rf /var/lib/libvirt
-  - REINSTALL
-    - dnf update && dnf install virt-manager
-  - DETAILS
-    - qemu:///system
-
-# CLI
-  - dnf install libvirt-client
-  - sudo su-
-    virsh list --all
-
-# Broke and restored access by non-root
-  - https://www.poftut.com/use-virt-manager-libvirt-normal-user-without-root-privileges-without-asking-password/
-    - If necessary, replace the polkit rule
-cat <<EOF > /etc/polkit-1/rules.d/80-libvirt.rules
-polkit.addRule(function(action, subject) {
- if (action.id == "org.libvirt.unix.manage" && subject.local && subject.active && subject.isInGroup("libvirt")) {
- return polkit.Result.YES;
- }
-});
-EOF
-
-# SET UP qemu:///system on /data on external drive
-#   REPLACE the default storage pool (for QEMU/KVM
-create /data (on separate drive)
-  - edit /etc/fstab
-    - /dev/sdb1 /mnt/data                    xfs    defaults,x-systemd.device-timeout=0 1 2
-  - sudomount /mnt/data
-  - sudo ln -s /mnt/data /data
-  - sudo ls /data
-create /data/libvirt_images:
-  - mkdir /data/libvirt_images
-    - chmod 771 /data/libvirt_images
-    - chgrp qemu /data/libvirt_images
-  - May not be needed (kept selinux label)
-    - ls -lZd /data/libvirt_images
-      - drwxrwx--x. 2 root qemu system_u:object_r:virt_image_t:s0 31 Oct 10 15:51 /data/libvirt_images
-virt-manager:
-  - select QEMU/KVM (session)
-  - edit connection
-  - Storage:
-    - stop and remove "default" (pool)
-    - create a new "default" (pool) on /data/
-
-# Check libvirt
-  - systemctl list-units --type=service --state=running | egrep -i 'libvirt'
-libvirtd.service                             loaded active running Virtualization daemon
-
-# SET UP qemu:///session
-  - add normal user to groups
-    - usermod -a -G pyoung kvm
-    - usermod -a -G pyoung libvirt
-    - usermod -a -G pyoung qemu
-  -  virt-manager -> File -> Add connection (user session)
-  - setup QEMU bridge
-    - https://blog.christophersmart.com/2016/08/31/configuring-qemu-bridge-helper-after-access-denied-by-acl-file-error/
-
-
+  
 ################################################################################
 # YQ (and snapd)
 ################################################################################
@@ -387,38 +421,6 @@ sudo firewall-cmd --runtime-to-permanent
 ################################################################################
 https://kifarunix.com/how-to-install-and-configure-guacamole-on-fedora-29/
 
-
-# VSCODE
-- Docs
-  https://computingforgeeks.com/install-visual-studio-code-on-fedora/
-- Extensions
-  - General
-    - https://code.visualstudio.com/docs/editor/extension-gallery
-- Extentions
-  - Click on the tetris icon on the left to show extensions
-  - Put "@installed" in the extensions dialog
-- Settings:
-  - Config
-    - mv ~/.config/Code/User/settings.json ~/.config/Code/User/settings.json.ORIG
-    - ln -S /home/pyoung/git/pwyoung/computer-setup/generic/vscode/settings.json ~/.config/Code/User/settings.json
-  - Settings:
-    - Make the Terminal run as a login shell
-      "terminal.integrated.automationShell.linux": "/bin/bash",
-      "terminal.integrated.shellArgs.linux": [ "-l" ],
-- Keybindings
-  - Custom Keybinding override file
-    - mv ~/.config/Code/User/keybindings.json ~/.config/Code/User/keybindings.json.ORIG
-    - ln -s ~/git/pwyoung/computer-setup/generic/vscode/keybindings.json ~/.config/Code/User/keybindings.json
-  - Docs
-    - https://code.visualstudio.com/docs/getstarted/keybindings
-    - Keymap Marketplace
-      - https://marketplace.visualstudio.com/search?target=VSCode&category=Keymaps&sortBy=Relevance
-- Emacs
-  - https://marketplace.visualstudio.com/items?itemName=rkwan94.vscode-emacs-improved
-    - Based on the one VsCode recommends:
-      - https://marketplace.visualstudio.com/items?itemName=hiro-sun.vscode-emacs
-- Vagrantfile
-  - https://marketplace.visualstudio.com/items?itemName=bbenoist.vagrant
 
 - Make
     - Configure extension
@@ -520,6 +522,31 @@ systemctl status xrdp
     - https://github.com/aki77/atom-emacs-plus/issues/28
       - https://atom.io/packages/disable-keybindings
     - https://medium.com/@lazlojuly/how-to-find-and-fix-conflicting-shortcuts-in-atom-10195bcbc7c
+
+- Anaconda
+  https://docs.anaconda.com/anaconda/install/linux/
+  To use anaconda, move anaconda setup from ~/.bashrc to ~/.profile.d/anaconda.sh
+- Python2
+  mkdir ~/virtualenv && cd $_
+  virtualenv -p python2 
+- Multiple Pythons
+  https://developer.fedoraproject.org/tech/languages/python/multiple-pythons.htmlpython2
+
+ - Docker 
+  https://docs.docker.com/install/linux/docker-ce/fedora/
+  See https://developer.fedoraproject.org/tools/docker/compose.html
+  sudo systemctl start docker
+  sudo systemctl enable docker
+  # sudo groupadd docker
+  sudo gpasswd -a ${USER} docker
+  newgrp docker
+  sudo systemctl restart docker
+  systemctl status docker
+  sudo systemctl enable docker
+- Compose
+  sudo dnf install docker-compose
+
+
 
 ################################################################################
 # MISC
