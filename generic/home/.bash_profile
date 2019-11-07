@@ -21,7 +21,9 @@ if [ -e ~/bin ]; then
     PATH=~/bin:$PATH
 fi
 
-alias z='cd $(cat ~/.marked_path)'
+# Moved to ~/.profile.d/z
+#alias z='cd $(cat ~/.marked_path)'
+
 export PS1='\h:\W \u\$ '
 
 export PATH
