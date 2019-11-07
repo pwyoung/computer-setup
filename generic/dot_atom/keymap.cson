@@ -9,6 +9,8 @@
   'ctrl-k ctrl-7': 'unset!'
   'ctrl-k ctrl-8': 'unset!'
   'ctrl-k ctrl-9': 'unset!'
+  'ctrl-a': 'unset!'
+
 
 'body':
   'ctrl-k ctrl-alt-w': 'unset!'
@@ -18,17 +20,13 @@
   'ctrl-k ctrl-p': 'unset!'
   'ctrl-k ctrl-right': 'unset!'
   'ctrl-k ctrl-up': 'unset!'
+  'ctrl-k ctrl-w': 'unset!'
   'ctrl-k down': 'unset!'
   'ctrl-k left': 'unset!'
   'ctrl-k right': 'unset!'
   'ctrl-k up': 'unset!'
-
-  # Navigate like terminal
-  'shift-left': 'pane:show-previous-item'
-  'shift-right': 'pane:show-next-item'
-  'shift-up': 'pane:close'
-  # https://atom.io/packages/platformio-ide-terminal
-  'shift-down': 'platformio-ide-terminal:toggle'
+  'ctrl-k up': 'unset!'
+#  'ctrl-a': 'unset!'
 
 '.platform-win32, .platform-linux':
   'ctrl-k ctrl-b': 'unset!'
@@ -40,9 +38,6 @@
   'ctrl-k ctrl-l': 'unset!'
   'ctrl-k ctrl-u': 'unset!'
 
-# https://github.com/atom/atom/issues/11905#issuecomment-224865625
-  'ctrl-+': 'ui:increase-font-size'
-  'ctrl--': 'ui:decrease-font-size'
 
 '.platform-win32 .tree-view, .platform-linux .tree-view':
   'ctrl-k down': 'unset!'
