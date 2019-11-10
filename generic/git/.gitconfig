@@ -3,7 +3,9 @@
 	#helper = osxkeychain
 	#
 	# File
-        helper = cache --timeout=220752000
+        #helper = cache --timeout=220752000
+        # FILE (~/.git-credentials) CLEARTEXT no timeout
+	helper = store
 
 [user]
 	name = pwyoung
