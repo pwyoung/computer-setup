@@ -32,10 +32,7 @@
         "key": "shift+down",
         "command": "workbench.action.terminal.focus"
     },
-    {
-        "key": "shift+end",
-        "command": "workbench.action.terminal.kill",
-    },
+    // shift-pageup: Kill Terminal
     {
         "key": "shift+pageup",
         "command": "workbench.action.terminal.kill",
@@ -56,12 +53,23 @@
         "key": "shift+pageup",
         "command": "workbench.action.closeActiveEditor",
     },
-
     // RUN HIGHLIGHTED COMMAND IN TERMINAL
     // https://code.visualstudio.com/docs/editor/integrated-terminal#_run-selected-text
     {
         "key": "ctrl+u",
         "command": "workbench.action.terminal.sendSequence",
         "args":  { "text": "\u001b[1;5D\u007f" }
-    }
+    },
+    // INDENT
+    {
+        "key": "alt+home",
+        "command": "pyPasteIndent.pasteIndent",
+        "when": "editorLangId == 'python'"
+    },
+    // SHOW MARKDOWN PREVIEW
+    {
+        "key": "ctrl+p",
+        "command": "markdown.showPreviewToSide",
+        "when": "editorLangId == 'markdown'"
+    }    
 ]
