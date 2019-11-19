@@ -153,5 +153,5 @@
 ;;   mkdir -p ~/.emacs.d/themes/ && cd $_ && git clone https://github.com/purcell/color-theme-sanityinc-tomorrow
 (load-file "~/.emacs.d/themes/color-theme-sanityinc-tomorrow/color-theme-sanityinc-tomorrow.el")
 (require 'color-theme-sanityinc-tomorrow)
-(color-theme-sanityinc-tomorrow-night)
+;;(color-theme-sanityinc-tomorrow-night)
 ;;(load-theme 'color-theme-sanityinc-tomorrow-night t)
