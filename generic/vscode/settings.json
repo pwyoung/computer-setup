@@ -1,7 +1,7 @@
 {
     "telemetry.enableTelemetry": false,
     "telemetry.enableCrashReporter": false,
-    "window.zoomLevel": 0,
+    "window.zoomLevel": 1,
     "python.analysis.memory.keepLibraryAst": true,
     "python.analysis.memory.keepLibraryLocalVariables": true,
     "hdinsight.disableOpenSurveyLink": true,
