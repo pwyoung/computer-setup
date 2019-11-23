@@ -25,35 +25,63 @@
     },
     //
     // TERMINAL
-    //   https://code.visualstudio.com/docs/editor/integrated-terminal#_terminal-keybindings
+    //     https://code.visualstudio.com/docs/editor/integrated-terminal#_terminal-keybindings
     //
-    // shift-down: Go to terminal
+    //     shift-up when in editor -> increase terminal size
+    {
+        "key": "shift+up",
+        "command": "workbench.action.terminal.resizePaneUp",
+        "when": "editorFocus"                        
+    },
+    //     shift-down when in terminal -> reduce terminal size
     {
         "key": "shift+down",
-        "command": "workbench.action.terminal.focus"
+        "command": "workbench.action.terminal.resizePaneDown",
+        "when": "terminalFocus"                        
     },
+    //     shift-down: Go to terminal
     {
-        "key": "shift+end",
-        "command": "workbench.action.terminal.kill",
+        "key": "shift+down",
+        "command": "workbench.action.terminal.focus",
+        "when": "editorFocus"                
     },
+    //     shift-pageup: Kill Terminal
     {
         "key": "shift+pageup",
         "command": "workbench.action.terminal.kill",
+        "when": "terminalFocus"                
     },
-    // shift-up: Go to Editor
+    //     shift-up: Go to Editor
     {
         "key": "shift+up",
         "command": "workbench.action.focusActiveEditorGroup",
+        "when": "terminalFocus"        
     },
-    // shift-insert: Go to Folders
+    //     shift-insert: Go to Folders
     {
         "key": "shift+insert",
         "command": "workbench.explorer.fileView.focus",
-        //"when": "terminalFocus"
+        "when": "terminalFocus"                        
     },
-    // shift-pageup: Close pane
+    //     FAILS: RUN HIGHLIGHTED COMMAND IN TERMINAL
+    //     https://code.visualstudio.com/docs/editor/integrated-terminal#_run-selected-text
     {
-        "key": "shift+pageup",
-        "command": "workbench.action.closeActiveEditor",
+        "key": "ctrl+u",
+        "command": "workbench.action.terminal.sendSequence",
+        "args":  { "text": "\u001b[1;5D\u007f" }
     },
+    // PYTHON
+    //     INDENT
+    {
+        "key": "alt+home",
+        "command": "pyPasteIndent.pasteIndent",
+        "when": "editorLangId == 'python'"
+    },
+    // MARKDOWN
+    //     SHOW MARKDOWN PREVIEW
+    {
+        "key": "ctrl+p",
+        "command": "markdown.showPreviewToSide",
+        "when": "editorLangId == 'markdown'"
+    }    
 ]

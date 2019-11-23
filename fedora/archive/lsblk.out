@@ -1,0 +1,11 @@
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda      8:0    0 953.9G  0 disk 
+├─sda1   8:1    0   1.9G  0 part /boot
+├─sda2   8:2    0 186.3G  0 part /
+├─sda3   8:3    0  60.5G  0 part [SWAP]
+├─sda4   8:4    0     1K  0 part 
+└─sda5   8:5    0 705.2G  0 part /home
+sdb      8:16   0   1.8T  0 disk 
+└─sdb1   8:17   0   1.8T  0 part 
+sdc      8:32   0 465.8G  0 disk 
+└─sdc1   8:33   0 465.8G  0 part /data
