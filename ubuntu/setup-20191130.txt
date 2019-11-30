@@ -1,0 +1,37 @@
+
+# sudo apt install tree emacs-nox git
+
+# Set up ~/git
+
+# Allow tracking /etc
+cd /etc; git init
+
+################################################################################
+# AMD
+################################################################################
+# Video Driver
+# OpenCL
+
+https://www.amd.com/en/support/kb/faq/gpu-635
+dpkg -l amdgpu-pro
+
+
+################################################################################
+# Review Video Settings
+################################################################################
+
+# https://linuxconfig.org/how-to-install-amd-radeon-drivers-on-ubuntu-18-10-cosmic-cuttlefish-linux
+
+lspci -vnn | grep  'VGA'
+#
+01:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Ellesmere [Radeon RX 470/480/570/570X/580/580X] [1002:67df] (rev e7) (prog-if 00 [VGA controller])
+02:00.0 VGA compatible controller [0300]: NVIDIA Corporation GP104 [GeForce GTX 1080] [10de:1b80] (rev a1) (prog-if 00 [VGA controller])
+
+sudo apt install mesa-utils
+#
+
+
+################################################################################
+
+
+nouveau.modeset=0

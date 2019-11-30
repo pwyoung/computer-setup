@@ -142,6 +142,7 @@
 
 
 
+
 ;; https://stackoverflow.com/questions/5982572/how-to-install-emacs-colortheme
 ;;   mkdir ~/.emacs.d/themes/
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -151,7 +152,7 @@
 ;;   https://github.com/purcell/color-theme-sanityinc-tomorrow
 ;; Steps
 ;;   mkdir -p ~/.emacs.d/themes/ && cd $_ && git clone https://github.com/purcell/color-theme-sanityinc-tomorrow
-(load-file "~/.emacs.d/themes/color-theme-sanityinc-tomorrow/color-theme-sanityinc-tomorrow.el")
-(require 'color-theme-sanityinc-tomorrow)
+;;(load-file "~/.emacs.d/themes/color-theme-sanityinc-tomorrow/color-theme-sanityinc-tomorrow.el")
+;;(require 'color-theme-sanityinc-tomorrow)
 ;;(color-theme-sanityinc-tomorrow-night)
 ;;(load-theme 'color-theme-sanityinc-tomorrow-night t)
