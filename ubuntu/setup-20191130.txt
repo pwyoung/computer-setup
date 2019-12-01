@@ -9,12 +9,27 @@ cd /etc; git init
 ################################################################################
 # AMD
 ################################################################################
+
+# /etc/default/grub
+# Set boot parameters so that Nvidia Card is not initialized
+#
+# Normal setting: This results in both GPUs being initialized (nicely, btw)
+#GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+#
+# This is deprecated. It results in only the primary GPU being available, but with poor settings.
+#GRUB_CMDLINE_LINUX_DEFAULT="nomodeset"
+#
+# This works as-advertised. The primary GPU is configured properly (e.g. with amdgpu modules),
+# full resolution, and the secondary gpu is not activated
+# Per https://askubuntu.com/questions/747314/is-nomodeset-still-required
+GRUB_CMDLINE_LINUX_DEFAULT="nouveau.modeset=0"
+
+################################################################################
+# AMD: Did not use the proprietary AMD driver (apparently it has problems)
+################################################################################
+https://www.amd.com/en/support/kb/faq/gpu-635
 # Video Driver
 # OpenCL
-
-https://www.amd.com/en/support/kb/faq/gpu-635
-dpkg -l amdgpu-pro
-
 
 ################################################################################
 # Review Video Settings
@@ -32,6 +47,144 @@ sudo apt install mesa-utils
 
 
 ################################################################################
+# GOAL: Run Windows in KVM passing the Nvidia GPU through
+################################################################################
 
 
-nouveau.modeset=0
+# Activate Intel Virtualization in UEFI/Bios
+# Done
+
+# NOTE: # Add Kernel switches to GRUB_CMDLINE_LINUX_DEFAULT because
+#   Per https://help.ubuntu.com/community/Grub2/Setup
+#     Options in GRUB_CMDLINE_LINUX are always effective.
+#     Options in GRUB_CMDLINE_LINUX_DEFAULT are effective ONLY
+#     during normal boot (NOT during recovery mode).
+
+
+# DOCS
+https://www.server-world.info/en/note?os=Ubuntu_18.04&p=kvm&f=11
+#
+# Get my IDs
+lspci -nn | grep -i nvidia
+02:00.0 VGA compatible controller [0300]: NVIDIA Corporation GP104 [GeForce GTX 1080] [10de:1b80] (rev a1)
+02:00.1 Audio device [0403]: NVIDIA Corporation GP104 High Definition Audio Controller [10de:10f0] (rev a1)
+
+
+# DOCS
+https://blog.zerosector.io/2018/07/28/kvm-qemu-windows-10-gpu-passthrough/
+#
+# Virt-Manager etc.
+sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf
+#
+#
+# Prevent Nouveau drivers from loading
+cat /etc/modprobe.d/blacklist-nouveau.conf
+# Per https://blog.zerosector.io/2018/07/28/kvm-qemu-windows-10-gpu-passthrough/
+blacklist nouveau
+options nouveau modeset=0
+#
+# Confirm:
+#   - AMD (open source) drivers are being used
+#   - Nouveau is not being used
+#   - DRM is being used
+lsmod  | egrep -i 'nouv|amd|gpu'
+amdgpu               3522560  23
+chash                  16384  1 amdgpu
+amd_iommu_v2           20480  1 amdgpu
+gpu_sched              32768  1 amdgpu
+ttm                   102400  1 amdgpu
+drm_kms_helper        180224  1 amdgpu
+drm                   483328  17 gpu_sched,drm_kms_helper,amdgpu,ttm
+i2c_algo_bit           16384  1 amdgpu
+
+
+# VFIO
+#
+sudo su -
+echo 'options vfio-pci ids=10de:1b80,10de:10f0' > /etc/modprobe.d/vfio.conf
+echo 'vfio-pci' > /etc/modules-load.d/vfio-pci.conf
+update-initramfs -u
+reboot
+#
+#
+ dmesg | grep -E "DMAR|IOMMU"
+[    0.291824] DMAR: IOMMU enabled
+[   13.320066] AMD-Vi: AMD IOMMUv2 driver by Joerg Roedel <jroedel@suse.de>
+[   13.320068] AMD-Vi: AMD IOMMUv2 functionality not available on this system
+#
+ dmesg | grep -i vfio
+[   12.957895] VFIO - User Level meta-driver version: 0.3
+[   12.963771] vfio-pci: probe of 0000:02:00.0 failed with error -22
+[   12.964290] vfio_pci: add [10de:1b80[ffffffff:ffffffff]] class 0x000000/00000000
+[   12.964842] vfio-pci: probe of 0000:02:00.0 failed with error -22
+[   12.964886] vfio-pci: probe of 0000:02:00.1 failed with error -22
+[   12.965956] vfio_pci: add [10de:10f0[ffffffff:ffffffff]] class 0x000000/00000000
+#
+
+
+# KVM
+#  https://linuxconfig.org/install-and-set-up-kvm-on-ubuntu-18-04-bionic-beaver-linux
+sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virt-manager
+
+# https://help.ubuntu.com/lts/serverguide/libvirt.html
+#
+kvm-ok
+INFO: /dev/kvm exists
+KVM acceleration can be used
+#
+sudo apt install qemu-kvm libvirt-bin
+# These are already done
+sudo adduser $USER libvirt
+sudo apt install virtinst
+
+
+# Set up QEMU/KVM User Session (for non-root stuff)
+virt-manager
+File -> Add Connection -> QEMU/KVM User session
+#
+# LIBVIRT NETWORKING
+virsh net-list --all
+#
+tardis:fedora pyoung$ virsh net-list --all
+ Name                 State      Autostart     Persistent
+----------------------------------------------------------
+ default              active     yes           yes
+#
+#
+# Check Bridge
+brctl show
+#
+bridge name	bridge id		STP enabled	interfaces
+virbr0		8000.52540032fbf3	yes		virbr0-nic
+#
+# Add groups
+sudo usermod -a -G kvm $USER
+sudo usermod -a -G libvirt-qemu $USER
+sudo usermod -a -G libvirt-dnsmasq $USER
+sudo usermod -a -G libvirt $USER
+reboot
+
+# This does not look as good as it did with Fedora
+virt-host-validate | grep -v PASS
+
+# Add timeshift
+It will detect Libvirt and intelligently default to ignoring /var/lib/libvirt
+
+
+# Added Gnome-Boxes (to test qemu/session easily)
+#   https://linuxhint.com/install-gnome-boxes-ubuntu/
+sudo apt-get install gnome-boxes
+# The box definitions are out of date. Use a new ISO, e.g.
+# http://releases.ubuntu.com/eoan/ubuntu-19.10-desktop-amd64.iso
+
+# Add virt-manager (confirm gnome-boxes created a VM in QEMU/KVM-user-session)
+https://virt-manager.org/
+
+
+# Back to https://blog.zerosector.io/2018/07/28/kvm-qemu-windows-10-gpu-passthrough/
+#
+#
+Grab the signed Fedora VirtIO Driver ISO from 
+https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/index.html
+  "Direct downloads"
+  wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso

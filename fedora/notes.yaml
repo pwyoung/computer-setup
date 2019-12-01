@@ -100,7 +100,7 @@ hostnamectl set-hostname sufil-linux
 # Vagrant and Libvirt
 - This might not be needed
   - sudo dnf install -y gcc binutils make glibc-devel patch libgomp glibc-headers  kernel-headers kernel-devel-`uname -r` dkms
-- Minimal  
+- Minimal
   - sudo dnf install vagrant-libvirt
 
 # DOCKER->PODMAN
@@ -108,9 +108,9 @@ hostnamectl set-hostname sufil-linux
   - Pros
     - Podman runs without root
     - Podman already works with CGroupsV2 (as of 11/7, Docker does not)
-    - Podman is 100% CLI compatible with DOCKER (plus has pod mgmt commands)    
+    - Podman is 100% CLI compatible with DOCKER (plus has pod mgmt commands)
   - Cons
-    - Lacks the docker socket that many apps use 
+    - Lacks the docker socket that many apps use
     - Docker will support root-less execution soon
     - Some (Ubuntu ?) seem to not on board (yeah, more fragmentation)
         - https://askubuntu.com/questions/477551/how-can-i-use-docker-without-sudo
@@ -118,17 +118,17 @@ hostnamectl set-hostname sufil-linux
     - Podman Base package
       - <installed in Fedora 31>
     - Docker-CLI
-      - cat ~/.profile.d/podman.sh 
+      - cat ~/.profile.d/podman.sh
 if command -v podman >/dev/null; then
     alias docker='podman'
 fi
-        - Test 
+        - Test
           - docker run hello-world
       - Docker-Compose
         - https://github.com/containers/podman-compose
           - pip3 install podman-compose
         - Setup
-        - cat ~/.profile.d/podman.sh 
+        - cat ~/.profile.d/podman.sh
 if command -v podman-compose >/dev/null; then
     alias docker='podman-compose'
 fi
@@ -156,18 +156,18 @@ libvirtd.service                             loaded active running Virtualizatio
 
 # SET UP qemu:///session
   - add normal user to groups
-    - sudo usermod -a -G kvm $USER 
-    - sudo usermod -a -G libvirt $USER 
-    - sudo usermod -a -G qemu $USER 
+    - sudo usermod -a -G kvm $USER
+    - sudo usermod -a -G libvirt $USER
+    - sudo usermod -a -G qemu $USER
   -  virt-manager -> File -> Add connection (user session)
   - setup QEMU bridge
     - https://blog.christophersmart.com/2016/08/31/configuring-qemu-bridge-helper-after-access-denied-by-acl-file-error/
   - TODO
     - https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
-- QEMU AS NON-ROOT 
+- QEMU AS NON-ROOT
     - qemu:///system
 
-  
+
 # Broke and restored access by non-root
   - https://www.poftut.com/use-virt-manager-libvirt-normal-user-without-root-privileges-without-asking-password/
     - If necessary, replace the polkit rule
@@ -247,7 +247,7 @@ Use gnome-tweak to set ICON theme
 
 
 
-  
+
 ################################################################################
 # YQ (and snapd)
 ################################################################################
@@ -267,7 +267,7 @@ echo 'a: "bcd"' | yq r - a
 
 # Check Virtualization setup
 virt-host-validate
-virt-host-validate | grep -v PASS 
+virt-host-validate | grep -v PASS
 
 # Add IOMMU support
   https://docs.fedoraproject.org/en-US/fedora/rawhide/system-administrators-guide/kernel-module-driver-configuration/Working_with_the_GRUB_2_Boot_Loader/
@@ -442,11 +442,11 @@ systemctl status xrdp
   To use anaconda, move anaconda setup from ~/.bashrc to ~/.profile.d/anaconda.sh
 - Python2
   mkdir ~/virtualenv && cd $_
-  virtualenv -p python2 
+  virtualenv -p python2
 - Multiple Pythons
   https://developer.fedoraproject.org/tech/languages/python/multiple-pythons.htmlpython2
 
- - Docker 
+ - Docker
   https://docs.docker.com/install/linux/docker-ce/fedora/
   See https://developer.fedoraproject.org/tools/docker/compose.html
   sudo systemctl start docker
