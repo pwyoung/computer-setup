@@ -4,24 +4,18 @@
 # Fedora Minimal Setup
 ################################################################################
 
-# Hostname
-hostnamectl set-hostname sufil-linux
+Firefox:
+  - Set up sync
 
-
-# Firefox:
-  - sync
-
-# Conveniences
+Conveniences:
   - sudo dnf install emacs-nox htop make
 
-# Timeshift:
-  - sudo dnf install -y timeshift
 
-# SSHD:
-  - sudo systemctl start sshd
-  - sudo systemctl enable sshd
+Hostname:
+  - hostnamectl set-hostname tardis.local
+  - emacs /etc/hosts 
 
-# THEMES
+THEMES:
   - sudo dnf install gnome-tweak-tool
 # Gnome Extension Firefox Plugin
   - https://extensions.gnome.org/
@@ -49,9 +43,112 @@ hostnamectl set-hostname sufil-linux
       ln -s git/pwyoung/computer-setup/generic/bin ./bin
   - BASH:
     - cd ~/ && \
+      mv ~/.bash_profile ~/.bash_profile.ORIG || true && \
       ln -s git/pwyoung/computer-setup/generic/home/.bash_profile ./
   - Gnome-Terminal:
     Preferences->Command->Checkbox "run command as login shell"
+
+# PYTHON
+- Set python3
+  ~/.profile.d/python.sh
+
+################################################################################
+# VIRTUALIZATION
+################################################################################
+
+mkdir -p ~/installed
+
+# LIBVIRT AND VAGRANT
+  - sudo dnf update
+  - sudo dnf -y groupinstall virtualization | tee ~/installed/virtualization
+  - sudo dnf install vagrant-libvirt | tee ~/installed/vagrant-libvirt
+# Check libvirt service
+  -  systemctl start libvirtd && \
+     systemctl status libvirtd && \
+     systemctl enable libvirtd     
+
+# Test with Gnome-Boxes
+  - Software -> Boxes -> Install an OS
+
+# Test Libvirt CLI
+  - virsh list --all
+
+# SET UP qemu:///session
+  - add normal user to groups
+    - Groups:  cat /etc/group | egrep -i 'kvm|virt|qemu'
+    - sudo usermod -a -G kvm $USER
+    - sudo usermod -a -G libvirt $USER
+    - sudo usermod -a -G qemu $USER
+  -  virt-manager -> File -> Add connection (user session)
+  - setup QEMU bridge
+    - https://blog.christophersmart.com/2016/08/31/configuring-qemu-bridge-helper-after-access-denied-by-acl-file-error/
+  - TODO
+    - https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
+- QEMU AS NON-ROOT
+    - qemu:///session
+
+
+################################################################################
+# Check setup
+################################################################################
+
+# Check Virtualization setup
+virt-host-validate
+virt-host-validate | grep -v PASS
+
+# Add IOMMU support
+  https://docs.fedoraproject.org/en-US/fedora/rawhide/system-administrators-guide/kernel-module-driver-configuration/Working_with_the_GRUB_2_Boot_Loader/
+  sudo emacs /etc/default/grub # add intel_iommu=on to the existing GRUB_CMDLINE_LINUX
+  sudo grub2-mkconfig  
+
+
+cat /boot/efi/EFI/fedora/grub.cfg | grep default_kernelopts
+set default_kernelopts="root=/dev/mapper/fedora_localhost--live-root ro resume=/dev/mapper/fedora_localhost--live-swap rd.lvm.lv=fedora_localhost-live/root rd.lvm.lv=fedora_localhost-live/swap rhgb quiet"
+
+# SNAFU: gotta use new tool, grubby...
+# https://fedoramagazine.org/setting-kernel-command-line-arguments-with-fedora-30/
+#
+grubby --update-kernel=ALL --args="intel_iommu=on"
+#
+grep -i 'intel_iommu=' /boot/*
+/boot/config-5.3.12-300.fc31.x86_64:CONFIG_INTEL_IOMMU=y
+/boot/config-5.3.7-301.fc31.x86_64:CONFIG_INTEL_IOMMU=y
+
+dmesg | grep DMAR
+[    0.355561] DMAR: IOMMU enabled
+
+
+
+
+
+################################################################################
+# Allow KVM nesting
+################################################################################
+
+  https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
+
+################################################################################
+# 
+################################################################################
+
+- Vagrantfile
+  - https://marketplace.visualstudio.com/items?itemName=bbenoist.vagrant
+
+# ANSIBLE
+- Install
+  sudo dnf install ansible
+
+# Timeshift:
+  - sudo dnf install -y timeshift
+
+# SSHD:
+  - sudo systemctl start sshd && \
+    sudo systemctl enable sshd \
+    ssh localhost
+
+################################################################################
+# VSCODE
+################################################################################
 
 # VSCODE
 - Docs
@@ -78,20 +175,12 @@ hostnamectl set-hostname sufil-linux
     - https://code.visualstudio.com/docs/getstarted/keybindings
     - Keymap Marketplace
       - https://marketplace.visualstudio.com/search?target=VSCode&category=Keymaps&sortBy=Relevance
-- Emacs
+- Emacs-mode
   - https://marketplace.visualstudio.com/items?itemName=rkwan94.vscode-emacs-improved
     - Based on the one VsCode recommends:
       - https://marketplace.visualstudio.com/items?itemName=hiro-sun.vscode-emacs
-- Vagrantfile
-  - https://marketplace.visualstudio.com/items?itemName=bbenoist.vagrant
 
-# PYTHON
-- Set python3
-  ~/.profile.d/python.sh
-
-# ANSIBLE
-- Install
-  sudo dnf install ansible
+################################################################################
 
 # Terraform
 - Put the binary in /usr/local/bin
@@ -140,35 +229,12 @@ fi
       - sudo ls -al /run/podman/io.podman
 
 
-# LIBVIRT AND VAGRANT
-  - sudo dnf update
-  - sudo dnf groupinstall virtualization
-  - sudo dnf install vagrant-libvirt
-# Check libvirt service
-  - systemctl list-units --type=service --state=running | egrep -i 'libvirt'
-libvirtd.service                             loaded active running Virtualization daemon
-
-# Test with Boxes
-  - Software -> Boxes -> Install an OS
-
-# Test Libvirt CLI
-  - virsh list --all
-
-# SET UP qemu:///session
-  - add normal user to groups
-    - sudo usermod -a -G kvm $USER
-    - sudo usermod -a -G libvirt $USER
-    - sudo usermod -a -G qemu $USER
-  -  virt-manager -> File -> Add connection (user session)
-  - setup QEMU bridge
-    - https://blog.christophersmart.com/2016/08/31/configuring-qemu-bridge-helper-after-access-denied-by-acl-file-error/
-  - TODO
-    - https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
-- QEMU AS NON-ROOT
-    - qemu:///system
 
 
+################################################################################
 # Broke and restored access by non-root
+################################################################################
+
   - https://www.poftut.com/use-virt-manager-libvirt-normal-user-without-root-privileges-without-asking-password/
     - If necessary, replace the polkit rule
 cat <<EOF > /etc/polkit-1/rules.d/80-libvirt.rules
@@ -178,30 +244,13 @@ polkit.addRule(function(action, subject) {
  }
 });
 EOF
-# SET UP qemu:///system on /data on external drive
-#   REPLACE the default storage pool (for QEMU/KVM
-create /data (on separate drive)
-  - edit /etc/fstab
-    - /dev/sdb1 /mnt/data                    xfs    defaults,x-systemd.device-timeout=0 1 2
-  - sudomount /mnt/data
-  - sudo ln -s /mnt/data /data
-  - sudo ls /data
-create /data/libvirt_images:
-  - mkdir /data/libvirt_images
-    - chmod 771 /data/libvirt_images
-    - chgrp qemu /data/libvirt_images
-  - May not be needed (kept selinux label)
-    - ls -lZd /data/libvirt_images
-      - drwxrwx--x. 2 root qemu system_u:object_r:virt_image_t:s0 31 Oct 10 15:51 /data/libvirt_images
+
 virt-manager:
   - select QEMU/KVM (session)
   - edit connection
   - Storage:
     - stop and remove "default" (pool)
     - create a new "default" (pool) on /data/
-
-
-
 
 
 ################################################################################
@@ -245,9 +294,6 @@ Use gnome-tweak to set ICON theme
     - Font mono-18
 
 
-
-
-
 ################################################################################
 # YQ (and snapd)
 ################################################################################
@@ -261,30 +307,6 @@ https://mikefarah.github.io/yq/read/
 
 echo 'a: "bcd"' | yq r - a
 
-################################################################################
-# Check setup
-################################################################################
-
-# Check Virtualization setup
-virt-host-validate
-virt-host-validate | grep -v PASS
-
-# Add IOMMU support
-  https://docs.fedoraproject.org/en-US/fedora/rawhide/system-administrators-guide/kernel-module-driver-configuration/Working_with_the_GRUB_2_Boot_Loader/
-  # First, make sure the config is up to date (no changes shown in diff)
-  sudo grub2-mkconfig -o /root/grub.cfg
-  sudo diff /root/grub.cfg /boot/grub2/grub.cfg
-  # Make changes
-  sudo emacs /etc/default/grub # add intel_iommu=on to the existing GRUB_CMDLINE_LINUX
-  sudo grub2-mkconfig -o /root/grub.cfg
-  sudo diff /root/grub.cfg /boot/grub2/grub.cfg
-  # Overwrite config file
-  sudo cp /root/grub.cfg /boot/grub2/grub.cfg #for BIOS systems
-  # chmod 664 /boot/grub2/grub.cfg # preserve perms
-  # UEFI sytems: /boot/efi/EFI/fedora/grub.cfg
-
-# Allow KVM nesting
-  https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
 
 ################################################################################
 # Firewalling
@@ -460,90 +482,6 @@ systemctl status xrdp
 - Compose
   sudo dnf install docker-compose
 
-################################################################################
-# FAILS: Try compiling QEMU/KVM LIBVIRT
-################################################################################
-# GRRR.... Try compiling vagrant
-#
-# RUBY
-#
-# FUCK RBENV... bbundle errors... travis uses rvm, prob cuz it werkz
-# https://devhints.io/rbenv
-#git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
-#git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-#cat ~/.private.d/rbenv.sh # eval "$(rbenv init -)"
-#rbenv install 2.6.1
-#rbenv global 2.6.1
-#
-# RVM
-#sudo dnf install rvm
-# https://rvm.io/
-gpg2 --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-curl -sSL https://get.rvm.io | bash -s stable
-#
-rvm -v
-rvm 1.29.9 (latest) by Michal Papis, Piotr Kuczynski, Wayne E. Seguin [https://rvm.io]
-#
-rvm install 2.6.1
-rvm use 2.6.1
-#
-gem list > ~/ruby_2.6.1_gem_list.txt
-#
-#
-# VAGRANT
-https://www.vagrantup.com/docs/installation/source.html
-git clone https://github.com/hashicorp/vagrant.git
-cd ./vagrant/
-#Use v2.2.3 per travis
-#https://github.com/vagrant-libvirt/vagrant-libvirt/blob/master/.travis.yml
-git checkout -b v2.2.3 v2.2.3
-#
-Use Ruby v2.6.1 per travis
-https://github.com/vagrant-libvirt/vagrant-libvirt/blob/master/.travis.yml
-rvm use 2.6.1
-#
-# Compile
-bundle install
-# Create exec/vagrant
-bundle --binstubs exec
-# Add '/home/pyoung/git/3rd-party/vagrant/exec' to $PATH
-
-# VAGRANT-LIBVIRT
-
-
-# VAGRANT-LIBVIRT
-#
-# Deps
-sudo dnf install libvirt-devel
-sudo yum install -y openssl-devel readline-devel
-sudo dnf -y install qemu libvirt libvirt-devel ruby-devel gcc
-sudo dnf -y install libxslt-devel libxml2-devel libvirt-devel libguestfs-tools-c ruby-devel gcc
-#
-# DOCS
-https://github.com/vagrant-libvirt/vagrant-libvirt.git
-cd ~/git/3rd-party
-git clone https://github.com/vagrant-libvirt/vagrant-libvirt.git
-cd vagrant-libvirt
-# Latest release
-git checkout -b0.0.45 0.0.45
-#
-TRAVIS
-https://github.com/vagrant-libvirt/vagrant-libvirt/blob/0.0.45/.travis.yml
-https://docs.travis-ci.com/user/job-lifecycle/
-gem update --system
-gem install bundler
-# LOst...
-# https://3ofcoins.net/2013/06/10/installing-vagrant-plugins-from-local-file/
-#run bundle cache to have all dependencies as .gem files in vendor/cache
-
-#
-# Following travis
-gem update --system --conservative
-gem update bundler --conservative # answered yes
-#
-
-# Fix gems
-vagrant plugin install vagrant-libvirt 2>&1 | grep find | perl -pe 's/.* Could not find (.*)-(.*) in any.*/gem install $1 -v $2/' | sh
 
 ################################################################################
 # MISC
@@ -561,6 +499,18 @@ lspci -nnk | grep -i nvidia
  sudo find /sys/kernel/iommu_groups/ -type l | grep '05:00.0'
 /sys/kernel/iommu_groups/27/devices/0000:05:00.0
 
-
-# Consider vmware workstation
-# https://www.vmware.com/in/products/player/faqs.html
+# SET UP qemu:///system on /data on external drive
+#   REPLACE the default storage pool (for QEMU/KVM
+create /data (on separate drive)
+  - edit /etc/fstab
+    - /dev/sdb1 /mnt/data                    xfs    defaults,x-systemd.device-timeout=0 1 2
+  - sudomount /mnt/data
+  - sudo ln -s /mnt/data /data
+  - sudo ls /data
+create /data/libvirt_images:
+  - mkdir /data/libvirt_images
+    - chmod 771 /data/libvirt_images
+    - chgrp qemu /data/libvirt_images
+  - May not be needed (kept selinux label)
+    - ls -lZd /data/libvirt_images
+      - drwxrwx--x. 2 root qemu system_u:object_r:virt_image_t:s0 31 Oct 10 15:51 /data/libvirt_images
