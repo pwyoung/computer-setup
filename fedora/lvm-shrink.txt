@@ -1,0 +1,74 @@
+# GOAL: document how I shrunk LVM volumes from a Fedora-31 box
+
+# References:
+# - https://rbgeek.wordpress.com/2013/02/11/how-to-reduce-the-root-partition-in-lvm/
+
+[root@tardis ~]# pvscan 
+  PV /dev/sdb2   VG ubuntu-vg               lvm2 [<1.82 TiB / 0    free]
+  PV /dev/sda3   VG fedora_localhost-live   lvm2 [952.17 GiB / 0    free]
+  Total: 2 [<2.75 TiB] / in use: 2 [<2.75 TiB] / in no VG: 0 [0   ]
+
+
+pvdisplay 
+  --- Physical volume ---
+  PV Name               /dev/sdb2
+  VG Name               ubuntu-vg
+  PV Size               <1.82 TiB / not usable <34.90 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              476792
+  Free PE               0
+  Allocated PE          476792
+  PV UUID               HqEwjw-t2Gd-rb85-p6VP-BSP9-g6sm-AGRz0w
+   
+  --- Physical volume ---
+  PV Name               /dev/sda3
+  VG Name               fedora_localhost-live
+  PV Size               952.20 GiB / not usable 33.12 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              243756
+  Free PE               0
+  Allocated PE          243756
+  PV UUID               uJmMXi-epta-DbES-iuCD-Igyi-Wexh-mgPYit
+
+vgscan
+  Found volume group "ubuntu-vg" using metadata type lvm2
+  Found volume group "fedora_localhost-live" using metadata type lvm2
+
+ vgchange -a y
+  2 logical volume(s) in volume group "ubuntu-vg" now active
+  3 logical volume(s) in volume group "fedora_localhost-live" now active
+
+lvscan
+  ACTIVE            '/dev/ubuntu-vg/root' [<1.82 TiB] inherit
+  ACTIVE            '/dev/ubuntu-vg/swap_1' [976.00 MiB] inherit
+  ACTIVE            '/dev/fedora_localhost-live/swap' [<31.43 GiB] inherit
+  ACTIVE            '/dev/fedora_localhost-live/home' [850.77 GiB] inherit
+  ACTIVE            '/dev/fedora_localhost-live/root' [<69.97 GiB] inherit
+
+
+fsck /dev/ubuntu-vg/root
+fsck from util-linux 2.34
+e2fsck 1.45.3 (14-Jul-2019)
+/dev/mapper/ubuntu--vg-root: recovering journal
+Clearing orphaned inode 99614778 (uid=0, gid=0, mode=0100644, size=352)
+Clearing orphaned inode 40769290 (uid=0, gid=0, mode=0100644, size=19616)
+Clearing orphaned inode 25955473 (uid=1000, gid=1000, mode=0100644, size=9971)
+Clearing orphaned inode 25956989 (uid=1000, gid=1000, mode=0100644, size=9971)
+Clearing orphaned inode 25954376 (uid=1000, gid=1000, mode=0100644, size=9971)
+Clearing orphaned inode 25952935 (uid=1000, gid=1000, mode=0100644, size=9971)
+Clearing orphaned inode 25963965 (uid=1000, gid=1000, mode=0100644, size=9971)
+Clearing orphaned inode 25952558 (uid=1000, gid=1000, mode=0100600, size=262144)
+Clearing orphaned inode 131447 (uid=121, gid=125, mode=0100644, size=396)
+Clearing orphaned inode 121766362 (uid=121, gid=125, mode=0100600, size=262144)
+Setting free inodes count to 121794315 (was 121795068)
+Setting free blocks count to 473249602 (was 473313845)
+/dev/mapper/ubuntu--vg-root: clean, 209141/122003456 files, 14735550/487985152 blocks
+
+e2fsck 1.45.3 (14-Jul-2019)
+/dev/mapper/ubuntu--vg-root: clean, 209141/122003456 files, 14735550/487985152 blocks
+
+resize2fs -p /dev/ubuntu-vg/root 80G
+
+lvreduce -L 80G /dev/vg_centos6/lv_root
