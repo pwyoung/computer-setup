@@ -66,9 +66,21 @@ LIBVIRT VIA VIRT-MANAGER
   - For now, this works to give us libvirt
   - rpm-ostree install virt-install virt-manager
 
+VNC Viewers
+  - virt-viewer
+    - cockpit will use this from its UI
+      -  sudo rpm-ostree install virt-viewer
+  - Remmina
+    - generally useful
+    - installed via flatpak
+
+
 VSCODE:
   - https://code.visualstudio.com/docs/setup/linux
 
+GITKRAKEN:
+  - https://www.gitkraken.com/
+  - Installed the flatpak
 
 
 
