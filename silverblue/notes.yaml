@@ -5,15 +5,43 @@
 ################################################################################
 
 Firefox:
-  - Set up sync
-
-Conveniences:
-  - sudo dnf install emacs-nox htop make
-
+  - Enable sync
+  - Codecs?:
+    - https://ask.fedoraproject.org/t/video-codecs-to-watch-netflix-in-firefox-silverblue/2082
 
 Hostname:
   - hostnamectl set-hostname tardis.local
-  - emacs /etc/hosts 
+  - vi /etc/hosts?
+
+SSH-Keys:
+  - ssh-keygen -t rsa
+  - Send to github
+
+Git:
+  - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/computer-setup.git
+  - for i in $(ls -a ~/git/pwyoung/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/pwyoung/computer-setup/home/$i ~/$i; done
+
+
+TOOLBOX:
+  Notes:
+    - Shared dirs:
+      - /home
+    - Unshared dirs:
+      - /etc
+  Create Toolbox:
+    - toolbox enter
+  From in toolbox:
+    - Fix Toolbox error on sudo (per https://ask.fedoraproject.org/t/sudo-setrlimit-rlimit-core-operation-not-permitted/4223)
+      - echo 'Set disable_coredump false' > /etc/sudo.conf
+
+FLATPAK:
+  - Use the CLI to see what permissions apps get
+  -
+OVERLAY (things that need to be in the os-tree):
+  - LIBVIRT:
+    - https://discussion.fedoraproject.org/t/playing-around-with-fedora-coreos-using-vagrant-libvirt-on-fedora-silverblue/1704
+
+
 
 THEMES:
   - sudo dnf install gnome-tweak-tool
@@ -65,7 +93,7 @@ mkdir -p ~/installed
 # Check libvirt service
   -  systemctl start libvirtd && \
      systemctl status libvirtd && \
-     systemctl enable libvirtd     
+     systemctl enable libvirtd
 
 # Test with Gnome-Boxes
   - Software -> Boxes -> Install an OS
@@ -99,7 +127,7 @@ virt-host-validate | grep -v PASS
 # Add IOMMU support
   https://docs.fedoraproject.org/en-US/fedora/rawhide/system-administrators-guide/kernel-module-driver-configuration/Working_with_the_GRUB_2_Boot_Loader/
   sudo emacs /etc/default/grub # add intel_iommu=on to the existing GRUB_CMDLINE_LINUX
-  sudo grub2-mkconfig  
+  sudo grub2-mkconfig
 
 
 cat /boot/efi/EFI/fedora/grub.cfg | grep default_kernelopts
@@ -148,7 +176,7 @@ dmesg | grep DMAR
   https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
 
 ################################################################################
-# 
+#
 ################################################################################
 
 - Vagrantfile
