@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sudo systemctl start cockpit
+firefox http://localhost:9090
