@@ -34,12 +34,37 @@ NETFLIX:
     - rpm-ostree ./*rpm
 
 VIRTUALIZATION:
-  - virt-manager is being deprecated. Use Cockpit
-  - https://www.projectatomic.io/docs/cockpit/
+  - Notes
+    - Check support (bios, chipset, and OS)
+      grep -wo -e vmx -e svm /proc/cpuinfo | uniq
+    - Check nested VM support
+      - https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html
+      - cat /sys/module/kvm_intel/parameters/nested
+    - For posterity
+       lsmod | grep kvm
+             kvm_intel             299008  0
+             kvm                   770048  1 kvm_intel
+             irqbypass              16384  1 kvm
+    - virt-manager is being deprecated.
+      Use Cockpit (if possible)
+      https://www.projectatomic.io/docs/cockpit/
+    - Silverblue
+      https://discussion.fedoraproject.org/t/playing-around-with-fedora-coreos-using-vagrant-libvirt-on-fedora-silverblue/1704
 
 COCKPIT:
   - rpm-ostree update
   - rpm-ostree install cockpit
+  - reboot
+  - systemctl start cockpit
+  - systemctl status cockpit
+COCKPIT VIRTUAL MACHINES:
+  - https://cockpit-project.org/guide/latest/feature-virtualmachines.html#feature-virtualmachines-extending
+  - sudo rpm-ostree install cockpit-machines
+
+LIBVIRT VIA VIRT-MANAGER
+  - SNAFU: virt-manager is deprecated (since it's a good, fast, useful tool...gotta replace it with a web interface...)
+  - For now, this works to give us libvirt
+  - rpm-ostree install virt-install virt-manager
 
 VSCODE:
   - https://code.visualstudio.com/docs/setup/linux
