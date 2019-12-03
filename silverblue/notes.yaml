@@ -21,6 +21,17 @@ Git:
   - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/computer-setup.git
   - for i in $(ls -a ~/git/pwyoung/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/pwyoung/computer-setup/home/$i ~/$i; done
 
+NVIDIA:
+    - SoftwareTool: enable NVIDIA Repo (RPMFusion)
+    - time rpm-ostree install kmod-nvidia xorg-x11-drv-nvidia
+
+
+FLATPAK:
+  Notes:
+    - Flatpaks are not necessarily sandboxed.
+      They can get whatever access they request
+    - Use the CLI to see what permissions apps get
+  -
 
 TOOLBOX:
   Notes:
@@ -34,9 +45,6 @@ TOOLBOX:
     - Fix Toolbox error on sudo (per https://ask.fedoraproject.org/t/sudo-setrlimit-rlimit-core-operation-not-permitted/4223)
       - echo 'Set disable_coredump false' > /etc/sudo.conf
 
-FLATPAK:
-  - Use the CLI to see what permissions apps get
-  -
 OVERLAY (things that need to be in the os-tree):
   - LIBVIRT:
     - https://discussion.fedoraproject.org/t/playing-around-with-fedora-coreos-using-vagrant-libvirt-on-fedora-silverblue/1704
