@@ -6,8 +6,6 @@
 
 Firefox:
   - Enable sync
-  - Codecs?:
-    - https://ask.fedoraproject.org/t/video-codecs-to-watch-netflix-in-firefox-silverblue/2082
 
 Hostname:
   - hostnamectl set-hostname tardis.local
@@ -17,13 +15,36 @@ SSH-Keys:
   - ssh-keygen -t rsa
   - Send to github
 
-Git:
+HOME links:
   - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/computer-setup.git
   - for i in $(ls -a ~/git/pwyoung/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/pwyoung/computer-setup/home/$i ~/$i; done
 
 NVIDIA:
     - SoftwareTool: enable NVIDIA Repo (RPMFusion)
-    - time rpm-ostree install kmod-nvidia xorg-x11-drv-nvidia
+    - References:
+      - https://medium.com/@youngty1997/what-is-fedora-silverblue-how-to-game-on-it-and-should-you-use-it-7df122eec0a3
+      - https://blogs.gnome.org/alexl/2019/03/06/nvidia-drivers-in-fedora-silverblue/
+    - Steps
+      - sudo rpm-ostree install kmod-nvidia xorg-x11-drv-nvidia
+
+NETFLIX:
+  - FIREFOX FAILS (some packages were not found. Did not want to add to os-tree layer)
+    - https://ask.fedoraproject.org/t/video-codecs-to-watch-netflix-in-firefox-silverblue/2082
+  - Install Google-Chrome
+    - rpm-ostree ./*rpm
+
+VIRTUALIZATION:
+  - virt-manager is being deprecated. Use Cockpit
+  - https://www.projectatomic.io/docs/cockpit/
+
+COCKPIT:
+  - rpm-ostree update
+  - rpm-ostree install cockpit
+
+VSCODE:
+  - https://code.visualstudio.com/docs/setup/linux
+
+
 
 
 FLATPAK:
