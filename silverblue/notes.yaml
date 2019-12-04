@@ -34,6 +34,8 @@ NETFLIX:
     - rpm-ostree ./*rpm
 
 VIRTUALIZATION:
+  - Good Docs
+    - https://fedoramagazine.org/create-virtual-machines-with-cockpit-in-fedora/
   - Notes
     - Check support (bios, chipset, and OS)
       grep -wo -e vmx -e svm /proc/cpuinfo | uniq
@@ -57,9 +59,13 @@ COCKPIT:
   - reboot
   - systemctl start cockpit
   - systemctl status cockpit
+  - Per https://www.redhat.com/en/blog/managing-virtual-machines-rhel-8-web-console
+    - systemctl enable --now cockpit.socket
+
 COCKPIT VIRTUAL MACHINES:
   - https://cockpit-project.org/guide/latest/feature-virtualmachines.html#feature-virtualmachines-extending
   - sudo rpm-ostree install cockpit-machines
+  - sudo rpm-ostree install virt-viewer
 
 LIBVIRT VIA VIRT-MANAGER
   - SNAFU: virt-manager is deprecated (since it's a good, fast, useful tool...gotta replace it with a web interface...)
@@ -108,6 +114,15 @@ OVERLAY (things that need to be in the os-tree):
     - https://discussion.fedoraproject.org/t/playing-around-with-fedora-coreos-using-vagrant-libvirt-on-fedora-silverblue/1704
 
 
+TOOLBOX-APPS:
+  - FAIL
+    - Etcher (useless, can not write to devices, e.g. /dev/sdb1)
+      - sudo wget https://balena.io/etcher/static/etcher-rpm.repo -O /etc/yum.repos.d/etcher-rpm.repo
+      - sudo dnf install -y balena-etcher-electron
+  - Ansible
+    - sudo dnf install ansible
+  - Vagrant and LibVIRT
+    - sudo dnf install vagrant-libvirt
 
 THEMES:
   - sudo dnf install gnome-tweak-tool
@@ -628,3 +643,37 @@ create /data/libvirt_images:
   - May not be needed (kept selinux label)
     - ls -lZd /data/libvirt_images
       - drwxrwx--x. 2 root qemu system_u:object_r:virt_image_t:s0 31 Oct 10 15:51 /data/libvirt_images
+
+
+################################################################################
+# TOOLBOX: A great wrapper
+################################################################################
+
+cat /proc/11263/cmdline
+podmanexec--interactive--tty--userpyoung--workdir/var/home/pyoung/git/pwyoung/computer-setup/silverblue--env=COLORTERM=truecolor--env=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus--env=DESKTOP_SESSION=gnome--env=DISPLAY=:1--env=LANG=en_US.UTF-8--env=SHELL=/bin/bash--env=SSH_AUTH_SOCK=/run/user/1000/keyring/ssh--env=TERM=xterm-256color--env=VTE_VERSION=5803--env=XDG_CURRENT_DESKTOP=GNOME--env=XDG_DATA_DIRS=/var/home/pyoung/.local/share/flatpak/exports/share/:/var/lib/flatpak/exports/share/:/usr/local/share/:/usr/share/--env=XDG_MENU_PREFIX=gnome---env=XDG_RUNTIME_DIR=/run/user/1000--env=XDG_SESSION_DESKTOP=gnome--env=XDG_SESSION_TYPE=x11--env=COLUMNS=134--env=LINES=28fedora-toolbox-31capsh--caps=---cexec "$@"/bin/sh/bin/bash-ltoolbox:module-vagrant pyoung$
+
+
+podmanexec
+--interactive
+--tty
+--userpyoung
+--workdir/var/home/pyoung/git/pwyoung/computer-setup/silverblue
+--env=COLORTERM=truecolor
+--env=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+--env=DESKTOP_SESSION=gnome
+--env=DISPLAY=:1
+--env=LANG=en_US.UTF-8
+--env=SHELL=/bin/bash
+--env=SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
+--env=TERM=xterm-256color
+--env=VTE_VERSION=5803
+--env=XDG_CURRENT_DESKTOP=GNOME
+--env=XDG_DATA_DIRS=/var/home/pyoung/.local/share/flatpak/exports/share/:/var/lib/flatpak/exports/share/:/usr/local/share/:/usr/share/
+--env=XDG_MENU_PREFIX=gnome
+---env=XDG_RUNTIME_DIR=/run/user/1000
+--env=XDG_SESSION_DESKTOP=gnome
+--env=XDG_SESSION_TYPE=x11
+--env=COLUMNS=134
+--env=LINES=28fedora-toolbox-31capsh
+--caps=-
+--cexec "$@"/bin/sh/bin/bash-ltoolbox:module-vagrant pyoung$
