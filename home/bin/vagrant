@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# This is intended to be put in ~/bin.
+#   Specifically, do not put this in /usr/bin/vagrant (unless podman is installed)
+#   or this will loop forever.
+
+if ! command -v podman >/dev/null; then
+    if [ -f /usr/bin/vagrant ]; then
+	echo "No podman; use /usr/bin/vagrant"
+	/usr/bin/vagrant $@
+    else
+	echo "No podman or /usr/bin/vagrant found!"
+	exit 1
+    fi
+fi
+
+IMAGE='localhost/vagrant-container:latest'
+if ! podman inspect "$IMAGE" >/dev/null; then
+    echo "Building Image $IMAGE"
+    cd /tmp
+    cat - > Dockerfile <<EOF
+FROM docker://registry.fedoraproject.org/fedora:30
+RUN dnf install -y openssh-clients vagrant vagrant-libvirt
+CMD [ "/bin/bash" ]
+EOF
+    podman build -t localhost/vagrant-container:latest .
+fi
+
+echo "Running vagrant via Podman"
+podman run --rm -it \
+        --volume /run/libvirt:/run/libvirt \
+        --volume "${HOME}:${HOME}:rslave" \
+        --env "HOME=${HOME}" \
+        --workdir "$(pwd)" \
+        --net host \
+        --privileged \
+        --security-opt label=disable \
+        --entrypoint /usr/bin/vagrant \
+        localhost/vagrant-container:latest $@
+

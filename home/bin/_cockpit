@@ -1,4 +1,10 @@
 #!/bin/bash
 
+echo "Check Libvirt"
+sysctl status libvirtd
+
+echo "Check KVM"
+ls -l /dev/kvm
+
 sudo systemctl start cockpit
 firefox http://localhost:9090

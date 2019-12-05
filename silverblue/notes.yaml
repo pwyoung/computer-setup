@@ -47,11 +47,31 @@ VIRTUALIZATION:
              kvm_intel             299008  0
              kvm                   770048  1 kvm_intel
              irqbypass              16384  1 kvm
-    - virt-manager is being deprecated.
-      Use Cockpit (if possible)
+    - virt-manager is being deprecated, use Cockpit
       https://www.projectatomic.io/docs/cockpit/
     - Silverblue
       https://discussion.fedoraproject.org/t/playing-around-with-fedora-coreos-using-vagrant-libvirt-on-fedora-silverblue/1704
+
+  - Give WHEEL group access to libvirt
+    https://discussion.fedoraproject.org/t/how-can-i-add-myself-to-the-libvirt-group-in-fedora-silverblue/1412
+cat << EOF > /etc/polkit-1/rules.d/80-libvirt-manage.rules
+polkit.addRule(function(action, subject) {
+  if (action.id == "org.libvirt.unix.manage" && subject.local && subject.active && subject.isInGroup("wheel")) {
+      return polkit.Result.YES;
+  }
+});
+EOF
+  - Add user to wheel
+    usermod -a -G wheel $USER
+  - Show real groups on silverblue
+    cat /usr/lib/group | egrep -i "virt|kvm|qemu|$USER"
+
+GNOME-BOXES
+  - "Gnome Boxes is gui wrapper for qemu-kvm."
+    - https://williamperry.com/home/articles/gnome-boxes/
+  - Data
+    - ~/.var/app/org.gnome.Boxes
+    - ~/.var/app/org.gnome.Boxes/data/gnome-boxes/images/
 
 COCKPIT:
   - rpm-ostree update
@@ -68,8 +88,8 @@ COCKPIT VIRTUAL MACHINES:
   - sudo rpm-ostree install virt-viewer
 
 LIBVIRT VIA VIRT-MANAGER
-  - SNAFU: virt-manager is deprecated (since it's a good, fast, useful tool...gotta replace it with a web interface...)
   - For now, this works to give us libvirt
+    Libvirt needs to run as an os layer
   - rpm-ostree install virt-install virt-manager
 
 VNC Viewers
@@ -79,7 +99,6 @@ VNC Viewers
   - Remmina
     - generally useful
     - installed via flatpak
-
 
 VSCODE:
   - https://code.visualstudio.com/docs/setup/linux
@@ -360,26 +379,19 @@ fi
 
 
 
-################################################################################
-# Broke and restored access by non-root
-################################################################################
-
-  - https://www.poftut.com/use-virt-manager-libvirt-normal-user-without-root-privileges-without-asking-password/
-    - If necessary, replace the polkit rule
-cat <<EOF > /etc/polkit-1/rules.d/80-libvirt.rules
+#
+# https://major.io/2015/04/11/run-virsh-and-access-libvirt-as-a-regular-user/
+#
+cat <<EOF > /etc/polkit-1/rules.d/49-org.libvirt.unix.manager.rules
+/* Allow users in kvm group to manage the libvirt
+daemon without authentication */
 polkit.addRule(function(action, subject) {
- if (action.id == "org.libvirt.unix.manage" && subject.local && subject.active && subject.isInGroup("libvirt")) {
- return polkit.Result.YES;
- }
+    if (action.id == "org.libvirt.unix.manage" &&
+        subject.isInGroup("wheel")) {
+            return polkit.Result.YES;
+    }
 });
 EOF
-
-virt-manager:
-  - select QEMU/KVM (session)
-  - edit connection
-  - Storage:
-    - stop and remove "default" (pool)
-    - create a new "default" (pool) on /data/
 
 
 ################################################################################
