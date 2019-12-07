@@ -17,6 +17,53 @@ sudo timeshift-gtk
 Timeshift-Snapshot: Initial Setup
 
 ################################################################################
+# NOMAJ
+################################################################################
+
+# GIT
+apt-get install git
+
+# ANSIBLE
+apt-get install ansible
+
+# PYTHON3
+apt-get install python3-venv
+
+# PYTHON DEPS
+cd .../nomaj/
+make deps
+
+# NOMAJ ANSIBLE TEST
+#
+# Requires passwordless ssh to localhost
+ssh localhost hostname
+#
+Test
+cd nomaj/tests/module-ansible
+make
+
+# NOMAJ VAGRANT TEST
+#
+# Requires vagrant (on linux installs vagrant-libvirt)
+apt-get install vagrant
+#
+Test
+cd nomaj/tests/module-vagrant
+make
+# ERROR
+# '/var/run/libvirt/libvirt-sock': Permission denied
+sudo usermod -G libvirt -a $USER
+reboot
+#
+Could not open '/home/pyoung/.local/share/libvirt/images/test_module_vagrant/node-2_1.qcow2': Permission denied
+sudo usermod -G libvirt-qemu -a $USER
+#
+  288  sudo apt-get install apparmor-profiles apparmor-utils
+  289  sudo aa-complain /usr/lib/libvirt/virt-aa-helper
+#
+
+
+################################################################################
 # Virtualization
 ################################################################################
 
@@ -61,8 +108,8 @@ Create a VM in virt-manager
  - Shows GUI and links to just the XML config for the options
  - Too bad it's deprecated in RHEL-8...
 
-
 # Timeshift Snapshot: Virtual Machine Manager
+
 ################################################################################
 # VIRTUALIZATION
 ################################################################################
