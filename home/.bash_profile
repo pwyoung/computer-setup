@@ -6,6 +6,7 @@ if [ -e ~/.profile.d ]; then
 fi
 for i in $SCRIPTS; do
     #echo "Running $i"
+    #source $i
     source $i &>/dev/null
 done
 
