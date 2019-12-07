@@ -1,0 +1,109 @@
+
+################################################################################
+# Initial Setup
+################################################################################
+sudo apt install emacs-nox
+
+Firefox:
+  - sync
+  - log into github, add keys, clone this repo
+
+software tool:
+  - update
+  - Add timeshift
+
+sudo timeshift-gtk
+
+Timeshift-Snapshot: Initial Setup
+
+################################################################################
+# Virtualization
+################################################################################
+
+HOME links:
+  - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/computer-setup.git
+  - for i in $(ls -a ~/git/pwyoung/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; \
+    ln -s ~/git/pwyoung/computer-setup/home/$i ~/$i; done
+
+Notes:
+  LIBVIRT/KVM/QEMU-based:
+    virt-manager:
+      - Is deprecated
+        - RHEL-8 is pushing Cockpit (a web service) to replace it.
+    Cockpit
+      - Is meant to replace virt-manager
+        - Is in early dev (which is why RHEL-8 will still include virt-manager)
+    Gnome-Boxes:
+      - Easy to use
+      - Local boxes are QEMU (user) Session.
+        - Excellent for ensuring this works
+      - Not as full-featured as above tools
+        - Claims its just for testing out new VMs and connecting to remote ones
+  VirtualBox:
+    - Nice, but vagrant can only provision one of these boxes at a time
+    - Vagrant on Linux (Fedora anyway) has all sorts of ruby plugin conflicts
+    - Requires maintaining GuestAdditions (for NVME drives, and other features)
+    - So provisioning tends to be much slower but given the deprecation of virt-manager
+      the GUI in Virtualbox is better for many  users
+
+software tool:
+ - Add gnome-boxes
+
+sudp apt-get install virt-manager
+
+# Cockpit
+sudo apt-get install cockpit
+systemctl restart cockpit
+systemctl status cockpit
+
+Create a VM in virt-manager
+# This tool is great.
+ - Shows GUI and links to just the XML config for the options
+ - Too bad it's deprecated in RHEL-8...
+
+
+# Timeshift Snapshot: Virtual Machine Manager
+################################################################################
+# VIRTUALIZATION
+################################################################################
+
+virsh vol-list default
+error: failed to connect to the hypervisor
+error: Failed to connect socket to '/var/run/libvirt/libvirt-sock': Permission denied
+
+ls -l /var/run/libvirt/libvirt-sock
+srwxrwx--- 1 root libvirt 0 Dec  6 18:29 /var/run/libvirt/libvirt-sock
+
+cat /etc/libvirt/libvirtd.conf | grep unix_sock_ | egrep -v '^#'
+unix_sock_group = "libvirt"
+unix_sock_ro_perms = "0777"
+unix_sock_rw_perms = "0770"
+
+# https://wiki.libvirt.org/page/Failed_to_connect_to_the_hypervisor
+grep libvirt /etc/group /etc/passwd
+/etc/group:libvirt:x:130:pyoung
+/etc/group:libvirt-qemu:x:64055:libvirt-qemu
+/etc/group:libvirt-dnsmasq:x:131:
+/etc/passwd:libvirt-qemu:x:64055:108:Libvirt Qemu,,,:/var/lib/libvirt:/usr/sbin/nologin
+/etc/passwd:libvirt-dnsmasq:x:122:131:Libvirt Dnsmasq,,,:/var/lib/libvirt/dnsmasq:/usr/sbin/nologin
+
+sudo usermod -G libvirt -a $USER
+#sudo usermod -G libvirt-qemu -a $USER
+#sudo usermod -G libvirtdnsmasq -a $USER
+
+# Timeshift Snapshot: Added user to libvirt group
+
+reboot
+
+Works
+
+sudo apt autoremove
+
+sudo apt-get install vagrant-libvirt | tee ~/vagrant-libvirt.log
+
+# Timeshift Snapshot: Added vagrant-libvirt
+
+mkdir -p ~/git/pwyoung; cd $_
+
+Background Image:
+  - https://wallpapercave.com/tardis-desktop-background
