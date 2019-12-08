@@ -7,7 +7,7 @@ sudo apt install emacs-nox
 Firefox:
   - sync
   - log into github, add keys, clone this repo
-
+  
 software tool:
   - update
   - Add timeshift
@@ -17,30 +17,68 @@ sudo timeshift-gtk
 Timeshift-Snapshot: Initial Setup
 
 ################################################################################
+# Home links
+################################################################################
+
+SSH-Keys:
+  - ssh-keygen -t rsa
+  - Send to github
+
+HOME links:
+  - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/computer-setup.git
+  - for i in $(ls -a ~/git/pwyoung/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/pwyoung/computer-setup/home/$i ~/$i; done
+
+
+software tool:
+  - update NVIDIA driver
+  - Check version
+apt list --installed 2>/dev/null | grep nvidia-driver 
+nvidia-driver-435/eoan,now 440.31-1pop1~1573485407~19.10~af08493 amd64 [installed]
+nvidia-driver-440/eoan,now 440.31-1pop1~1573485407~19.10~af08493 amd64 [installed]
+
+Timeshift-Snapshot: Added Nvidia
+
+################################################################################
 # NOMAJ
 ################################################################################
 
-# GIT
-apt-get install git
+# GIT, ANSIBLE
+sudo apt-get install git ansible
 
-# ANSIBLE
-apt-get install ansible
+# PYTHON
+sudo apt-get install python3-dev python3-venv
 
-# PYTHON3
-apt-get install python3-venv
+# Cleanup
+sudo apt autoremove
+
+Nomaj:
+  - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/nomaj.git; cd nomaj
 
 # PYTHON DEPS
 cd .../nomaj/
 make deps
 
+# PASSWORDLESS SSH to localhost
+cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys
+sudo apt-get install openssh-server
+ssh localhost hostname
+
 # NOMAJ ANSIBLE TEST
 #
 # Requires passwordless ssh to localhost
-ssh localhost hostname
-#
-Test
 cd nomaj/tests/module-ansible
 make
+
+reboot
+
+Timeshift-Snapshot: Nomaj Ansible
+
+<TODO: stopped here>
+
+################################################################################
+# VAGRANT WITH LIBVIRT
+################################################################################
+
 
 # NOMAJ VAGRANT TEST
 #
