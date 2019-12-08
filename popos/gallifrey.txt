@@ -203,14 +203,70 @@ Call to virDomainCreateWithFlags failed: internal error: process exited while co
 # Experiments are in /home/pyoung/git/pwyoung/vagrant-libvirt-testing/test-qemu-session
 #
 
+# Failed OS updates...
+# dpkg --configure -a # Grub to /dev/sdb1
 
-#
-Could not open '/home/pyoung/.local/share/libvirt/images/test_module_vagrant/node-2_1.qcow2': Permission denied
-sudo usermod -G libvirt-qemu -a $USER
-#
-  288  sudo apt-get install apparmor-profiles apparmor-utils
-  289  sudo aa-complain /usr/lib/libvirt/virt-aa-helper
-#
+Timeshift-Snapshot: failed-os-updates-recovered
+
+################################################################################
+# KVM Checks/Attempts
+################################################################################
+
+https://help.ubuntu.com/community/KVM/Installation
+sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
+# Above only installed bridge-utils
+#   dpkg -S bridge-utils
+#   e /usr/share/doc/bridge-utils/HOWTO
+
+lsmod | grep kvm
+kvm_intel             278528  0
+kvm                   651264  1 kvm_intel
+irqbypass              16384  1 kvm
+
+kvm-ok
+INFO: /dev/kvm exists
+KVM acceleration can be used
+
+reboot
+TimeShift Snapshot: Before-building-libvirt
+
+################################################################################
+# LIBVIRT TESTS
+################################################################################
+
+cd /home/pyoung/git/pwyoung/vagrant-libvirt-testing/cli-tests
+./test-virbr0.sh # WORKS
+
+
+################################################################################
+# Attempt to build LIBVIRT
+################################################################################
+
+# HE IS RIGHT
+#   https://jonaspfannschmidt.com/libvirt_session.html
+#   "Luckily there is now a way to use existing bridges with qemu:///session. The tool qemu-bridge-helper can configure a tap device which connects the guest to a bridge. Unfortunately it doesn't seem to be configured correctly out-of-the-box in Ubuntu."
+
+
+
+
+
+################################################################################
+# VIRTUALBOX
+################################################################################
+
+sudo apt-get install virtualbox
+sudo apt install virtualbox-ext-pack
+
+sudo apt remove virtualbox
+
+
+
+
+
+
+
+
+
 
 
 ################################################################################
@@ -250,7 +306,6 @@ Create a VM in virt-manager
  - Shows GUI and links to just the XML config for the options
  - Too bad it's deprecated in RHEL-8...
 
-# Timeshift Snapshot: Virtual Machine Manager
 
 ################################################################################
 # VIRTUALIZATION
@@ -292,6 +347,10 @@ sudo apt-get install vagrant-libvirt | tee ~/vagrant-libvirt.log
 
 # Timeshift Snapshot: Added vagrant-libvirt
 
+
+
+
+
 mkdir -p ~/git/pwyoung; cd $_
 
 Background Image:
@@ -304,3 +363,14 @@ Background Image:
 GNOME Shell Extensions:
   todo:
     - 427: Workspaces to Dock
+
+
+
+################################################################################
+Call to virDomainCreateWithFlags failed: Cannot access storage file '/var/lib/libvirt/images/test-module-vagrant_node-2.img' (as uid:64055, gid:108): No such file or directory
+
+cat /etc/passwd | grep 64055
+libvirt-qemu:x:64055:108:Libvirt Qemu,,,:/var/lib/libvirt:/usr/sbin/nologin
+
+root@pop-os:/etc/polkit-1/localauthority.conf.d# cat /etc/group | grep 108
+kvm:x:108:
