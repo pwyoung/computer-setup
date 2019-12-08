@@ -187,6 +187,22 @@ srwxrwx--- 1 root libvirt 0 Dec  7 20:40 /var/run/libvirt/libvirt-sock
 sudo usermod -G libvirt -a $USER
 reboot
 
+Timeshift-Snapshot: vagrant-reboot-1
+
+# Error after "make"
+Call to virDomainCreateWithFlags failed: internal error: process exited while connecting to monitor: 2019-12-08T01:58:39.381378Z qemu-system-x86_64: -drive file=/home/pyoung/.local/share/libvirt/images/test_module_vagrant/node-2_1.qcow2,if=none,id=drv1: Could not open '/home/pyoung/.local/share/libvirt/images/test_module_vagrant/node-2_1.qcow2': Permission denied
+#
+# virt-manager
+#   Shows these were created under QEMU/system
+#
+# Change the disk path to /var/lib/libvirt/images/ still fails (did not investigate)
+#
+# PLan: update Vagrantfile to work with qemu-session
+# Reproduce above error in /home/pyoung/git/pwyoung/nomaj/tests/vagrant-qemu-session
+#
+# Experiments are in /home/pyoung/git/pwyoung/vagrant-libvirt-testing/test-qemu-session
+#
+
 
 #
 Could not open '/home/pyoung/.local/share/libvirt/images/test_module_vagrant/node-2_1.qcow2': Permission denied
