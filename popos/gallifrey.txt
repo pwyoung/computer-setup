@@ -7,7 +7,7 @@ sudo apt install emacs-nox
 Firefox:
   - sync
   - log into github, add keys, clone this repo
-  
+
 software tool:
   - update
   - Add timeshift
@@ -32,7 +32,7 @@ HOME links:
 software tool:
   - update NVIDIA driver
   - Check version
-apt list --installed 2>/dev/null | grep nvidia-driver 
+apt list --installed 2>/dev/null | grep nvidia-driver
 nvidia-driver-435/eoan,now 440.31-1pop1~1573485407~19.10~af08493 amd64 [installed]
 nvidia-driver-440/eoan,now 440.31-1pop1~1573485407~19.10~af08493 amd64 [installed]
 
@@ -69,29 +69,125 @@ ssh localhost hostname
 cd nomaj/tests/module-ansible
 make
 
-reboot
-
 Timeshift-Snapshot: Nomaj Ansible
 
-<TODO: stopped here>
-
 ################################################################################
-# VAGRANT WITH LIBVIRT
+# GNOME-BOXES
 ################################################################################
 
+# Gnome-boxes
+sudo apt-get install gnome-boxes
 
-# NOMAJ VAGRANT TEST
+# Check packages
+sudo apt list --installed 2>/dev/null | egrep -i 'libvirt|kvm|qemu|virtual'
 #
-# Requires vagrant (on linux installs vagrant-libvirt)
-apt-get install vagrant
+ipxe-qemu-256k-compat-efi-roms/eoan,eoan,now 1.0.0+git-20150424.a25a16d-0ubuntu3 all [installed,automatic]
+ipxe-qemu/eoan,eoan,now 1.0.0+git-20190109.133f4c4-0ubuntu2 all [installed,automatic]
+libvirt-daemon-driver-storage-rbd/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-daemon/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-glib-1.0-0/eoan,now 2.0.0-1 amd64 [installed,automatic]
+libvirt0/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+qemu-block-extra/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-kvm/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-common/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-data/eoan-updates,eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 all [installed,automatic]
+qemu-system-gui/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-x86/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-utils/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+
+Timeshift-Snapshot: gnome-boxes
+
+Install Fedora-31 in a gnome-box
+
+Timeshift-Snapshot: gnome-boxes completed
+
+################################################################################
+# VIRT-MANAGER
+################################################################################
+This is deprecated but it's the best Libvirt GUI
+and it can help validate the other stuff
+
+sudo apt-get install virt-manager
+
+sudo apt list --installed 2>/dev/null | egrep -i 'libvirt|kvm|qemu|virtual'
+gir1.2-libvirt-glib-1.0/eoan,now 2.0.0-1 amd64 [installed,automatic]
+ipxe-qemu-256k-compat-efi-roms/eoan,eoan,now 1.0.0+git-20150424.a25a16d-0ubuntu3 all [installed,automatic]
+ipxe-qemu/eoan,eoan,now 1.0.0+git-20190109.133f4c4-0ubuntu2 all [installed,automatic]
+libvirt-clients/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-daemon-driver-storage-rbd/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-daemon-system/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-daemon/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-glib-1.0-0/eoan,now 2.0.0-1 amd64 [installed,automatic]
+libvirt0/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+python3-libvirt/eoan,now 5.0.0-1 amd64 [installed,automatic]
+qemu-block-extra/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-kvm/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-common/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-data/eoan-updates,eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 all [installed,automatic]
+qemu-system-gui/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-x86/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-utils/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+
+Timeshift-Snapshot: virt-manager
+
+sudo systemctl status libvirtd
+virt-manager
+  File -> Add Connection -> QEMU/KVM User Session -> See the gnome-box created above
+
+################################################################################
+# VAGRANT
+################################################################################
+
+sudo apt-get install vagrant
+
+# Check packages
+sudo apt list --installed 2>/dev/null | egrep -i 'libvirt|kvm|qemu|virtual|vagrant'
+#
+sudo apt list --installed 2>/dev/null | egrep -i 'libvirt|kvm|qemu|virtual|vagrant'
+gir1.2-libvirt-glib-1.0/eoan,now 2.0.0-1 amd64 [installed,automatic]
+ipxe-qemu-256k-compat-efi-roms/eoan,eoan,now 1.0.0+git-20150424.a25a16d-0ubuntu3 all [installed,automatic]
+ipxe-qemu/eoan,eoan,now 1.0.0+git-20190109.133f4c4-0ubuntu2 all [installed,automatic]
+libvirt-clients/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-daemon-driver-storage-rbd/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-daemon-system/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-daemon/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-glib-1.0-0/eoan,now 2.0.0-1 amd64 [installed,automatic]
+libvirt0/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+python3-libvirt/eoan,now 5.0.0-1 amd64 [installed,automatic]
+qemu-block-extra/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-kvm/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-common/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-data/eoan-updates,eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 all [installed,automatic]
+qemu-system-gui/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-x86/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-utils/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+ruby-fog-libvirt/eoan,eoan,now 0.6.0-1 all [installed,automatic]
+ruby-libvirt/eoan,now 0.7.1-1 amd64 [installed,automatic]
+ruby-vagrant-cloud/eoan,eoan,now 2.0.2-1 all [installed,automatic]
+vagrant-libvirt/eoan,eoan,now 0.0.45-2 all [installed,automatic]
+vagrant/eoan,eoan,now 2.2.3+dfsg-1ubuntu2 all [installed]
+
+
+Timeshift-Snapshot: vagrant
+
+################################################################################
+# NOMAJ VAGRANT TEST
 #
 Test
 cd nomaj/tests/module-vagrant
 make
+
+
 # ERROR
-# '/var/run/libvirt/libvirt-sock': Permission denied
+#   Call to virConnectOpen failed: Failed to connect socket to '/var/run/libvirt/libvirt-sock': Permission denied
+#
+# ls -l /var/run/libvirt/libvirt-sock
+srwxrwx--- 1 root libvirt 0 Dec  7 20:40 /var/run/libvirt/libvirt-sock
+
 sudo usermod -G libvirt -a $USER
 reboot
+
+
 #
 Could not open '/home/pyoung/.local/share/libvirt/images/test_module_vagrant/node-2_1.qcow2': Permission denied
 sudo usermod -G libvirt-qemu -a $USER
@@ -105,10 +201,6 @@ sudo usermod -G libvirt-qemu -a $USER
 # Virtualization
 ################################################################################
 
-HOME links:
-  - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/computer-setup.git
-  - for i in $(ls -a ~/git/pwyoung/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; \
-    ln -s ~/git/pwyoung/computer-setup/home/$i ~/$i; done
 
 Notes:
   LIBVIRT/KVM/QEMU-based:
@@ -131,10 +223,6 @@ Notes:
     - So provisioning tends to be much slower but given the deprecation of virt-manager
       the GUI in Virtualbox is better for many  users
 
-software tool:
- - Add gnome-boxes
-
-sudp apt-get install virt-manager
 
 # Cockpit
 sudo apt-get install cockpit
@@ -192,3 +280,11 @@ mkdir -p ~/git/pwyoung; cd $_
 
 Background Image:
   - https://wallpapercave.com/tardis-desktop-background
+
+
+
+################################################################################
+
+GNOME Shell Extensions:
+  todo:
+    - 427: Workspaces to Dock
