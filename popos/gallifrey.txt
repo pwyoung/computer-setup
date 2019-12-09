@@ -14,20 +14,21 @@ software tool:
 
 sudo timeshift-gtk
 
-Timeshift-Snapshot: After updates
+sudo apt-add-repository -y ppa:teejee2008/ppa
 
+sudo apt-get update
 
-################################################################################
-# 
-################################################################################
+sudo apt-get install xfsprogs
+sudo apt-get install timeshift
 
 SSH-Keys:
   - ssh-keygen -t rsa
   - Send to github
 
+Timeshift-Snapshot: After-updates
 
 ################################################################################
-# CREATE A BRIDGE (BR0) in QEMU/Session
+# LIBVIRT
 ################################################################################
 
 https://www.linuxtechi.com/install-configure-kvm-ubuntu-18-04-server/
@@ -61,6 +62,11 @@ Dec 08 19:43:39 pop-os dnsmasq[12504]: read /etc/hosts - 3 addresses
 Dec 08 19:43:39 pop-os dnsmasq[12504]: read /var/lib/libvirt/dnsmasq/default.addnhosts - 0 addresses
 Dec 08 19:43:39 pop-os dnsmasq-dhcp[12504]: read /var/lib/libvirt/dnsmasq/default.hostsfile
 
+Timeshift-Snapshot: libvirt
+
+################################################################################
+# CREATE A BRIDGE (BR0) in QEMU/Session
+################################################################################
 
 # Q: Why not use systemctl?
 
@@ -69,7 +75,6 @@ Dec 08 19:43:39 pop-os dnsmasq-dhcp[12504]: read /var/lib/libvirt/dnsmasq/defaul
 # Network: how should I add a bridge, if I should?
 sudo tree /etc/systemd/network # empty
 sudo tree /etc/netplan # empty
-
 
 # ---
  systemctl status | grep -i network
@@ -118,10 +123,10 @@ sudo systemctl status systemd-networkd
 #   There is no bridge (per https://www.linuxtechi.com/install-configure-kvm-ubuntu-18-04-server/)
 #
 # NOTE:
-#  https://bbs.archlinux.org/viewtopic.php?id=184164 
+#  https://bbs.archlinux.org/viewtopic.php?id=184164
 #    You can't have systemd-networkd and NetworkManager working at the same time.
 #
-sudo networkctl status -a 2>/dev/null | grep '●' 
+sudo networkctl status -a 2>/dev/null | grep '●'
 ● 1: lo
 ● 2: eno1
 ● 3: virbr0
@@ -138,7 +143,7 @@ https://askubuntu.com/questions/1161422/etc-network-interfaces-systemd-networkd-
 
 #
 # Attempt 1: make bridge with netplay->NetworkManager
-# 
+#
 
 # Using network-manager
 #   https://netplan.io/examples#using-network-manager-as-a-renderer
@@ -158,42 +163,6 @@ network:
 # Per https://fabianlee.org/2019/04/01/kvm-creating-a-bridged-network-with-netplan-on-ubuntu-bionic/
 sudo netplan generate
 sudo netplan --debug apply
-** (generate:16423): DEBUG: 20:29:19.148: Processing input file /etc/netplan/config.yaml..
-** (generate:16423): DEBUG: 20:29:19.148: starting new processing pass
-** (generate:16423): DEBUG: 20:29:19.148: eno1: setting default backend to 2
-** (generate:16423): DEBUG: 20:29:19.148: Configuration is valid
-** (generate:16423): DEBUG: 20:29:19.148: br0: setting default backend to 2
-** (generate:16423): DEBUG: 20:29:19.149: Configuration is valid
-** (generate:16423): DEBUG: 20:29:19.149: Generating output files..
-** (generate:16423): DEBUG: 20:29:19.149: networkd: definition eno1 is not for us (backend 2)
-** (generate:16423): DEBUG: 20:29:19.149: networkd: definition br0 is not for us (backend 2)
-DEBUG:no netplan generated networkd configuration exists
-DEBUG:netplan generated NM configuration changed, restarting NM
-DEBUG:eno1 not found in {}
-DEBUG:br0 not found in {}
-DEBUG:Merged config:
-network:
-  bonds: {}
-  bridges:
-    br0:
-      dhcp4: true
-      interfaces:
-      - eno1
-  ethernets:
-    eno1:
-      dhcp4: false
-  vlans: {}
-  wifis: {}
-
-DEBUG:Skipping non-physical interface: lo
-DEBUG:Skipping composite member eno1
-DEBUG:Skipping non-physical interface: virbr0
-DEBUG:Skipping non-physical interface: virbr0-nic
-DEBUG:{}
-DEBUG:netplan triggering .link rules for lo
-DEBUG:netplan triggering .link rules for eno1
-DEBUG:netplan triggering .link rules for virbr0
-DEBUG:netplan triggering .link rules for virbr0-nic
 
 # Review
 sudo networkctl status -a 2>/dev/null | grep '●'
@@ -209,7 +178,7 @@ sudo networkctl status -a 2>/dev/null | grep '●'
 # This shows the brige has the IP address this host does get from the router's DHCP server
 # This works because the mac of the bridge is correct (matches the ethernet)
 #  HW Address: <same as ethernet>
-sudo networkctl status -a 2>/dev/null 
+sudo networkctl status -a 2>/dev/null
 #
 ● 5: br0
        Link File: /lib/systemd/network/99-default.link
@@ -277,6 +246,10 @@ HOME links:
 Timeshift-Snapshot: host-bridge
 
 ################################################################################
+# Skipped above for now on tardis
+################################################################################
+
+################################################################################
 # NOMAJ
 ################################################################################
 
@@ -325,84 +298,15 @@ Timeshift-Snapshot: Nomaj-Ansible
 ################################################################################
 
 sudo apt-get install vagrant-libvirt
-#
-The following additional packages will be installed:
-  attr bsdtar btrfs-progs db-util db5.3-util exfat-fuse exfat-utils extlinux fonts-lato gawk hfsplus icoutils javascript-common
-  ldmtool libafflib0v5 libarchive-tools libbfio1 libconfig9 libdate-manip-perl libevent-2.1-6 libewf2 libguestfs-hfsplus
-  libguestfs-perl libguestfs-reiserfs libguestfs-tools libguestfs-xfs libguestfs0 libhfsp0 libhivex0 libintl-perl libintl-xs-perl
-  libjs-jquery libldm-1.0-0 libnetpbm10 libnfsidmap2 libruby2.5 libsigsegv2 libsodium-dev libstring-shellquote-perl
-  libsys-virt-perl libtirpc1 libtsk13 libwin-hivex-perl libxml-xpath-perl lsscsi lzop mtools netpbm nfs-common nfs-kernel-server
-  rake reiserfsprogs rpcbind ruby ruby-bcrypt-pbkdf ruby-blankslate ruby-builder ruby-childprocess ruby-did-you-mean
-  ruby-domain-name ruby-erubis ruby-excon ruby-ffi ruby-fog-core ruby-fog-json ruby-fog-libvirt ruby-fog-xml ruby-formatador
-  ruby-http-cookie ruby-i18n ruby-json ruby-libvirt ruby-listen ruby-log4r ruby-mime-types ruby-mime-types-data ruby-minitest
-  ruby-multi-json ruby-net-scp ruby-net-sftp ruby-net-ssh ruby-net-telnet ruby-netrc ruby-nokogiri ruby-oj ruby-pkg-config
-  ruby-power-assert ruby-rb-inotify ruby-rbnacl ruby-rest-client ruby-sqlite3 ruby-test-unit ruby-unf ruby-unf-ext ruby2.5
-  rubygems-integration scrub sgabios sleuthkit sqlite3 supermin syslinux syslinux-common vagrant zerofree
-Suggested packages:
-  duperemove gawk-doc libterm-readline-gnu-perl | libterm-readline-perl-perl apache2 | lighttpd | httpd libguestfs-gfs2
-  libguestfs-jfs libguestfs-nilfs libguestfs-rescue libguestfs-rsync libguestfs-zfs floppyd open-iscsi watchdog ri ruby-dev
-  ruby-builder-doc ruby-activesupport bundler autopsy mac-robber sqlite3-doc virtualbox
-The following NEW packages will be installed:
-  attr bsdtar btrfs-progs db-util db5.3-util exfat-fuse exfat-utils extlinux fonts-lato gawk hfsplus icoutils javascript-common
-  ldmtool libafflib0v5 libarchive-tools libbfio1 libconfig9 libdate-manip-perl libevent-2.1-6 libewf2 libguestfs-hfsplus
-  libguestfs-perl libguestfs-reiserfs libguestfs-tools libguestfs-xfs libguestfs0 libhfsp0 libhivex0 libintl-perl libintl-xs-perl
-  libjs-jquery libldm-1.0-0 libnetpbm10 libnfsidmap2 libruby2.5 libsigsegv2 libsodium-dev libstring-shellquote-perl
-  libsys-virt-perl libtirpc1 libtsk13 libwin-hivex-perl libxml-xpath-perl lsscsi lzop mtools netpbm nfs-common nfs-kernel-server
-  rake reiserfsprogs rpcbind ruby ruby-bcrypt-pbkdf ruby-blankslate ruby-builder ruby-childprocess ruby-did-you-mean
-  ruby-domain-name ruby-erubis ruby-excon ruby-ffi ruby-fog-core ruby-fog-json ruby-fog-libvirt ruby-fog-xml ruby-formatador
-  ruby-http-cookie ruby-i18n ruby-json ruby-libvirt ruby-listen ruby-log4r ruby-mime-types ruby-mime-types-data ruby-minitest
-  ruby-multi-json ruby-net-scp ruby-net-sftp ruby-net-ssh ruby-net-telnet ruby-netrc ruby-nokogiri ruby-oj ruby-pkg-config
-  ruby-power-assert ruby-rb-inotify ruby-rbnacl ruby-rest-client ruby-sqlite3 ruby-test-unit ruby-unf ruby-unf-ext ruby2.5
-  rubygems-integration scrub sgabios sleuthkit sqlite3 supermin syslinux syslinux-common vagrant vagrant-libvirt zerofree
-0 upgraded, 106 newly installed, 0 to remove and 0 not upgraded.
-#
-
-
 
 # Check packages
  sudo apt list --installed 2>/dev/null | egrep -i 'libvirt|kvm|qemu|virtual|vagrant'
-gir1.2-libvirt-glib-1.0/bionic,now 1.0.0-1 amd64 [installed,automatic]
-ipxe-qemu/bionic-updates,bionic-updates,now 1.0.0+git-20180124.fbe8c52d-0ubuntu2.2 all [installed,automatic]
-ipxe-qemu-256k-compat-efi-roms/bionic,bionic,now 1.0.0+git-20150424.a25a16d-0ubuntu2 all [installed,automatic]
-libvirt-bin/bionic-updates,now 4.0.0-1ubuntu8.14 amd64 [installed]
-libvirt-clients/bionic-updates,now 4.0.0-1ubuntu8.14 amd64 [installed,automatic]
-libvirt-daemon/bionic-updates,now 4.0.0-1ubuntu8.14 amd64 [installed,automatic]
-libvirt-daemon-driver-storage-rbd/bionic-updates,now 4.0.0-1ubuntu8.14 amd64 [installed,automatic]
-libvirt-daemon-system/bionic-updates,now 4.0.0-1ubuntu8.14 amd64 [installed,automatic]
-libvirt-glib-1.0-0/bionic,now 1.0.0-1 amd64 [installed,automatic]
-libvirt0/bionic-updates,now 4.0.0-1ubuntu8.14 amd64 [installed,automatic]
-python-libvirt/bionic,now 4.0.0-1 amd64 [installed,automatic]
-qemu/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed]
-qemu-block-extra/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-kvm/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed]
-qemu-slof/bionic,bionic,now 20170724+dfsg-1ubuntu1 all [installed,automatic]
-qemu-system/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-system-arm/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-system-common/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-system-mips/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-system-misc/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-system-ppc/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-system-s390x/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-system-sparc/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-system-x86/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-user/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-user-binfmt/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-qemu-utils/bionic-updates,now 1:2.11+dfsg-1ubuntu7.21 amd64 [installed,automatic]
-ruby-fog-libvirt/bionic,bionic,now 0.3.0-1 all [installed,automatic]
-ruby-libvirt/bionic,now 0.7.0-1build2 amd64 [installed,automatic]
-vagrant/bionic,bionic,now 2.0.2+dfsg-2ubuntu8 all [installed,automatic]
-vagrant-libvirt/bionic,bionic,now 0.0.43-2 all [installed]
 
-
-Timeshift-Snapshot: vagrant
+# Timeshift-Snapshot: vagrant
 
 ################################################################################
-# NOMAJ VAGRANT TEST
-#
-Test
-cd nomaj/tests/module-vagrant
-make
-
+# TEST VAGRANT-LIBVIRT
+################################################################################
 
 # ERROR
 #   Call to virConnectOpen failed: Failed to connect socket to '/var/run/libvirt/libvirt-sock': Permission denied
@@ -414,6 +318,26 @@ sudo usermod -G libvirt -a $USER
 reboot
 
 Timeshift-Snapshot: vagrant-reboot-1
+
+
+# Test again
+cd ~/git/pwyoung
+git clone ....
+cd ./vagrant-libvirt-testing
+make
+
+################################################################################
+# CHANGE CODE TO USE QEMU/SYSTEM - NO NVME
+################################################################################
+
+
+
+################################################################################
+# NOMAJ VAGRANT TEST
+#
+Test
+cd nomaj/tests/module-vagrant
+make
 
 # Error after "make"
 Call to virDomainCreateWithFlags failed: internal error: process exited while connecting to monitor: 2019-12-08T01:58:39.381378Z qemu-system-x86_64: -drive file=/home/pyoung/.local/share/libvirt/images/test_module_vagrant/node-2_1.qcow2,if=none,id=drv1: Could not open '/home/pyoung/.local/share/libvirt/images/test_module_vagrant/node-2_1.qcow2': Permission denied
