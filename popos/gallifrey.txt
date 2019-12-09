@@ -135,10 +135,91 @@ wpasupplicant, wireless-tools, resolvconf, netbase, ifupdown, avahi-daemon, avah
 # Apparently, they can coexist
 https://askubuntu.com/questions/1161422/etc-network-interfaces-systemd-networkd-and-networkmanager-how-do-they-coexis
 
+#
+# Attempt 1: make bridge with netplay->NetworkManager
+# 
 
+# Using network-manager
+#   https://netplan.io/examples#using-network-manager-as-a-renderer
+emacs /etc/netplan/config.yaml
+network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    eno1:
+      dhcp4: no
+  bridges:
+    br0:
+      dhcp4: yes
+      interfaces:
+        - eno1
+#
+# Per https://fabianlee.org/2019/04/01/kvm-creating-a-bridged-network-with-netplan-on-ubuntu-bionic/
+sudo netplan generate
+sudo netplan --debug apply
+** (generate:16423): DEBUG: 20:29:19.148: Processing input file /etc/netplan/config.yaml..
+** (generate:16423): DEBUG: 20:29:19.148: starting new processing pass
+** (generate:16423): DEBUG: 20:29:19.148: eno1: setting default backend to 2
+** (generate:16423): DEBUG: 20:29:19.148: Configuration is valid
+** (generate:16423): DEBUG: 20:29:19.148: br0: setting default backend to 2
+** (generate:16423): DEBUG: 20:29:19.149: Configuration is valid
+** (generate:16423): DEBUG: 20:29:19.149: Generating output files..
+** (generate:16423): DEBUG: 20:29:19.149: networkd: definition eno1 is not for us (backend 2)
+** (generate:16423): DEBUG: 20:29:19.149: networkd: definition br0 is not for us (backend 2)
+DEBUG:no netplan generated networkd configuration exists
+DEBUG:netplan generated NM configuration changed, restarting NM
+DEBUG:eno1 not found in {}
+DEBUG:br0 not found in {}
+DEBUG:Merged config:
+network:
+  bonds: {}
+  bridges:
+    br0:
+      dhcp4: true
+      interfaces:
+      - eno1
+  ethernets:
+    eno1:
+      dhcp4: false
+  vlans: {}
+  wifis: {}
 
+DEBUG:Skipping non-physical interface: lo
+DEBUG:Skipping composite member eno1
+DEBUG:Skipping non-physical interface: virbr0
+DEBUG:Skipping non-physical interface: virbr0-nic
+DEBUG:{}
+DEBUG:netplan triggering .link rules for lo
+DEBUG:netplan triggering .link rules for eno1
+DEBUG:netplan triggering .link rules for virbr0
+DEBUG:netplan triggering .link rules for virbr0-nic
 
+# Review
+sudo networkctl status -a 2>/dev/null | grep '●'
 
+# YES - WE HAVE A BRIDGE!
+sudo networkctl status -a 2>/dev/null | grep '●'
+● 1: lo
+● 2: eno1
+● 3: virbr0
+● 4: virbr0-nic
+● 5: br0
+
+# This shows the brige has the IP address this host does get from the router's DHCP server
+# This works because the mac of the bridge is correct (matches the ethernet)
+#  HW Address: <same as ethernet>
+sudo networkctl status -a 2>/dev/null 
+#
+● 5: br0
+       Link File: /lib/systemd/network/99-default.link
+    Network File: n/a
+            Type: ether
+           State: n/a (unmanaged)
+          Driver: bridge
+      HW Address: 9c:5c:8e:73:1a:25 (ASUSTek COMPUTER INC.)
+         Address: 10.250.0.101
+                  fe80::9e5c:8eff:fe73:1a25
+         Gateway: 10.250.0.1 (NETGEAR)
 
 
 
