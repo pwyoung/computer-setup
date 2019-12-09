@@ -14,19 +14,140 @@ software tool:
 
 sudo timeshift-gtk
 
-Timeshift-Snapshot: Initial Setup
+Timeshift-Snapshot: After updates
+
 
 ################################################################################
-# Home links
+# 
 ################################################################################
 
 SSH-Keys:
   - ssh-keygen -t rsa
   - Send to github
 
-HOME links:
-  - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/computer-setup.git
-  - for i in $(ls -a ~/git/pwyoung/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/pwyoung/computer-setup/home/$i ~/$i; done
+
+################################################################################
+# KVM
+################################################################################
+https://www.linuxtechi.com/install-configure-kvm-ubuntu-18-04-server/
+
+sudo apt install cpu-checker
+
+sudo kvm-ok
+
+sudo apt update
+sudo apt install qemu qemu-kvm libvirt-bin bridge-utils  virt-manager
+
+# AHA: libvirt-bin failed to install on 19.10!
+
+sudo service libvirtd restart
+sudo service libvirtd status
+ libvirtd.service - Virtualization daemon
+   Loaded: loaded (/lib/systemd/system/libvirtd.service; enabled; vendor preset: enabled)
+   Active: active (running) since Sun 2019-12-08 19:43:38 EST; 1s ago
+     Docs: man:libvirtd(8)
+           https://libvirt.org
+ Main PID: 14286 (libvirtd)
+    Tasks: 19 (limit: 32768)
+   CGroup: /system.slice/libvirtd.service
+           ├─12504 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script
+           ├─12505 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script
+           └─14286 /usr/sbin/libvirtd
+
+Dec 08 19:43:38 pop-os systemd[1]: Starting Virtualization daemon...
+Dec 08 19:43:38 pop-os systemd[1]: Started Virtualization daemon.
+Dec 08 19:43:39 pop-os dnsmasq[12504]: read /etc/hosts - 3 addresses
+Dec 08 19:43:39 pop-os dnsmasq[12504]: read /var/lib/libvirt/dnsmasq/default.addnhosts - 0 addresses
+Dec 08 19:43:39 pop-os dnsmasq-dhcp[12504]: read /var/lib/libvirt/dnsmasq/default.hostsfile
+
+
+# Q: Why not use systemctl?
+
+# Q: The above docs say /etc/netplan/50-cloud-init.yaml already exists, but it doesn't...
+
+# Network: how should I add a bridge, if I should?
+sudo tree /etc/systemd/network # empty
+sudo tree /etc/netplan # empty
+
+
+# ---
+ systemctl status | grep -i network
+           │ │ │ └─15729 grep --color=auto -i network
+             ├─networkd-dispatcher.service
+             │ └─1022 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
+             ├─NetworkManager.service
+             │ ├─1052 /usr/sbin/NetworkManager --no-daemon
+             │ └─1486 /sbin/dhclient -d -q -sf /usr/lib/NetworkManager/nm-dhcp-helper -pf /run/dhclient-eno1.pid -lf /var/lib/NetworkManager/dhclient-efca3a65-f60b-32b8-a6b4-4788fae677fd-eno1.lease -cf /var/lib/NetworkManager/dhclient-eno1.conf eno1
+
+# Looks like netplan is used
+#
+ cat /etc/network/interfaces
+# ifupdown has been replaced by netplan(5) on this system.  See
+# /etc/netplan for current configuration.
+# To re-enable ifupdown on this system, you can run:
+#    sudo apt install ifupdown
+
+# Check net procs
+sudo ps -ef | grep -i net
+root        82     2  0 19:15 ?        00:00:00 [netns]
+root      1022     1  0 19:15 ?        00:00:00 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
+root      1052     1  0 19:15 ?        00:00:00 /usr/sbin/NetworkManager --no-daemon
+root      1486  1052  0 19:15 ?        00:00:00 /sbin/dhclient -d -q -sf /usr/lib/NetworkManager/nm-dhcp-helper -pf /run/dhclient-eno1.pid -lf /var/lib/NetworkManager/dhclient-efca3a65-f60b-32b8-a6b4-4788fae677fd-eno1.lease -cf /var/lib/NetworkManager/dhclient-eno1.conf eno1
+pyoung   16190 15755  0 20:17 pts/4    00:00:00 grep --color=auto -i net
+
+
+# Apparently this CAN work with networkmanager,but often conflicts
+sudo systemctl status systemd-networkd
+● systemd-networkd.service - Network Service
+   Loaded: loaded (/lib/systemd/system/systemd-networkd.service; disabled; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd-networkd.service(8)
+
+
+#
+# A: It looks like netplan is used, but... review other docs
+#
+
+
+# Other docs
+#   https://netplan.io/examples#bridging
+
+
+# Confirmed:
+#   There is no bridge (per https://www.linuxtechi.com/install-configure-kvm-ubuntu-18-04-server/)
+#
+# NOTE:
+#  https://bbs.archlinux.org/viewtopic.php?id=184164 
+#    You can't have systemd-networkd and NetworkManager working at the same time.
+#
+sudo networkctl status -a 2>/dev/null | grep '●' 
+● 1: lo
+● 2: eno1
+● 3: virbr0
+● 4: virbr0-nic
+
+
+# https://unix.stackexchange.com/questions/475146/how-exactly-are-networkmanager-networkd-netplan-ifupdown2-and-iproute2-inter/475190
+#
+ dpkg -S /etc/network
+wpasupplicant, wireless-tools, resolvconf, netbase, ifupdown, avahi-daemon, avahi-autoipd, bridge-utils: /etc/network
+
+# Apparently, they can coexist
+https://askubuntu.com/questions/1161422/etc-network-interfaces-systemd-networkd-and-networkmanager-how-do-they-coexis
+
+
+
+
+
+
+
+
+
+
+
+################################################################################
+# Home links
+################################################################################
 
 
 software tool:
@@ -36,7 +157,7 @@ apt list --installed 2>/dev/null | grep nvidia-driver
 nvidia-driver-435/eoan,now 440.31-1pop1~1573485407~19.10~af08493 amd64 [installed]
 nvidia-driver-440/eoan,now 440.31-1pop1~1573485407~19.10~af08493 amd64 [installed]
 
-Timeshift-Snapshot: Added Nvidia
+
 
 ################################################################################
 # NOMAJ
@@ -70,6 +191,16 @@ cd nomaj/tests/module-ansible
 make
 
 Timeshift-Snapshot: Nomaj Ansible
+
+
+
+
+
+HOME links:
+  - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/computer-setup.git
+  - for i in $(ls -a ~/git/pwyoung/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/pwyoung/computer-setup/home/$i ~/$i; done
+
+
 
 ################################################################################
 # GNOME-BOXES
