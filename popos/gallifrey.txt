@@ -147,7 +147,11 @@ https://askubuntu.com/questions/1161422/etc-network-interfaces-systemd-networkd-
 
 # Using network-manager
 #   https://netplan.io/examples#using-network-manager-as-a-renderer
-emacs /etc/netplan/config.yaml
+sudo emacs /etc/netplan/config.yaml
+# /etc/netplan/config.yaml
+# Use your own device as needed: (replace BOTH places in the file)
+#   - eno1
+#   - enp8s0
 network:
   version: 2
   renderer: NetworkManager
@@ -163,6 +167,11 @@ network:
 # Per https://fabianlee.org/2019/04/01/kvm-creating-a-bridged-network-with-netplan-on-ubuntu-bionic/
 sudo netplan generate
 sudo netplan --debug apply
+
+# EXAMPLE OF HOW TO DELETE A BRIDGE
+#  For example, if the wrong config was applied
+ifconfig br0 down
+brctl delbr br0
 
 # Review
 sudo networkctl status -a 2>/dev/null | grep '●'
@@ -192,7 +201,7 @@ sudo networkctl status -a 2>/dev/null
          Gateway: 10.250.0.1 (NETGEAR)
 
 # Additional confirmation
- sudo netplan ip leases br0
+sudo netplan ip leases br0
 lease {
   interface "br0";
   fixed-address 10.250.0.101;
@@ -212,7 +221,7 @@ lease {
 # Configure libvirt network to use existing bridge
 #   Per https://fabianlee.org/2019/04/01/kvm-creating-a-bridged-network-with-netplan-on-ubuntu-bionic/
 #
-cat << EOF > ./host-bridge.xml
+sudo cat << EOF > ./host-bridge.xml
 <network>
   <name>host-bridge</name>
   <forward mode="bridge"/>
@@ -220,20 +229,71 @@ cat << EOF > ./host-bridge.xml
 </network>
 EOF
 #
-virsh net-define host-bridge.xml
-virsh net-start host-bridge
-virsh net-autostart host-bridge
+sudo virsh net-define host-bridge.xml
+sudo virsh net-start host-bridge
+sudo virsh net-autostart host-bridge
 # state should be active, autostart, and persistent
-virsh net-list --all
+sudo virsh net-list --all
 
 # REBOOT
 # Wait for IP address
 ip a s
 # YES ... This is in the USER SESSION !!!
-virsh --connect qemu:///session net-list
+sudo virsh --connect qemu:///session net-list
  Name                 State      Autostart     Persistent
 ----------------------------------------------------------
  host-bridge          active     yes           yes
+
+# Actually, enabled vagrant-libvirt bridge too
+sudo virsh --connect qemu:///session net-list
+ Name                 State      Autostart     Persistent
+----------------------------------------------------------
+ default              active     yes           yes
+ host-bridge          active     yes           yes
+ vagrant-libvirt      active     yes           yes
+
+# NOTE: The connection seems to silently fail if run as non-root
+virsh --connect qemu:///session net-list # nothing
+
+# Another way to look at the bridge
+sudo virsh --connect qemu:///session net-info host-bridge
+Name:           host-bridge
+UUID:           d4b20719-c4e3-4064-951c-90c7b122f0b2
+Active:         yes
+Persistent:     yes
+Autostart:      yes
+Bridge:         br0
+
+
+# But, it seems that the qemu helper on Ubuntu is broken
+# This assumption is based on:
+#   - The error below
+#   - The fact that there are blogs saying so and showing how they recompiled libvirt
+#     to make it work.
+#     - e.g. https://jonaspfannschmidt.com/libvirt_session.html
+Error starting domain: internal error: /usr/lib/qemu/qemu-bridge-helper --br=br0 --fd=25: failed to communicate with bridge helper: Transport endpoint is not connected
+stderr=failed to write fd to unix socket: Socket operation on non-socket
+
+# ATTEMPT 2: Make yet another bridge
+# Base on this: https://github.com/vagrant-libvirt/vagrant-libvirt/issues/272
+#   - "You need to set up your bridge (let's say virbr0) independent of qemu:///session. Like via system libvirtd/qemu:///system. Then with qemu:///session give your VM device XML like:"
+emacs ~/bridge-virbr0.xml
+# ~/bridge-virbr0.xml
+<network>
+  <name>host-bridge</name>
+  <forward mode="bridge"/>
+  <bridge name="br0"/>
+</network>
+#
+sudo virsh net-define bridge-virbr0.xml
+sudo virsh net-start bridge-virbr0
+sudo virsh net-autostart bridge-virbr0
+# state should be active, autostart, and persistent
+sudo virsh net-list --all
+
+# GIVING UP ON QEMU/Session on Ubuntu (at least 18.04)
+# Perhaps "usermode networking" can be specified in vagrant-libvirt ... maybe....
+
 
 ################################################################################
 # Home links
@@ -244,10 +304,6 @@ HOME links:
   - for i in $(ls -a ~/git/pwyoung/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/pwyoung/computer-setup/home/$i ~/$i; done
 
 Timeshift-Snapshot: host-bridge
-
-################################################################################
-# Skipped above for now on tardis
-################################################################################
 
 ################################################################################
 # NOMAJ
@@ -300,7 +356,7 @@ Timeshift-Snapshot: Nomaj-Ansible
 sudo apt-get install vagrant-libvirt
 
 # Check packages
- sudo apt list --installed 2>/dev/null | egrep -i 'libvirt|kvm|qemu|virtual|vagrant'
+sudo apt list --installed 2>/dev/null | egrep -i 'libvirt|kvm|qemu|virtual|vagrant'
 
 # Timeshift-Snapshot: vagrant
 
@@ -314,7 +370,9 @@ sudo apt-get install vagrant-libvirt
 # ls -l /var/run/libvirt/libvirt-sock
 srwxrwx--- 1 root libvirt 0 Dec  7 20:40 /var/run/libvirt/libvirt-sock
 
+sudo usermod -G libvirt-qemu -a $USER
 sudo usermod -G libvirt -a $USER
+sudo usermod -G kvm -a $USER
 reboot
 
 Timeshift-Snapshot: vagrant-reboot-1
@@ -560,3 +618,40 @@ libvirt-qemu:x:64055:108:Libvirt Qemu,,,:/var/lib/libvirt:/usr/sbin/nologin
 
 root@pop-os:/etc/polkit-1/localauthority.conf.d# cat /etc/group | grep 108
 kvm:x:108:
+
+
+
+
+################################################################################
+# ADD BOXES
+################################################################################
+
+# Installed gnome-boxes
+# Added a box
+# Turned off the box
+# Added another NIC (bridge "br0")
+
+sudo su -
+mkdir /etc/qemu
+echo 'allow all' > /etc/qemu/bridge.conf
+chmod u+s /usr/lib/qemu/qemu-bridge-helper
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
