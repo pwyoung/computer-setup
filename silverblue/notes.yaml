@@ -252,7 +252,8 @@ grubby --update-kernel=ALL --args=iommu=pt
 # Use CGroups legacy/V1
 # https://ask.fedoraproject.org/t/fedora-31-and-container-docker-ce-moby-engine-start-systemd-problem/3582
 #
-grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
+sudo dnf install grubby
+sudo grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
 
 
 # Check boot command line used

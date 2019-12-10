@@ -1,0 +1,31 @@
+
+################################################################################
+# Virtualization
+################################################################################
+
+sudo dnf install virt-install virt-manager
+
+# Problem
+#   virt-host-validate
+#   produces: "(Enable 'cpu' in kernel Kconfig file or mount/enable cgroup controller in your system)"
+# Solution
+# Use CGroups legacy/V1
+# https://ask.fedoraproject.org/t/fedora-31-and-container-docker-ce-moby-engine-start-systemd-problem/3582
+#
+sudo dnf install grubby
+sudo grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
+
+
+TODO
+# Check boot command line used
+ dmesg | grep 'Kernel command line'
+[    0.355299] Kernel command line: BOOT_IMAGE=(hd0,gpt2)/vmlinuz-5.3.12-300.fc31.x86_64 root=/dev/mapper/fedora_localhost--l\
+ive-root ro resume=/dev/mapper/fedora_localhost--live-swap rd.lvm.lv=fedora_localhost-live/root rd.lvm.lv=fedora_localhost-li\
+ve/swap rhgb quiet intel_iommu=on
+
+
+dmesg | grep -i -e DMAR -e IOMMU
+
+dmesg | grep DMAR
+[    0.355561] DMAR: IOMMU enabled
+
