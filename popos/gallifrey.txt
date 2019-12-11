@@ -636,22 +636,60 @@ mkdir /etc/qemu
 echo 'allow all' > /etc/qemu/bridge.conf
 chmod u+s /usr/lib/qemu/qemu-bridge-helper
 
+################################################################################
+# (RE)SET permissions on /var/lib/libvirt/images
+################################################################################
+
+
+sudo chown libvirt-qemu /var/lib/libvirt/images
+sudo chgrp kvm /var/lib/libvirt/images
+sudo chmod 775 /var/lib/libvirt/images
+sudo chmod g+s /var/lib/libvirt/images
+sudo chmod u+s /var/lib/libvirt/images
+ls -ld /var/lib/libvirt/images
+drwsrwsr-x 2 libvirt-qemu kvm 4096 Dec 10 16:18 /var/lib/libvirt/images
+
+# Error.
+#
+Call to virDomainCreateWithFlags failed: internal error: process exited while connecting to monitor: 2019-12-10T21:21:26.900613Z qemu-system-x86_64: -drive file=/var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_1.qcow2,if=none,id=drv1: Could not open '/var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_1.qcow2': Permission denied
+#
+ls -ld /var/lib/libvirt/images/*
+-rw-rw-r-- 1 pyoung       kvm      198216 Dec 10 16:21 /var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_1.qcow2
+-rw-rw-r-- 1 pyoung       kvm      198216 Dec 10 16:21 /var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_2.qcow2
+-rw------- 1 root         root     197120 Dec 10 16:21 /var/lib/libvirt/images/example-vagrant-qemu-system-nvme_node-1.img
+-rwxrw-r-- 1 libvirt-qemu kvm  1216439296 Dec  9 00:45 /var/lib/libvirt/images/generic-VAGRANTSLASH-ubuntu1804_vagrant_box_image_2.0.6.img
+
+# Attempt 2:
+sudo chown root /var/lib/libvirt/images
+sudo chgrp libvirt-qemu /var/lib/libvirt/images
+sudo chmod 775 /var/lib/libvirt/images
+sudo chmod g+s /var/lib/libvirt/images
+sudo chmod u-s /var/lib/libvirt/images
+ls -ld /var/lib/libvirt/images
+drwxrwsr-x 2 root libvirt-qemu 4096 Dec 10 16:21 /var/lib/libvirt/images
+
+# Error
+#
+Call to virDomainCreateWithFlags failed: internal error: process exited while connecting to monitor: 2019-12-10T21:27:38.332683Z qemu-system-x86_64: -drive file=/var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_1.qcow2,if=none,id=drv1: Could not open '/var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_1.qcow2': Permission denied
+#
+
+# This?
+https://bbs.archlinux.org/viewtopic.php?pid=1728381#p1728381
+
+################################################################################
+# MAYBE QEMU/SESSION WOULD BE EASIER... IT WORKED ON FEDORA
+################################################################################
 
 
 
+################################################################################
+# KVM NESTING
+################################################################################
+https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
+https://stafwag.github.io/blog/blog/2018/06/04/nested-virtualization-in-kvm/
+virt-host-validate
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+kernelstub -a intel_iommu=on
 
 
