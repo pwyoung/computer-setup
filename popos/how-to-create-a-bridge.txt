@@ -1,0 +1,146 @@
+
+################################################################################
+# HOW TO CREATE A BRIDGE (BR0) in QEMU/Session (NOT DONE ON TARDIS)
+################################################################################
+
+sudo networkctl status -a 2>/dev/null | grep '●'
+● 1: lo
+● 2: eno1
+● 3: virbr0
+● 4: virbr0-nic
+
+
+#
+# Attempt 1: make bridge with netplay->NetworkManager
+#
+
+# Using network-manager
+#   https://netplan.io/examples#using-network-manager-as-a-renderer
+sudo emacs /etc/netplan/config.yaml
+# /etc/netplan/config.yaml
+# Use your own device as needed: (replace BOTH places in the file)
+#   - eno1
+#   - enp8s0
+network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    eno1:
+      dhcp4: no
+  bridges:
+    br0:
+      dhcp4: yes
+      interfaces:
+        - eno1
+#
+# Per https://fabianlee.org/2019/04/01/kvm-creating-a-bridged-network-with-netplan-on-ubuntu-bionic/
+sudo netplan generate
+sudo netplan --debug apply
+
+# EXAMPLE OF HOW TO DELETE A BRIDGE
+#  For example, if the wrong config was applied
+ifconfig br0 down
+brctl delbr br0
+
+# Review
+sudo networkctl status -a 2>/dev/null | grep '●'
+
+# YES - WE HAVE A BRIDGE!
+sudo networkctl status -a 2>/dev/null | grep '●'
+● 1: lo
+● 2: eno1
+● 3: virbr0
+● 4: virbr0-nic
+● 5: br0
+
+# This shows the brige has the IP address this host does get from the router's DHCP server
+# This works because the mac of the bridge is correct (matches the ethernet)
+#  HW Address: <same as ethernet>
+sudo networkctl status -a 2>/dev/null
+#
+● 5: br0
+       Link File: /lib/systemd/network/99-default.link
+    Network File: n/a
+            Type: ether
+           State: n/a (unmanaged)
+          Driver: bridge
+      HW Address: 9c:5c:8e:73:1a:25 (ASUSTek COMPUTER INC.)
+         Address: 10.250.0.101
+                  fe80::9e5c:8eff:fe73:1a25
+         Gateway: 10.250.0.1 (NETGEAR)
+
+# Additional confirmation
+sudo netplan ip leases br0
+lease {
+  interface "br0";
+  fixed-address 10.250.0.101;
+  option subnet-mask 255.255.255.0;
+  option routers 10.250.0.1;
+  option dhcp-lease-time 86400;
+  option dhcp-message-type 5;
+  option domain-name-servers 10.250.0.1;
+  option dhcp-server-identifier 10.250.0.1;
+  renew 1 2019/12/09 12:12:51;
+  rebind 1 2019/12/09 22:29:50;
+  expire 2 2019/12/10 01:29:50;
+}
+
+
+#
+# Configure libvirt network to use existing bridge
+#   Per https://fabianlee.org/2019/04/01/kvm-creating-a-bridged-network-with-netplan-on-ubuntu-bionic/
+#
+sudo cat << EOF > ./host-bridge.xml
+<network>
+  <name>host-bridge</name>
+  <forward mode="bridge"/>
+  <bridge name="br0"/>
+</network>
+EOF
+#
+sudo virsh net-define host-bridge.xml
+sudo virsh net-start host-bridge
+sudo virsh net-autostart host-bridge
+# state should be active, autostart, and persistent
+sudo virsh net-list --all
+
+# REBOOT
+# Wait for IP address
+ip a s
+# YES ... This is in the USER SESSION !!!
+sudo virsh --connect qemu:///session net-list
+ Name                 State      Autostart     Persistent
+----------------------------------------------------------
+ host-bridge          active     yes           yes
+
+# Actually, enabled vagrant-libvirt bridge too
+sudo virsh --connect qemu:///session net-list
+ Name                 State      Autostart     Persistent
+----------------------------------------------------------
+ default              active     yes           yes
+ host-bridge          active     yes           yes
+ vagrant-libvirt      active     yes           yes
+
+# NOTE: The connection seems to silently fail if run as non-root
+virsh --connect qemu:///session net-list # nothing
+
+# Another way to look at the bridge
+sudo virsh --connect qemu:///session net-info host-bridge
+Name:           host-bridge
+UUID:           d4b20719-c4e3-4064-951c-90c7b122f0b2
+Active:         yes
+Persistent:     yes
+Autostart:      yes
+Bridge:         br0
+
+
+# But, it seems that the qemu helper on Ubuntu is broken
+# This assumption is based on:
+#   - The error below
+#   - The fact that there are blogs saying so and showing how they recompiled libvirt
+#     to make it work.
+#     - e.g. https://jonaspfannschmidt.com/libvirt_session.html
+Error starting domain: internal error: /usr/lib/qemu/qemu-bridge-helper --br=br0 --fd=25: failed to communicate with bridge helper: Transport endpoint is not connected
+stderr=failed to write fd to unix socket: Socket operation on non-socket
+
+

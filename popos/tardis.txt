@@ -1,0 +1,94 @@
+
+################################################################################
+# Initial Setup
+################################################################################
+sudo apt install emacs-nox
+
+Firefox:
+  - sync
+  - log into github, add keys, clone this repo
+
+software tool:
+  - update
+  - Add timeshift
+
+SSH-Keys:
+  - ssh-keygen -t rsa
+  - Send to github
+
+Netflix on Firefox:
+  - https://support.system76.com/articles/flash/
+    - sudo apt install browser-plugin-freshplayer-pepperflash
+
+################################################################################
+# PYTHON3
+################################################################################
+
+HOME links:
+  - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/computer-setup.git
+  - for i in $(ls -a ~/git/pwyoung/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/pwyoung/computer-setup/home/$i ~/$i; done
+
+Python:
+  - python3 -m venv ~/venv/python3
+  - Open new terminal
+  - which python
+
+################################################################################
+# DISPLAY SETUP
+################################################################################
+
+# Fractional Scaling
+Close DisplaySettings
+In Terminal, run:
+  gsettings set org.gnome.mutter experimental-features "['x11-randr-fractional-scaling']"
+Open DisplaySettings:
+  - Set 4k monitor to something like 200%, or 175%
+  - Set 1080p monitor to 100%
+If necessary, undo the scaling setting:
+  - gsettings reset org.gnome.mutter experimental-features
+
+################################################################################
+# KVM SUPPORT FOR EVERYTHING (Nesting and device pass-through)
+################################################################################
+
+https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
+https://stafwag.github.io/blog/blog/2018/06/04/nested-virtualization-in-kvm/
+
+virt-host-validate | grep -v PASS
+  QEMU: Checking if IOMMU is enabled by kernel                               : WARN (IOMMU appears to be disabled in kernel. Add intel_iommu=on to kernel cmdline arguments)
+
+sudo kernelstub -a intel_iommu=on
+
+virt-host-validate # ALL PASS
+
+TODO: PASSTHROUGH
+  https://access.redhat.com/documentation/en-us/red_hat_virtualization/4.1/html/installation_guide/appe-configuring_a_hypervisor_host_for_pci_passthrough
+
+################################################################################
+# NOMAJ DEPS
+################################################################################
+
+This sets up:
+- ansible
+- vagrant
+- virt-manager, libvirt, kvm, qemu
+- QEMU/Session (network bridge to virbr0)
+
+Packages:
+  - sudo apt-get install python3-venv vagrant-libvirt ansible qemu qemu-kvm bridge-utils virt-manager
+  - sudo ln -s /etc/apparmor.d/usr.sbin.libvirtd /etc/apparmor.d/disable/usr.sbin.libvirtd && reboot
+  - QEMU/Session (for Libvirt/KVM as non-root)
+    - sudo mkdir -p /etc/qemu
+    - echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
+    - sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
+    - sudo ln -s /etc/apparmor.d/usr.sbin.libvirtd /etc/apparmor.d/disable/usr.sbin.libvirtd && reboot
+  - sudo service libvirtd status
+
+################################################################################
+# TODO: TEST NOMAJ AGAIN W/VIRTUALBOX
+################################################################################
+
+sudo apt-get install virtualbox
+sudo apt install virtualbox-ext-pack
+
+sudo apt remove virtualbox
