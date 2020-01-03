@@ -1,3 +1,16 @@
+################################################################################
+# TODO: TEST NOMAJ AGAIN W/VIRTUALBOX
+################################################################################
+
+sudo apt-get install virtualbox
+sudo apt install virtualbox-ext-pack
+
+sudo apt remove virtualbox
+
+
+
+
+
 
 ################################################################################
 # Initial Setup
@@ -85,10 +98,53 @@ Packages:
   - sudo service libvirtd status
 
 ################################################################################
-# TODO: TEST NOMAJ AGAIN W/VIRTUALBOX
+# DOCKER COMPOSE
 ################################################################################
 
-sudo apt-get install virtualbox
-sudo apt install virtualbox-ext-pack
+sudo apt-get update
+sudo apt-get auto-remove
 
-sudo apt remove virtualbox
+apt-get install docker-compose
+
+# Run as non-root
+sudo usermod -aG docker $USER
+newgrp docker #Or reboot to affect all shells
+docker run hello-world
+
+################################################################################
+# Windows in Gnome-Boxes
+################################################################################
+
+# References:
+- https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/
+- https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/virtualization_host_configuration_and_guest_installation_guide/form-virtualization_host_configuration_and_guest_installation_guide-para_virtualized_drivers-mounting_the_image_with_virt_manager
+
+Installed Drivers:
+  - Get latest iso with drivers
+    - wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.171-1/virtio-win.iso
+Drivers:
+  - NetKVM/ - Virtio network driver
+3
+No Change:
+  - Disk
+  - Display Adapter
+
+viostor/ - Virtio block driver
+
+vioscsi/ - Virtio Small Computer System Interface (SCSI) driver
+
+vioser/ - Virtio serial driver
+Balloon/ - Virtio memory balloon driver
+
+/media/pyoung/data/downloads/OperatingSystems/win10/win10_home/Win10_1909_English_x64.iso
+
+virsh vcpupin win10
+
+# PROCESSOR AFFINITY
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/virtualization/ch33s08
+https://fatmin.com/2016/01/06/numa-cpu-pinning-with-kvmvirsh/
+# Or not
+https://www.reddit.com/r/VFIO/comments/7zcn5g/kvm_windows_10_guest_cpu_pinning_recommended/
+
+# VFIO
+https://gist.github.com/hflw/ed9590f4c79daaeb482c2419f74ed897

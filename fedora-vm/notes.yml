@@ -29,3 +29,7 @@ dmesg | grep -i -e DMAR -e IOMMU
 dmesg | grep DMAR
 [    0.355561] DMAR: IOMMU enabled
 
+
+# Sharing folders
+sudo rpm-ostree install spice-webdavd
+
