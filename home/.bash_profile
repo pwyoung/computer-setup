@@ -17,6 +17,9 @@ fi
 for i in $PWSCRIPTS; do
     source $i &>/dev/null
 done
+if [ -e ~/bin-local ]; then
+    PATH=~/bin-local:$PATH
+fi
 
 if [ -e ~/bin ]; then
     PATH=~/bin:$PATH
