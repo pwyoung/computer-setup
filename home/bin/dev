@@ -1,32 +1,42 @@
 #!/bin/bash
 
-# On windows
-# ln -s '/cygdrive/c/Users/youngp/AppData/Local/Mozilla Firefox/firefox.exe' ~/bin-local/firefox
+VERBOSE='false'
+#VERBOSE='true'
 
 test_docker() {
     docker rm -f nginx
     docker run --name=nginx -d -v ~/nginxlogs:/var/log/nginx -p 5000:80 nginx
+    # On windows
+    # ln -s '/cygdrive/c/Users/youngp/AppData/Local/Mozilla Firefox/firefox.exe' ~/bin-local/firefox
     firefox http://localhost:5000
     docker rm -f nginx
 }
 
-run_dev_container() {
+log() {
+    MSG="$1"
+    if [ "$VERBOSE" == "true" ]; then
+        echo "$MSG"
+    fi  
+}
 
-    # Uncomment for initial dev/test
-    #docker rm -f dev
-
-    #docker run --name=dev -d nginx 
-    #docker run -it ubuntu bash
-    #docker run --name=dev -it ubuntu bash
-    #docker run --name=dev -it ubuntu:18.04 bash    
-    #docker run --name=dev -it ubuntu:19.10 bash        
-    # docker run --name=dev -it ubuntu:18.04 bash -c 'ls /'
-    # docker run --rm -v c:/Users/youngp/'OneDrive - ACI Worldwide Corp'/data:/data alpine ls /data
-    #docker run --rm -v c:/Users/youngp/'OneDrive - ACI Worldwide Corp'/data:/data ubuntu:18.04 ls /data   
-    docker run --rm -v c:/Users/youngp/'OneDrive - ACI Worldwide Corp'/data:/data ubuntu:18.04 bash
-
+run_dev_container() {    
+    if [ $(docker ps --filter "name=dev" | wc -l) -eq 2 ]; then
+        log "Container is running" 
+        docker exec -it dev bash       
+    else    
+        echo "Container is NOT running"    
+        if [ $(docker ps -a --filter "name=dev" | wc -l) -eq 2 ]; then
+            log "Container exists"
+            docker start dev
+            docker exec -it dev bash
+        else
+            log "Container does NOT exist"            
+            docker run -it --name=dev -v c:/Users/youngp/'OneDrive - ACI Worldwide Corp'/data:/data ubuntu:18.04 bash
+        fi
+    fi    
 }
 
 # test_docker
+# Uncomment for initial dev/test
+#docker rm -f dev
 run_dev_container
-
