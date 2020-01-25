@@ -22,21 +22,48 @@ log() {
 run_dev_container() {    
     if [ $(docker ps --filter "name=dev" | wc -l) -eq 2 ]; then
         log "Container is running" 
-        docker exec -it dev bash       
+        docker exec -it dev bash -l      
     else    
         echo "Container is NOT running"    
         if [ $(docker ps -a --filter "name=dev" | wc -l) -eq 2 ]; then
             log "Container exists"
             docker start dev
-            docker exec -it dev bash
+            docker exec -it dev bash -l
         else
             log "Container does NOT exist"            
-            docker run -it --name=dev -v c:/Users/youngp/'OneDrive - ACI Worldwide Corp'/data:/data ubuntu:18.04 bash
+            docker run -it --name=dev \
+                -v c:/Users/youngp/'OneDrive - ACI Worldwide Corp'/data:/data \
+                -v C:/cygwin64/home:/home \
+                ubuntu:18.04 \
+                bash -l
         fi
     fi    
 }
 
+configure_container() {
+    apt update -y
+    apt upgrade -y
+    apt-get install -y emacs-nox 
+    apt-get install -y wget htop ispell inetutils-ping htdig git 
+    apt-get install -y krb5-kdc krb5-admin-server
+    #
+    apt-get install -y openssh-server 
+    apt-get install -y openssh-client
+    ssh-keygen -t rsa  
+
+    cat << EOF    
+    cd ~
+    ln -s /data ~/data
+    ln -s /data/git ~/git
+    ln -s /data/git/pwyoung/computer-setup/home/bin/ ~/bin    
+    ln -s ~/git/pwyoung/computer-setup/home/.profile.d ~/
+    ln -s ~/git/pwyoung/computer-setup/home/.emacs ~/    
+    ln -s ~/git/pwyoung/computer-setup/home/.bash_profile ~/
+
+    cp -r /home/youngp/.ssh ~/
+EOF
+}
+
 # test_docker
-# Uncomment for initial dev/test
-#docker rm -f dev
+
 run_dev_container
