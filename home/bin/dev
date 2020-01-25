@@ -61,6 +61,7 @@ configure_container() {
     ln -s ~/git/pwyoung/computer-setup/home/.bash_profile ~/
 
     cp -r /home/youngp/.ssh ~/
+    cp -r /home/youngp/.gitconfig ~/    
 EOF
 }
 
