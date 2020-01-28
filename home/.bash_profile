@@ -62,6 +62,32 @@ unset color_prompt force_color_prompt
 
 ################################################################################
 
+# JAVA: use jenv everywhere
+if [ -d ~/.jenv ]; then
+    PATH="~/.jenv/bin:$PATH"
+    # EXPAND "jenv init -" and replace username with $USER
+    export PATH="/home/$USER/.jenv/shims:${PATH}"
+    export JENV_SHELL=bash
+    export JENV_LOADED=1
+    unset JAVA_HOME
+    source "/home/$USER/.jenv/libexec/../completions/jenv.bash"
+    jenv rehash 2>/dev/null
+    jenv() {
+	typeset command
+	command="$1"
+	if [ "$#" -gt 0 ]; then
+	    shift
+	fi
+
+	case "$command" in
+	    enable-plugin|rehash|shell|shell-options)
+		eval `jenv "sh-$command" "$@"`;;
+	    *)
+		command jenv "$command" "$@";;
+	esac
+    }
+fi
+
 export PATH
 
 # Stop warnings about this settingx
