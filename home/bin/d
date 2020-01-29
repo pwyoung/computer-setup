@@ -1,4 +1,0 @@
-#!/bin/sh
-
-clear
-diff -rq /repos/pwyoung/ceph-testing /repos/STTOOA/ceph-testing | grep -v '.git'
