@@ -106,7 +106,9 @@
     (setq show-trailing-whitespace t)
     (turn-on-auto-revert-mode))
   :config
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+;;;; Thisneeds ispell and starts slowly
+;;;;  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+;;;;  
   (add-hook 'prog-mode-hook 'flycheck-mode)
   (add-hook 'prog-mode-hook 'my-prog-mode-hook)
   )
