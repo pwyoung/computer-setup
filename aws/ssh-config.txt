@@ -1,0 +1,13 @@
+# ~/.ssh/config for jumpbox on AWS
+
+Host jb
+  HostName 52.54.72.108
+  User root
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  #IdentitiesOnly yes # Caused failure on ec2 but not vagrant
+  # Forward my SSH keys into the session so I can SSH to another host
+  ForwardAgent yes

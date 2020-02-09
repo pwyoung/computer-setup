@@ -30,3 +30,14 @@
 
 # VSCODE
 **/.vscode
+
+# All terraform files
+# Compiled files
+**/*.tfstate
+**/*.tfstate.backup
+# Module directory
+**/.terraform/
+# Sensitive Files
+**/variables.tf
+# Custom
+**/*.tfplan
