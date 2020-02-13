@@ -1,1 +1,8 @@
-ssh -L 8080:localhost:8080 ambari
+#!/bin/sh
+
+#ssh -L 8080:localhost:8080 ambari
+
+#ssh -L 8080:localhost:8080 ec2-user@52.45.220.96 # perm denied
+
+#ssh -L 8080:localhost:8080 hive@52.45.220.96
+ssh -L 8080:localhost:8080 cloudbreak@52.45.220.96
