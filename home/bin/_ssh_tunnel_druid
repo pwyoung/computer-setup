@@ -1,0 +1,2 @@
+
+ssh -L 8888:localhost:9088 ambari
