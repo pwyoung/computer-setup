@@ -5,7 +5,7 @@
 	# File
         #helper = cache --timeout=220752000
         # FILE (~/.git-credentials) CLEARTEXT no timeout
-	helper = cache --timeout=360000
+	helper = cache --timeout=3600000
 
 [user]
 	name = pwyoung

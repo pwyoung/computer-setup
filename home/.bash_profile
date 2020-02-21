@@ -70,7 +70,12 @@ if [ -d ~/.jenv ]; then
     export JENV_SHELL=bash
     export JENV_LOADED=1
     unset JAVA_HOME
-    source "/home/$USER/.jenv/libexec/../completions/jenv.bash"
+    # PWY: START
+    source ~/.jenv/libexec/../completions/jenv.bash
+    # PWY: SNAFU: "what apps need JAVA_HOME"  https://github.com/jenv/jenv/issues/44
+    export JAVA_HOME="$HOME/.jenv/versions/`jenv version-name`"
+    #echo "JAVA_HOME=$JAVA_HOME"
+    # PWY: END
     jenv rehash 2>/dev/null
     jenv() {
 	typeset command

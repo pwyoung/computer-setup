@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ssh -L 8080:localhost:8080 ambari
+ssh -L 8080:localhost:8080 perf1-master
 
 #ssh -L 8080:localhost:8080 ec2-user@52.45.220.96 # perm denied
 
