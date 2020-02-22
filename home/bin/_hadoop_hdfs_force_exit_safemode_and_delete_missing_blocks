@@ -1,0 +1,14 @@
+
+# Find (and remember) missing blocks
+hdfs fsck / 2>&1 > hdfs.fsck.out
+cat hdfs.fsck.out
+
+# Delete missing blocks
+hdfs fsck / -delete
+
+# Force exit safemode
+hdfs dfsadmin -safemode forceExit
+
+# Show HDFS health
+hdfs fsck /
+
