@@ -1,8 +1,3 @@
-echo "The built in Desktop sharing in PopPos works"
-echo "The best VNC client seems to be Gnome-boxes"
-
-exit 1
-
 ################################################################################
 # VNC Server
 ################################################################################

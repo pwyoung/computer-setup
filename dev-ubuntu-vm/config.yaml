@@ -1,0 +1,64 @@
+ansible:
+  extra_vars:
+    test_msg: TEST MESSAGE FROM EXTRA_VARS
+  inventory:
+    all:
+      children:
+        group_a:
+          hosts:
+            dev-ubuntu: null
+        group_b:
+          hosts:
+            dev-ubuntu: null
+        group_c:
+          children:
+            group_a: null
+            group_b: null
+      # 'ungrouped' hosts can be added here
+      #hosts:
+      #  dev-ubuntu: null
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
+  playbooks:
+  - entry: playbook.yaml
+    name: ansible-playbook-sanity-check
+    scm: git
+    src: https://github.com/pwyoung/ansible-playbook-sanity-check
+    version: master
+  roles:
+  - name: ansible-role-sanity-check
+    scm: git
+    src: https://github.com/pwyoung/ansible-role-sanity-check
+    version: 0.0.2
+generic:
+  project_namespace: test-module-make
+vagrant:
+  boxes:
+  - name: dev-ubuntu
+  global:
+    boot_timeout: 300
+    cpus: 4
+    libvirt_cfg:
+      append_project_name_to_nvme_disk_path: 'true'
+      box: generic/ubuntu1804
+      emulator_path: /usr/bin/qemu-system-x86_64
+      enabled: true
+      machine_type: q35
+      nvme_disk_id_prefix: drv
+      #nvme_disk_path: $HOME/.local/share/libvirt/images/
+      nvme_disk_path: 'images/'
+      nvme_disk_postfix: qcow2
+    memory: 4096
+    nvme_disks:
+      data:
+        size: 102401
+      data2:
+        size: 102401
+    virtualbox_cfg:
+      append_project_name_to_nvme_disk_path: 'true'
+      box: generic/ubuntu1804
+      enable_sse4: true
+      enabled: true
+      nvme_disk_path: .vagrant/nvme_disks/
+      nvme_disk_postfix: vdi
+      nvme_disk_prefix: nvme_disk

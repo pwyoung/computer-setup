@@ -1,0 +1,6 @@
+#!/bin/sh
+
+#ssh -L 8888:localhost:8888 cloudbreak@100.24.218.34
+
+ssh -L 8888:localhost:8888 druid-coordinator
+
