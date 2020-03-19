@@ -11,7 +11,7 @@
   (package-refresh-contents))
 
 (defconst user-packages
-  '(use-package go-mode go-imports flycheck exec-path-from-shell auto-complete go-autocomplete)
+  '(use-package go-mode go-imports flycheck exec-path-from-shell auto-complete go-autocomplete smart-tabs-mode)
   "List of packages to install.")
 (dolist (p user-packages)
   (when (not (package-installed-p p))
@@ -102,13 +102,13 @@
   (defun my-prog-mode-hook ()
     "Personal prog-mode hook"
     (set-variable 'tab-width 8)
-    (setq indent-tabs-mode t)
+;;    (setq indent-tabs-mode t)
     (setq show-trailing-whitespace t)
     (turn-on-auto-revert-mode))
   :config
 ;;;; Thisneeds ispell and starts slowly
 ;;;;  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-;;;;  
+;;;;
   (add-hook 'prog-mode-hook 'flycheck-mode)
   (add-hook 'prog-mode-hook 'my-prog-mode-hook)
   )
@@ -116,13 +116,19 @@
 ;; Removed
 ;;   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 
+
+;; SMART TABS:
+
+;; https://www.emacswiki.org/emacs/SmartTabs#Python
+(smart-tabs-insinuate 'c 'javascript 'python)
+
+
+
+
 ;; --------------------------------------------------------------------------------
 ;; MISC
 ;; --------------------------------------------------------------------------------
 
-;; Prevent Extraneous Tabs
-;; Doc: https://www.gnu.org/software/emacs/manual/html_node/eintr/Indent-Tabs-Mode.html
-(setq-default indent-tabs-mode nil)
 
 ;; Ctrl+T: deletes trailing whitespace
 (global-set-key (kbd "C-T") 'delete-trailing-whitespace)
