@@ -1,0 +1,62 @@
+show create table redi.v_druid_summary_kpi1;
+
+
+
+drop view redi.v_druid_summary_kpi1;
+
+create view redi.v_druid_summary_kpi1 as
+select `FLOOR_DAY`(`__time`) as `clientdateyyyy-mm-dd`, 
+  `__time` as clientdate,
+  t.*
+from  `redikp`.`druid_summary_kpi1` t;
+
+
+select  `clientdateyyyy-mm-dd`, 
+  sum(`count`) as `count`,
+  sum(`totalclient`) as `totalclient`,
+  max(`clientdate`) as `max_clientdate`
+from  `redi`.`v_druid_summary_kpi1`
+group by `clientdateyyyy-mm-dd`
+limit 5;
+
++------------------------+--------+-----------------------+------------------------+
+|  clientdateyyyy-mm-dd  | count  |      totalclient      |     max_clientdate     |
++------------------------+--------+-----------------------+------------------------+
+| 2019-06-13 00:00:00.0  | 2      | 20127.04              | 2019-06-13 00:00:00.0  |
+| 2019-11-05 00:00:00.0  | 24000  | 2.649225341850004E9   | 2019-11-05 00:00:00.0  |
+| 2019-11-28 00:00:00.0  | 27     | 2742751.61            | 2019-11-28 00:00:00.0  |
+| 2019-10-14 00:00:00.0  | 1500   | 1.2080593260000005E7  | 2019-10-14 00:00:00.0  |
+| 2019-10-19 00:00:00.0  | 1500   | 1.2012808890000004E7  | 2019-10-19 00:00:00.0  |
++------------------------+--------+-----------------------+------------------------+
+
+-- pwy
+-- Create the Druid 
+--create view redi.v_druid_summary_kpi1_pwy as
+
+drop view redi.v_druid_summary_kpi1_pwy;
+
+create view redi.v_druid_summary_kpi1_pwy as
+select `FLOOR_DAY`(`__time`) as `clientdateyyyy-mm-dd`, 
+  `__time` as clientdate,
+  t.*
+from  `redikp`.`druid_summary_kpi1_pwy` t;
+
+
+select  `clientdateyyyy-mm-dd`, 
+  sum(`count`) as `count`,
+  sum(`totalclient`) as `totalclient`,
+  max(`clientdate`) as `max_clientdate`
+from  `redi`.`v_druid_summary_kpi1`
+group by `clientdateyyyy-mm-dd`
+limit 5;
+
++------------------------+--------+-----------------------+------------------------+
+|  clientdateyyyy-mm-dd  | count  |      totalclient      |     max_clientdate     |
++------------------------+--------+-----------------------+------------------------+
+| 2019-06-13 00:00:00.0  | 2      | 20127.04              | 2019-06-13 00:00:00.0  |
+| 2019-11-05 00:00:00.0  | 24000  | 2.649225341850004E9   | 2019-11-05 00:00:00.0  |
+| 2019-11-28 00:00:00.0  | 27     | 2742751.61            | 2019-11-28 00:00:00.0  |
+| 2019-10-14 00:00:00.0  | 1500   | 1.2080593260000005E7  | 2019-10-14 00:00:00.0  |
+| 2019-10-19 00:00:00.0  | 1500   | 1.2012808890000004E7  | 2019-10-19 00:00:00.0  |
++------------------------+--------+-----------------------+------------------------+
+5 rows selected (2.326 seconds)

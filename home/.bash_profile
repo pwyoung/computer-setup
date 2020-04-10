@@ -68,8 +68,12 @@ export PATH
 export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore
 
 # https://developer.bring.com/blog/configuring-jenv-the-right-way/
-export PATH="$HOME/.jenv/bin:$PATH"
-eval "$(jenv init -)"
+# On Cygwin, this causes a 3 second delay after shell commands complete before the prompt returns
+# So, source ~/bin/jenv.sh if/when this is needed
+if ! uname -s | grep -s CYGWIN >/dev/null; then
+  export PATH="$HOME/.jenv/bin:$PATH"
+  eval "$(jenv init -)"
+fi
 #
 # SET JAVA_HOME (for Maven, etc)
 #jenv enable-plugin maven
