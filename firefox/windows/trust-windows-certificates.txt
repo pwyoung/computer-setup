@@ -1,0 +1,9 @@
+https://support.umbrella.com/hc/en-us/articles/115000669728-Configuring-Firefox-to-use-the-Windows-Certificate-Storehttps://support.umbrella.com/hc/en-us/articles/115000669728-Configuring-Firefox-to-use-the-Windows-Certificate-Store11;rgb:0000/0000/0000
+
+open
+  about:config
+search for
+  security.enterprise_roots.enabled
+set it to:
+  true
+  
