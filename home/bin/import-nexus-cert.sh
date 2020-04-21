@@ -8,8 +8,18 @@
 set -x
 set -e
 
-# This was exported from a browser
-CERT_FILE=~/Downloads/nexus-cert.cer
+# This was exported from Google Chrome
+#ALIAS='wildcard-am'
+#CERT_FILE=~/Downloads/nexus-cert.cer 
+#
+#ALIAS='wildcard-am-chrome-base64'
+#CERT_FILE=~/Downloads/nexus-cert-base64.cer 
+#
+ALIAS='wildcard-am-firefox-crt'
+CERT_FILE=~/Downloads/nexus-cert-am_tsacorp_com-from-firefox.crt 
+#
+#ALIAS='wildcard-am-firefox-crt'
+#CERT_FILE=~/Downloads/nexus-cert-am_tsacorp_com-from-firefox.crt 
 
 # Check OS
 if ! uname -a | egrep -i 'cygwin|linux' >/dev/null; then
@@ -53,7 +63,7 @@ else
 fi
 
 # Import the cert to Java
-"$KEYTOOL" -importcert -keystore "${JAVA_HOME}\jre\lib\security\cacerts" -storepass changeit -file "${CERT_FILE_TO_USE}" -alias wildcard-am -trustcacerts -noprompt  
+"$KEYTOOL" -importcert -keystore "${JAVA_HOME}\jre\lib\security\cacerts" -storepass changeit -file "${CERT_FILE_TO_USE}" -alias $ALIAS -trustcacerts -noprompt  
 
 
 

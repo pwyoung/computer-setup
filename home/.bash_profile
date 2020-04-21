@@ -60,6 +60,11 @@ else
 fi
 unset color_prompt force_color_prompt
 
+
+# SBT
+PATH=~/sbt/bin:$PATH
+
+
 ################################################################################
 export PATH
 
@@ -78,3 +83,5 @@ fi
 # SET JAVA_HOME (for Maven, etc)
 #jenv enable-plugin maven
 #jenv enable-plugin export
+
+
