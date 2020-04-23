@@ -72,16 +72,24 @@ export PATH
 # https://github.com/ansible/ansible/issues/56930
 export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore
 
-# https://developer.bring.com/blog/configuring-jenv-the-right-way/
-# On Cygwin, this causes a 3 second delay after shell commands complete before the prompt returns
-# So, source ~/bin/jenv.sh if/when this is needed
-if ! uname -s | grep -s CYGWIN >/dev/null; then
-  export PATH="$HOME/.jenv/bin:$PATH"
-  eval "$(jenv init -)"
+# JENV: manage multiple Java versions and update JAVA_HOME automatically
+#   Site:
+#     https://github.com/jenv/jenv
+#   Proper Setup:
+#     Run these commands ONCE so that jenv will manage JAVA_HOME (e.g. for Maven)
+#       jenv enable-plugin maven
+#       jenv enable-plugin export
+if uname -s | grep -s CYGWIN >/dev/null; then
+    # DO NOT USE JENV ON CYGWIN (by default anyway)
+    # On Cygwin, this causes a 3 second delay after shell commands complete before the prompt returns.
+    # So, source ~/bin/jenv.sh to invoke jenv if/when it is needed
+    if [ -z "$JAVA_HOME" ]; then
+      JB="$(which java)"
+      if [ ! -z "$JB" ]; then
+        export JAVA_HOME=$(dirname "$JB")
+      fi
+    fi
+else
+    export PATH="$HOME/.jenv/bin:$PATH"
+    eval "$(jenv init -)"
 fi
-#
-# SET JAVA_HOME (for Maven, etc)
-#jenv enable-plugin maven
-#jenv enable-plugin export
-
-
