@@ -79,7 +79,13 @@ export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore
 #     Run these commands ONCE so that jenv will manage JAVA_HOME (e.g. for Maven)
 #       jenv enable-plugin maven
 #       jenv enable-plugin export
-if uname -s | grep -s CYGWIN >/dev/null; then
+#
+#
+# Allow force-setting the Java version to /java if it exists.
+if [ -d /java ]; then
+    JAVA_HOME=/java
+else
+  if uname -s | grep -s CYGWIN >/dev/null; then
     # DO NOT USE JENV ON CYGWIN (by default anyway)
     # On Cygwin, this causes a 3 second delay after shell commands complete before the prompt returns.
     # So, source ~/bin/jenv.sh to invoke jenv if/when it is needed
@@ -89,7 +95,9 @@ if uname -s | grep -s CYGWIN >/dev/null; then
         export JAVA_HOME=$(dirname "$JB")
       fi
     fi
-else
+  else
     export PATH="$HOME/.jenv/bin:$PATH"
     eval "$(jenv init -)"
+  fi
 fi
+echo "JAVA_HOME is $JAVA_HOME"

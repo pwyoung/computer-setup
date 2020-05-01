@@ -8,6 +8,7 @@
 */*~
 .#*
 
+
 # Generic
 *.log
 
@@ -16,8 +17,11 @@
 *.pyc
 
 # IDE: Intellij/idea
-.idea/
-*.iml
+**/.idea
+**/*.iml
+
+# Maven
+**/target
 
 # Ansible
 *.retry
@@ -41,3 +45,5 @@
 **/variables.tf
 # Custom
 **/*.tfplan
+
+

@@ -1,0 +1,4 @@
+
+
+# Ignore file permission differences
+git config core.filemode false

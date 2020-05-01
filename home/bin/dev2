@@ -1,0 +1,69 @@
+#!/bin/bash
+
+VERBOSE='false'
+#VERBOSE='true'
+
+test_docker() {
+    docker rm -f nginx
+    docker run --name=nginx -d -v ~/nginxlogs:/var/log/nginx -p 5000:80 nginx
+    # On windows
+    # ln -s '/cygdrive/c/Users/youngp/AppData/Local/Mozilla Firefox/firefox.exe' ~/bin-local/firefox
+    firefox http://localhost:5000
+    docker rm -f nginx
+}
+
+log() {
+    MSG="$1"
+    if [ "$VERBOSE" == "true" ]; then
+        echo "$MSG"
+    fi
+}
+
+run_dev2_container() {
+    if [ $(docker ps --filter "name=dev2" | wc -l) -eq 2 ]; then
+        log "Container is running"
+        docker exec -it dev2 bash -l
+    else
+        echo "Container is NOT running"
+        if [ $(docker ps -a --filter "name=dev2" | wc -l) -eq 2 ]; then
+            log "Container exists"
+            docker start dev2
+            docker exec -it dev2 bash -l
+        else
+            log "Container does NOT exist"
+            docker run -it --name=dev2 \
+                -v C:/:/c \
+                ubuntu:18.04 \
+                bash -l
+        fi
+    fi
+}
+
+configure_container() {
+    apt update -y
+    apt upgrade -y
+    apt-get install -y emacs-nox
+    apt-get install -y wget htop ispell inetutils-ping htdig git
+    apt-get install -y krb5-kdc krb5-admin-server
+    #
+    apt-get install -y openssh-server
+    apt-get install -y openssh-client
+    ssh-keygen -t rsa
+
+    cat << EOF
+    cd ~
+    ln -s /data ~/data
+    ln -s /data/git ~/git
+    ln -s /data/git/pwyoung/computer-setup/home/bin/ ~/bin
+    ln -s ~/git/pwyoung/computer-setup/home/.profile.d ~/
+    ln -s ~/git/pwyoung/computer-setup/home/.emacs ~/
+    ln -s ~/git/pwyoung/computer-setup/home/.bash_profile ~/
+
+    cp -r /home/youngp/.ssh ~/
+    cp -r /home/youngp/.gitconfig ~/
+EOF
+}
+
+# test_docker
+
+run_dev2_container
