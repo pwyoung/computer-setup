@@ -1,3 +1,96 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/fedora30"
 end
+
+Vagrant.require_version ">= 2.2.3"
+
+require 'rbconfig'
+
+Vagrant.configure("2") do |config|
+
+    # Set the default provider for the OS
+    @os = RbConfig::CONFIG['host_os']
+    case
+    when @os.downcase.include?('linux')
+        operating_system = 'linux'
+        provider = "libvirt"
+    when @os.downcase.include?('darwin')
+        operating_system = 'darwin'
+        provider = "virtualbox"
+    else
+        puts "You OS hasn't been tested yet, go add support and send a patch."
+        exit
+    end
+
+
+    # Ensure the OS-Provider combination is supported
+    os_provider = operating_system + '-' + provider
+    if ! ['linux-virtualbox', 'linux-libvirt', 'darwin-virtualbox'].include? os_provider
+        puts "Unsupported provider: #{provider} on " + operating_system
+        puts "Consider adding support and send a patch"
+        exit
+    end
+
+    # Set the project_namespace
+    project_namespace = "test-module-vagrant"
+
+    # shorthand accessors
+    pn_l = project_namespace.downcase
+    pn_u = project_namespace.upcase
+
+    # Bash variables cannot use "-", they must use _
+    pn_u = pn_u.tr("-", "_")
+    pn_l = pn_l.tr("-", "_")
+
+    # Let the provider be overridden on a per-project basis by a local variable
+    if ENV[pn_u + '_VAGRANT_PROVIDER']
+        provider = ENV[pn_u + '_VAGRANT_PROVIDER']
+    end
+
+    # Explicitly set the provider variable (that Vagrant uses)
+    # This ensures CLI commands like 'vagrant status' use the correct provider
+    ENV['VAGRANT_DEFAULT_PROVIDER']="#{provider}"
+
+# No NVME Disks    # Disable the default folder syncing.
+    config.vm.synced_folder './', '/vagrant', disabled: true
+
+    # Box #1
+    config.vm.define "node-1" do |conf|# For details see: https://www.vagrantup.com/docs/virtualbox/configuration.html
+        conf.vm.provider :virtualbox do |vb, override|
+            vb.name = "#{project_namespace}_node-1" # name shown in Virtualbox
+            vb.customize ["modifyvm", :id, "--memory", '4096' ]
+            vb.customize ["modifyvm", :id, "--cpus", '4' ]
+            vb.customize ["modifyvm", :id, "--nictype1", 'Am79C973' ]
+            vb.customize ["modifyvm", :id, "--ioapic", 'on' ]
+            vb.customize ["modifyvm", :id, "--rtcuseutc", 'on' ]
+
+            # Support SSE4.x
+            vb.customize ["setextradata", :id, "VBoxInternal/CPUM/SSE4.1", "1"]
+            vb.customize ["setextradata", :id, "VBoxInternal/CPUM/SSE4.2", "1"]
+
+            override.vm.box = "generic/ubuntu1804"
+            override.vm.hostname = "node-1" # Set hostname in the OS
+            override.vm.boot_timeout = 300
+            override.vm.network "private_network", type: "dhcp"
+
+
+        end # conf.vm.provider :virtualbox do |vb, override|
+
+        # For details see: https://github.com/vagrant-libvirt/vagrant-libvirt
+        conf.vm.provider :libvirt do |libvirt, override|            override.vm.box = "generic/ubuntu1804"
+            override.vm.hostname = "node-1" # Set hostname in the OS
+            override.vm.boot_timeout = 300
+            libvirt.watchdog :model => 'i6300esb', :action => 'reset'
+            libvirt.qemu_use_session = true
+            libvirt.memory = 4096
+            libvirt.cpus = 4
+       	    libvirt.emulator_path = "/usr/bin/qemu-system-x86_64"
+            libvirt.machine_type = "q35"
+            libvirt.default_prefix = "#{project_namespace}"
+
+            # START: LIBVIRT NVME DRIVES
+	            # END: LIBVIRT NVME DRIVES
+        end # conf.vm.provider :libvirt do |libvirt, override|
+    end # config.vm.define "node-1" do |conf|
+
+end
