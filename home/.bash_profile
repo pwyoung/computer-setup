@@ -65,12 +65,6 @@ unset color_prompt force_color_prompt
 PATH=~/sbt/bin:$PATH
 
 
-################################################################################
-export PATH
-
-# Stop warnings about this settingx
-# https://github.com/ansible/ansible/issues/56930
-export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore
 
 # JENV: manage multiple Java versions and update JAVA_HOME automatically
 #   Site:
@@ -82,8 +76,11 @@ export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore
 #
 #
 # Allow force-setting the Java version to /java if it exists.
-if [ -d /java ]; then
-    JAVA_HOME=/java
+# Also, this avoids having spaces in path names (e.g. on Cygwin)
+#if [ -e /usr/lib/jvm/java-8-openjdk-amd64 ]; then
+    
+if [ -e /java ]; then
+    export JAVA_HOME=/java
 else
   if uname -s | grep -s CYGWIN >/dev/null; then
     # DO NOT USE JENV ON CYGWIN (by default anyway)
@@ -101,3 +98,65 @@ else
   fi
 fi
 echo "JAVA_HOME is $JAVA_HOME"
+
+
+################################################################################
+# HADOOP IN Docker
+################################################################################
+D=/c/cygwin64/home/youngp/hadoop-3.1.3
+if [ -d $D ]; then
+    export HADOOP_HOME=$D
+    PATH=$PATH:$HADOOP_HOME/bin
+fi
+
+################################################################################
+# SPARK SETUP
+################################################################################
+# RESOURCES
+#   https://medium.com/big-data-engineering/how-to-install-apache-spark-2-x-in-your-pc-e2047246ffc3
+
+# ln -s /c/spark-2.4.5-bin-hadoop2.7 /spark
+# Also, this avoids having spaces in path names (e.g. on Cygwin)
+if [ -d /spark ]; then
+    export SPARK_HOME=/spark
+    PATH=$SPARK_HOME:$PATH
+fi
+
+if [ -f $SPARK_HOME/bin/winutils.exe ]; then
+    export HADOOP_HOME=$SPARK_HOME
+fi
+
+
+################################################################################
+# WINDOWS PYTHON
+################################################################################
+
+D=/cygdrive/c/Users/youngp/AppData/Local/Programs/Python/Python38-32/Scripts
+if [ -e $D ]; then
+    PATH=$D:$PATH
+fi
+D=/cygdrive/c/Users/youngp/AppData/Local/Programs/Python/Python38-32
+if [ -e $D ]; then
+    PATH=$D:$PATH
+fi
+
+# Test Python
+#  python --version
+
+# Test Pip
+#  pip --version
+
+# Cygwin confirms
+# Test Pip
+#  pip --version
+# which python
+# which pip
+
+################################################################################
+# EXPORT THESE AT THE END
+################################################################################
+export PATH
+
+# Stop warnings about this settingx
+# https://github.com/ansible/ansible/issues/56930
+export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore

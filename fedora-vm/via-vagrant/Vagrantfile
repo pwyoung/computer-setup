@@ -1,4 +1,6 @@
 Vagrant.configure("2") do |config|
+  ENV['VAGRANT_DEFAULT_PROVIDER']="hyperv"
+  
   config.vm.box = "generic/fedora30"
 end
 

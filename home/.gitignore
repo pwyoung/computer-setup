@@ -22,6 +22,8 @@
 
 # Maven
 **/target
+*/target
+
 
 # Ansible
 *.retry
