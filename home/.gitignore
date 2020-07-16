@@ -23,7 +23,7 @@
 # Maven
 **/target
 */target
-
+target
 
 # Ansible
 *.retry

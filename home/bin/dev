@@ -31,11 +31,12 @@ run_dev_container() {
             docker exec -it dev bash -l
         else
             log "Container does NOT exist"
-            docker run -it --name=dev \
-                -v c:/Users/youngp/'OneDrive - ACI Worldwide Corp'/data:/data \
-                -v C:/cygwin64/home:/home \
-                ubuntu:18.04 \
-                bash -l
+            docker run -it \
+		   --name=dev \
+                   -v C:/:/c \
+		   --network host \
+                   ubuntu:18.04 \
+                   bash -l
         fi
     fi
 }

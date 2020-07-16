@@ -12,6 +12,6 @@ fi
 export set PYTHONIOENCODING=UTF-8
 export set PYTHONUNBUFFERED=1
 
-source ${VENV_DIR}/bin/activate
+. ${VENV_DIR}/bin/activate
 
 echo "python.sh: end"
