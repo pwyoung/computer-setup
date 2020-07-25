@@ -149,7 +149,7 @@ if [ -d /spark ]; then
 fi
 if [ ! -z "$SPARK_HOME" ]; then
     echo "SPARK_HOME is $SPARK_HOME"
-    PATH=$SPARK_HOME:$PATH
+    PATH=$SPARK_HOME/bin:$PATH
 fi
 
 # Spark on windows wants HADOOP_HOME set
@@ -163,6 +163,17 @@ fi
 if [ ! -z "$HADOOP_HOME" ]; then
     echo "HADOOP_HOME is $HADOOP_HOME"
     PATH=$PATH:$HADOOP_HOME/bin
+fi
+
+################################################################################
+# KAFKA
+################################################################################
+if [ -d /kafka ]; then
+    export KAFKA_HOME=/kafka
+fi
+if [ ! -z "$KAFKA_HOME" ]; then
+    echo "KAFKA_HOME is $KAFKA_HOME"
+    PATH=$KAFKA_HOME/bin:$PATH
 fi
 
 
