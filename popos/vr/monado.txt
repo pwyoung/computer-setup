@@ -1,0 +1,315 @@
+https://monado.freedesktop.org/getting-started.html
+
+################################################################################
+# OPENXR SDK: DEPS
+################################################################################
+
+#   https://github.com/KhronosGroup/OpenXR-SDK#linux
+DEPS="cmake build-essential libgl1-mesa-dev libvulkan-dev libx11-xcb-dev libxcb-dri2-0-dev libxcb-glx0-dev libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-randr0-dev libxrandr-dev libxxf86vm-dev mesa-common-dev"
+
+# View status of each package 
+for i in $DEPS; do echo $i; apt-cache policy $i; done
+
+# Install deps
+apt install $DEPS
+
+
+################################################################################
+# OPENXR SDK: COMPILE
+################################################################################
+
+git clone https://github.com/KhronosGroup/OpenXR-SDK.git
+cd OpenXR-SDK
+
+
+# OPTION A: Per https://monado.freedesktop.org/getting-started.html
+#   this was done
+apt install meson ninja-build
+cmake -G Ninja -DCMAKE_INSTALL_PREFIX=/usr -Bbuild | tee ~/log.txt
+ninja -C build install | tee -a ~/log.txt
+
+
+# OPTION B: Per https://github.com/KhronosGroup/OpenXR-SDK#linux
+#     Release (not debug)
+#
+# Commented out since this is was not done
+#
+#mkdir -p build/linux_release
+#cd build/linux_release
+#cmake -DCMAKE_BUILD_TYPE=Release ../..
+#make
+
+
+################################################################################
+# MONADO
+################################################################################
+
+# Per https://monado.freedesktop.org/getting-started.html
+
+# DEPS
+apt install build-essential git wget unzip cmake meson ninja-build libeigen3-dev curl patch python3 pkg-config libx11-dev libx11-xcb-dev libxxf86vm-dev libxrandr-dev libxcb-randr0-dev libvulkan-dev glslang-tools libglvnd-dev libgl1-mesa-dev ca-certificates libusb-1.0-0-dev libudev-dev libhidapi-dev libwayland-dev libuvc-dev libavcodec-dev libopencv-dev libv4l-dev libcjson-dev libsdl2-dev libegl1-mesa-dev
+
+# COMPILE
+git clone https://gitlab.freedesktop.org/monado/monado.git
+cd monado
+meson --prefix=/usr build
+ninja -C build install
+
+# RUN AS ROOT
+monado-service 
+No config file!
+DEBUG [_print_vec3] acc_bias = -0.054809 -0.169893 0.094596
+DEBUG [_print_vec3] acc_scale = 0.999023 0.999430 1.000569
+DEBUG [_print_vec3] gyro_bias = 0.004489 -0.000042 0.006062
+DEBUG [_print_vec3] gyro_scale = 1.000000 1.000000 1.000000
+DEBUG [xrt_gfx_provider_create_native] Doing init 0x55ae43e60f60
+WARN [compositor_check_and_prepare_xdev] Had to fill in meshuv on xdev 'Valve Index', this should be done in the driver.
+ERROR [comp_window_direct_connect] Could not open X display.
+
+# RUN AS NON-ROOT
+monado-service
+
+# Error
+p_libusb_can_open - libusb_open failed: LIBUSB_ERROR_ACCESS
+
+
+# Show config
+ls -l /etc/xdg/openxr/1/active_runtime.json
+lrwxrwxrwx 1 root root 38 Oct 29 19:53 /etc/xdg/openxr/1/active_runtime.json -> /usr/share/openxr/1/openxr_monado.json
+
+cat /etc/xdg/openxr/1/active_runtime.json
+
+{
+    "file_format_version": "1.0.0",
+    "runtime": {
+        "library_path": "/usr/lib/x86_64-linux-gnu/libopenxr_monado.so"
+    }
+}
+
+
+
+################################################################################
+# UDEV RULES FOR USB ACCESS AS NON-ROOT
+################################################################################
+
+# Is this problem related to why OpenHMD is recommended ?
+
+# Linked from https://gitlab.freedesktop.org/monado/utilities/xr-hardware
+
+git clone https://gitlab.freedesktop.org/monado/utilities/xr-hardware.git
+cd ./xr-hardware/
+
+make install
+
+make test # fails due to missing modules
+apt-get install python3-pip
+pip install attrs
+pip install flake8
+make test # succeeds
+
+
+################################################################################
+# ATTEMPT
+################################################################################
+
+# Fixed Error
+p_libusb_can_open - libusb_open failed: LIBUSB_ERROR_ACCESS
+
+# Command
+VIVE_LOG=debug
+monado-service  2>&1 | tee ~/monado-service.out
+
+# Output
+
+No config file!
+DEBUG [_print_vec3] acc_bias = -0.054809 -0.169893 0.094596
+DEBUG [_print_vec3] acc_scale = 0.999023 0.999430 1.000569
+DEBUG [_print_vec3] gyro_bias = 0.004489 -0.000042 0.006062
+DEBUG [_print_vec3] gyro_scale = 1.000000 1.000000 1.000000
+open_hid_interface - Failed to open device '/dev/hidraw3' got '-13'
+ERROR [vive_controller_found] Could not open Vive controller device.
+open_hid_interface - Failed to open device '/dev/hidraw8' got '-13'
+ERROR [vive_controller_found] Could not open Vive controller device.
+DEBUG [xrt_gfx_provider_create_native] Doing init 0x558e70171a40
+WARN [compositor_check_and_prepare_xdev] Had to fill in meshuv on xdev 'Valve Index', this should be done in the driver.
+INTEL-MESA: warning: Performance support disabled, consider sysctl dev.i915.perf_stream_paranoid=0
+
+INTEL-MESA: warning: Performance support disabled, consider sysctl dev.i915.perf_stream_paranoid=0
+
+ERROR [comp_window_direct_acquire_xlib_display] vkAcquireXlibDisplayEXT: UNKNOWN RESULT (0x0000558e7073f198)
+ERROR [compositor_init_swapchain] Window init_swapchain failed!
+
+################################################################################
+# xrhardware rules
+################################################################################
+cat /etc/udev/rules.d/70-xrhardware.rules | grep -A 2 Valve
+# Valve Watchman Dongle - USB
+ATTRS{idVendor}=="28de", ATTRS{idProduct}=="2101", TAG+="uaccess", ENV{ID_xrhardware}="1"
+
+--
+# Valve Index Controller - USB
+ATTRS{idVendor}=="28de", ATTRS{idProduct}=="2300", TAG+="uaccess", ENV{ID_xrhardware}="1"
+
+--
+# Valve Receiver for Lighthouse - HTC Vive - USB
+ATTRS{idVendor}=="28de", ATTRS{idProduct}=="2000", TAG+="uaccess", ENV{ID_xrhardware}="1"
+
+
+
+################################################################################
+# GATHER INFO
+################################################################################
+
+# Current state
+Can not access hidraw 3 and 8
+# Per current error
+open_hid_interface - Failed to open device '/dev/hidraw3' got '-13'
+ERROR [vive_controller_found] Could not open Vive controller device.
+open_hid_interface - Failed to open device '/dev/hidraw8' got '-13'
+ERROR [vive_controller_found] Could not open Vive controller device.
+
+# Boot with HMD connected and review Valve-related hid messages
+dmesg | grep hid | grep Valve
+[    5.086699] hid-generic 0003:28DE:2300.0001: hiddev0,hidraw0: USB HID v1.11 Device [Valve Index HMD] on usb-0000:00:14.0-2.3.1/input0
+[    5.086906] hid-generic 0003:28DE:2300.0002: hiddev1,hidraw1: USB HID v1.11 Device [Valve Index HMD] on usb-0000:00:14.0-2.3.1/input1
+[    5.087048] hid-generic 0003:28DE:2300.0003: hiddev2,hidraw2: USB HID v1.11 Device [Valve Index HMD] on usb-0000:00:14.0-2.3.1/input2
+[    5.555042] hid-generic 0003:28DE:2102.0004: hiddev3,hidraw3: USB HID v1.11 Device [Valve Corporation Valve VR Radio] on usb-0000:00:14.0-2.3.2/input0
+[    6.189904] hid-generic 0003:28DE:2102.0009: hiddev4,hidraw8: USB HID v1.11 Device [Valve Corporation Valve VR Radio & HMD Mic] on usb-0000:00:14.0-2.3.3/input0
+
+
+
+for i in 0 1 2 3 8; do echo $i; cat /sys/class/hidraw/hidraw${i}/device/uevent; done
+
+0
+DRIVER=hid-generic
+HID_ID=0003:000028DE:00002300
+HID_NAME=Valve Index HMD
+HID_PHYS=usb-0000:00:14.0-2.3.1/input0
+HID_UNIQ=LHR-F14CEFBA
+MODALIAS=hid:b0003g0001v000028DEp00002300
+1
+DRIVER=hid-generic
+HID_ID=0003:000028DE:00002300
+HID_NAME=Valve Index HMD
+HID_PHYS=usb-0000:00:14.0-2.3.1/input1
+HID_UNIQ=LHR-F14CEFBA
+MODALIAS=hid:b0003g0001v000028DEp00002300
+2
+DRIVER=hid-generic
+HID_ID=0003:000028DE:00002300
+HID_NAME=Valve Index HMD
+HID_PHYS=usb-0000:00:14.0-2.3.1/input2
+HID_UNIQ=LHR-F14CEFBA
+MODALIAS=hid:b0003g0001v000028DEp00002300
+3
+DRIVER=hid-generic
+HID_ID=0003:000028DE:00002102
+HID_NAME=Valve Corporation Valve VR Radio
+HID_PHYS=usb-0000:00:14.0-2.3.2/input0
+HID_UNIQ=8826AE787B-RYB
+MODALIAS=hid:b0003g0001v000028DEp00002102
+8
+DRIVER=hid-generic
+HID_ID=0003:000028DE:00002102
+HID_NAME=Valve Corporation Valve VR Radio & HMD Mic
+HID_PHYS=usb-0000:00:14.0-2.3.3/input0
+HID_UNIQ=06C9844787-LYM
+MODALIAS=hid:b0003g0001v000028DEp00002102
+
+ls -l /dev/hidraw*
+crw-rw----+ 1 root root 238, 0 Oct 30 12:33 /dev/hidraw0
+crw-rw----+ 1 root root 238, 1 Oct 30 12:33 /dev/hidraw1
+crw-rw----+ 1 root root 238, 2 Oct 30 12:33 /dev/hidraw2
+crw-------  1 root root 238, 3 Oct 30 12:33 /dev/hidraw3
+crw-------  1 root root 238, 4 Oct 30 12:33 /dev/hidraw4
+crw-------  1 root root 238, 5 Oct 30 12:33 /dev/hidraw5
+crw-------  1 root root 238, 6 Oct 30 12:33 /dev/hidraw6
+crw-------  1 root root 238, 7 Oct 30 12:33 /dev/hidraw7
+crw-------  1 root root 238, 8 Oct 30 12:33 /dev/hidraw8
+
+
+################################################################################
+
+# CRUDE OPTIONS:
+# Blunt way to fix hid device permissions
+# Per https://unix.stackexchange.com/questions/85379/dev-hidraw-read-permissions
+#   KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664", GROUP="plugdev"
+#
+#
+# This is similar to
+#   https://github.com/OpenHMD/OpenHMD/wiki/Udev-rules-list#creation-and-manual-installation-of-udev-rules
+#You can utilize these devices with hidapi via libusb:
+#
+#echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="2833", MODE="0666", GROUP="plugdev"' >> /etc/udev/rules.d/83-hmd.rules
+#udevadm control --reload-rules
+#
+#or hidraw:
+#
+# echo 'KERNEL=="hidraw*", ATTRS{busnum}=="1", ATTRS{idVendor}=="2833", MODE="0666", GROUP="plugdev"' >> /etc/udev/rules.d/83-hmd.rules
+#udevadm control --reload-rules
+
+
+Looks from the above like we need a rule for:
+HID_ID=0003:000028DE:00002102
+
+BOTTOM LINE:
+  It looks like the rule would be
+# Valve Corporation Valve VR Radio
+# Valve Corporation Valve VR Radio & HMD Mic
+ATTRS{idVendor}=="28de", ATTRS{idProduct}=="2102", TAG+="uaccess", ENV{ID_xrhardware}="1"
+
+################################################################################
+# ATTEMPT
+################################################################################
+F=/etc/udev/rules.d/69-manual-xrhardware.rules
+echo 'ATTRS{idVendor}=="28de", ATTRS{idProduct}=="2102", TAG+="uaccess", ENV{ID_xrhardware}="1"' > $F
+cat $F
+
+udevadm control --reload-rules
+udevadm trigger
+
+ls -l /dev/hidraw*
+crw-rw----+ 1 root root 238, 0 Oct 30 16:17 /dev/hidraw0
+crw-rw----+ 1 root root 238, 1 Oct 30 16:17 /dev/hidraw1
+crw-rw----+ 1 root root 238, 2 Oct 30 16:17 /dev/hidraw2
+crw-rw----+ 1 root root 238, 3 Oct 30 16:17 /dev/hidraw3
+crw-------  1 root root 238, 4 Oct 30 16:17 /dev/hidraw4
+crw-------  1 root root 238, 5 Oct 30 16:17 /dev/hidraw5
+crw-------  1 root root 238, 6 Oct 30 16:17 /dev/hidraw6
+crw-------  1 root root 238, 7 Oct 30 16:17 /dev/hidraw7
+crw-rw----+ 1 root root 238, 8 Oct 30 16:17 /dev/hidraw8
+
+# Note: 3 and 8 have new perms
+
+
+monado-service  2>&1 | tee ~/monado-service.out
+No config file!
+DEBUG [_print_vec3] acc_bias = -0.054809 -0.169893 0.094596
+DEBUG [_print_vec3] acc_scale = 0.999023 0.999430 1.000569
+DEBUG [_print_vec3] gyro_bias = 0.004489 -0.000042 0.006062
+DEBUG [_print_vec3] gyro_scale = 1.000000 1.000000 1.000000
+ERROR [vive_get_imu_range_report] Could not get range report!
+ERROR [vive_controller_create] Could not get watchman IMU range packet!
+ERROR [vive_get_imu_range_report] Could not get range report!
+ERROR [vive_controller_create] Could not get watchman IMU range packet!
+DEBUG [xrt_gfx_provider_create_native] Doing init 0x55afb49611c0
+WARN [compositor_check_and_prepare_xdev] Had to fill in meshuv on xdev 'Valve Index', this should be done in the driver.
+INTEL-MESA: warning: Performance support disabled, consider sysctl dev.i915.perf_stream_paranoid=0
+
+INTEL-MESA: warning: Performance support disabled, consider sysctl dev.i915.perf_stream_paranoid=0
+
+ERROR [comp_window_direct_acquire_xlib_display] vkAcquireXlibDisplayEXT: UNKNOWN RESULT (0x000055afb4f31938)
+ERROR [compositor_init_swapchain] Window init_swapchain failed!
+
+################################################################################
+# WATCH UDEV
+################################################################################
+
+udevadm monitor | grep -v thermal
+
+udevadm info ...
+
+################################################################################
+
+
+apt search libxcb | grep dev | grep amd64 | wc -l

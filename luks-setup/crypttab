@@ -1,0 +1,4 @@
+cryptdata UUID=4f72c71c-443b-493d-b496-7bc5ce9bcd4d none luks
+cryptswap UUID=4720253b-ab09-4db0-8b16-503ccc7861c2 /dev/urandom swap,plain,offset=1024,cipher=aes-xts-plain64,size=512
+
+DATA_INTERNAL UUID=6b292527-7e85-4756-a460-9f17b0b4255b /etc/luks-keys/DATA_INTERNAL luks

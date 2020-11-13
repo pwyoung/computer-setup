@@ -1,0 +1,53 @@
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# <file system>  <mount point>  <type>  <options>  <dump>  <pass>
+PARTUUID=12f9f610-bb1f-4894-b61c-be9588720986  /boot/efi  vfat  umask=0077  0  0
+PARTUUID=f52b4067-2bce-4944-866d-00a0a7eecaf3  /recovery  vfat  umask=0077  0  0
+/dev/mapper/cryptswap  none  swap  defaults  0  0
+UUID=76697b1c-46dd-46d2-8b43-4f1c181c59b6  /  ext4  noatime,errors=remount-ro  0  0
+
+
+# This is mounted via the desktop since I agreed to let it remember the passphrase. Just link to it.
+#   ln -s /media/pwyoung/2120ab71-c818-4655-a4e7-b1a941169938 /mnt/samsung
+
+################################################################################
+# Auto-mount Luks Partition
+#   Reference: https://blog.tinned-software.net/automount-a-luks-encrypted-volume-on-system-start/
+################################################################################
+#
+# Set up Luks encryption
+#   Verify disk UUID
+#     lsblk -f
+#     sudo cryptsetup luksDump /dev/sdb1 | grep "UUID"
+#UUID:          	6b292527-7e85-4756-a460-9f17b0b4255b
+#
+# ADD KEY FILE TO DECRYPT
+#   Make keyfile
+#     sudo su -
+#     P=/dev/sdb1 && D=/etc/luks-keys && N=DATA_INTERNAL && F=$D/$N
+#     mkdir -p $D
+#     dd if=/dev/urandom of=$F bs=512 count=8
+#     cryptsetup -v luksAddKey $P $F
+#
+#   Test Keyfile support
+#     Show that there are two keyslots used now
+#       cryptsetup luksDump $P
+#     Open
+#       cryptsetup -v luksOpen $P $N --key-file=$F
+#     Close
+#       cryptsetup -v luksClose $N
+#
+#   Set up files used to mount at boot time
+#     /etc/crypttab
+#DATA_INTERNAL UUID=6b292527-7e85-4756-a460-9f17b0b4255b /etc/luks-keys/DATA_INTERNAL luks
+#   Test
+#     cryptdisks_start DATA_INTERNAL
+#     lsblk -f
+#     cryptdisks_stop DATA_INTERNAL
+#   MOUNT AT BOOT TIME
+/dev/mapper/DATA_INTERNAL /data ext4    defaults   0       2
+
