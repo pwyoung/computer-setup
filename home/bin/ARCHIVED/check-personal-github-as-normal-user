@@ -2,4 +2,5 @@
 
 URL='https://github.com/pwyoung?tab=repositories'
 
-open ${URL}
+#open ${URL}
+xdg-open ${URL}

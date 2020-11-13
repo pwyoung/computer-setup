@@ -1,5 +1,5 @@
-#!/bin/sh
+rm -f ./*~ #&>/dev/null
+rm -f ./*# #&>/dev/null
+#clear
+
 # Cleanup the current dir
-rm -f ./*~ &>/dev/null
-rm -f ./*# &>/dev/null
-clear
