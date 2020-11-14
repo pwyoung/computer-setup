@@ -77,7 +77,7 @@ clone_repos() {
 	    echo "Git update $DEST_DIR/$DIR"
             cd ${DEST_DIR}/$DIR
             git fetch --all
-	    #git merge --ff-only
+	    git merge --ff-only
 	else
 	    echo "Clone $i"
             git clone $i
