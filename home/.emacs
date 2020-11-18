@@ -1,137 +1,32 @@
-;; --------------------------------------------------------------------------------
-;; PACKAGE MANAGEMENT
-;; --------------------------------------------------------------------------------
+;; emacs startup file.
 
-(setq package-archives
-      '(("melpa" . "http://melpa.milkbox.net/packages/")
-        ("gnu" . "http://elpa.gnu.org/packages/")))
+;; References
+;;   https://gist.github.com/pvlpenev/079a4ad74111a99bb9ac
+;;   https://gist.github.com/rplzzz/11258794
+
+;; uncomment next line to disable loading of "default.el" at startup
+;; (setq inhibit-default-init t)
+
+;; add personal load path
+(push "~/.emacs.d/lisp" load-path)
+
+;; set up MELPA package archive
+(require 'package)
+(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+                    (not (gnutls-available-p))))
+       (proto (if no-ssl "http" "https")))
+  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
+  ;;(add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
+  (add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
+  (when (< emacs-major-version 24)
+    ;; For important compatibility libraries like cl-lib
+    (add-to-list 'package-archives '("gnu" . (concat proto "://elpa.gnu.org/packages/")))))
 (package-initialize)
-;; Populate ~/.emacs.d/elpa/archives if uninitialized
-(when (not package-archive-contents)
-  (package-refresh-contents))
-
-(defconst user-packages
-  '(use-package go-mode go-imports flycheck exec-path-from-shell auto-complete go-autocomplete smart-tabs-mode)
-  "List of packages to install.")
-(dolist (p user-packages)
-  (when (not (package-installed-p p))
-    (package-refresh-contents)
-    (package-install p)))
-
-;; --------------------------------------------------------------------------------
-;; GO
-;; --------------------------------------------------------------------------------
-;;
-;; RESOURCES
-;;   http://tleyden.github.io/blog/2014/05/22/configure-emacs-as-a-go-editor-from-scratch/
-
-;; go-mode
-;; https://github.com/dominikh/go-mode.el
-
-;; flycheck
-;; https://www.flycheck.org/en/latest/
-;; enable "FlyC" mode
-(global-flycheck-mode)
-
-;; godoc
-;; Installed exec-path-from-shell
-;;
-;; This lets godoc find 3rd party docs
-(defun set-exec-path-from-shell-PATH ()
-  (let ((path-from-shell (replace-regexp-in-string
-                          "[ \t\n]*$"
-                          ""
-                          (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
-    (setenv "PATH" path-from-shell)
-    (setq eshell-path-env path-from-shell) ; for eshell users
-    (setq exec-path (split-string path-from-shell path-separator))))
-
-(when window-system (set-exec-path-from-shell-PATH))
-
-;; Turn on auto-complete-mode in "Go" Mode
-(defun auto-complete-for-go ()
-  (auto-complete-mode 1))
-(add-hook 'go-mode-hook 'auto-complete-for-go)
-;; https://github.com/nsf/gocode/issues/325
-(with-eval-after-load 'go-mode
-   (require 'go-autocomplete))
-
-(defun test-go-code ()
-  (shell-command "go generate && go build -v && go test -v && go vet"))
-
-;; GO HOOKS
-;;
-;; Go binaries (e.g. gofmt calls goimports)
-(add-to-list 'exec-path (expand-file-name "~/go/bin") )
-;;
-(defun my-go-mode-hook ()
-  ;; Use goimports instead of go-fmt
-  (setq gofmt-command "goimports")
-
-  ;;  Godef jump key bindings
-  (local-set-key (kbd "M-.") 'godef-jump)
-  (local-set-key (kbd "M-*") 'pop-tag-mark)
-  ;; Also, allow "M-," to return
-  (local-unset-key (kbd "M-,"))
-  (local-set-key (kbd "M-,") 'pop-tag-mark)
-
-  ;; Customize "compile-command" in "Go" mode
-  (if (not (string-match "go" compile-command))
-      (set (make-local-variable 'compile-command)
-           "go generate && go build -v && go test -v && go vet"))
-
-  ;; Call Gofmt before saving
-  (add-hook 'before-save-hook 'gofmt-before-save )
-
-  ;; After saving the file, test it
-  (add-hook 'after-save-hook 'test-go-code)
-
-  ;; Go GURU (formerly Oracle)
-  (require 'go-guru)
-
-  )
-(add-hook 'go-mode-hook 'my-go-mode-hook)
-
-;; --------------------------------------------------------------------------------
-;; Generic
-;; --------------------------------------------------------------------------------
-
-(use-package prog-mode
-  :defer t
-  :preface
-  (defun my-prog-mode-hook ()
-    "Personal prog-mode hook"
-    (set-variable 'tab-width 8)
-;;    (setq indent-tabs-mode t)
-    (setq show-trailing-whitespace t)
-    (turn-on-auto-revert-mode))
-  :config
-;;;; Thisneeds ispell and starts slowly
-;;;;  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-;;;;
-  (add-hook 'prog-mode-hook 'flycheck-mode)
-  (add-hook 'prog-mode-hook 'my-prog-mode-hook)
-  )
-
-;; Removed
-;;   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
-
-
-;; SMART TABS:
-
-;; https://www.emacswiki.org/emacs/SmartTabs#Python
-(smart-tabs-insinuate 'c 'javascript 'python)
-
-
 
 
 ;; --------------------------------------------------------------------------------
-;; MISC
+;; GENERIC
 ;; --------------------------------------------------------------------------------
-
-
-;; Ctrl+T: deletes trailing whitespace
-(global-set-key (kbd "C-T") 'delete-trailing-whitespace)
 
 ;; No Splash Screen
 (setq inhibit-splash-screen t)
@@ -145,36 +40,38 @@
 ;; F5 -> Compile
 ;;(global-set-key (kbd "<f5>") 'compile)
 
+;; remove unnecessary GUI elements
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+
+;; Show matching parentheses
+(show-paren-mode 1)
+
+;; Use UTF-8 by default
+(set-language-environment "UTF-8")
+
+;; Don't ring the bell.
+(setq ring-bell-function 'ignore)
+
+;; --------------------------------------------------------------------------------
+;; WHITESPACE AND TABS
+;; --------------------------------------------------------------------------------
+
+;; https://www.emacswiki.org/emacs/SmartTabs#Python
+(smart-tabs-insinuate 'c 'javascript 'python)
+
+;; Ctrl+T: deletes trailing whitespace
+(global-set-key (kbd "C-T") 'delete-trailing-whitespace)
+
 ;; Put this last (some things above reset it)
 (setq-default show-trailing-whitespace t)
 
-
-
-
-;; https://stackoverflow.com/questions/5982572/how-to-install-emacs-colortheme
-;;   mkdir ~/.emacs.d/themes/
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-;; Theme Gallery
-;;   https://pawelbx.github.io/emacs-theme-gallery/
-;; Theme
-;;   https://github.com/purcell/color-theme-sanityinc-tomorrow
-;; Steps
-;;   mkdir -p ~/.emacs.d/themes/ && cd $_ && git clone https://github.com/purcell/color-theme-sanityinc-tomorrow
-;;(load-file "~/.emacs.d/themes/color-theme-sanityinc-tomorrow/color-theme-sanityinc-tomorrow.el")
-;;(require 'color-theme-sanityinc-tomorrow)
-;;(color-theme-sanityinc-tomorrow-night)
-;;(load-theme 'color-theme-sanityinc-tomorrow-night t)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (go-autocomplete auto-complete exec-path-from-shell flycheck go-imports go-mode use-package))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; --------------------------------------------------------------------------------
+;; TODO: Use Tabs only in Makefiles...because we are saddled with them there.
+;; Why tabs are bad for programming...
+;;   Tabs are useful for e-books, but are confusing and inconsistent with programming
+;;   which uses fixed-width fonts for a good reason. The byte-savings is not worth it.
+;;   Even the Makefile authoer admits the tab requirement was a mistake.
+;; --------------------------------------------------------------------------------
+(setq-default indent-tabs-mode nil)
