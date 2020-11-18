@@ -72,6 +72,8 @@
 ;; Why tabs are bad for programming...
 ;;   Tabs are useful for e-books, but are confusing and inconsistent with programming
 ;;   which uses fixed-width fonts for a good reason. The byte-savings is not worth it.
-;;   Even the Makefile authoer admits the tab requirement was a mistake.
+;;   Even the Makefile author admits the tab requirement was a mistake.
+;;   YAML and Python spacing is fine by me, but requiring tab consistency is a PITA,
+;;   and further evidence that TABs in programming should immediately become 4 spaces.
 ;; --------------------------------------------------------------------------------
 (setq-default indent-tabs-mode nil)

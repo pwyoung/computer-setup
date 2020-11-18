@@ -86,7 +86,7 @@ for i in "${JAVA_DIRS[@]}"; do
     #echo "Checking $i"
     #ls -ld "$i"
     if [ -e "$i" ]; then
-	#echo "Found java at $i"	
+	#echo "Found java at $i"
 	export JAVA_HOME="$i"
 	break
     fi
@@ -97,7 +97,7 @@ if command -v jenv; then
     if [ -z "$JAVA_HOME" ]; then
 	export PATH="$HOME/.jenv/bin:$PATH"
 	eval "$(jenv init -)"
-	echo "Using jenv."	
+	echo "Using jenv."
     fi
 fi
 
@@ -113,7 +113,7 @@ fi
 MAVEN_DIRS=("/opt/apache-maven-3.6.3")
 for i in "${MAVEN_DIRS[@]}"; do
     #echo "Checking $i"
-    if [ -d "$i" ]; then	
+    if [ -d "$i" ]; then
 	#echo "Found maven at $i"
 	export MAVEN_HOME="$i"
 	break
@@ -219,3 +219,5 @@ export PATH
 # Stop warnings about this settingx
 # https://github.com/ansible/ansible/issues/56930
 export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore
+
+
