@@ -6,7 +6,8 @@ if [ -e ~/.profile.d ]; then
 fi
 for i in $SCRIPTS; do
     #echo "Running $i"
-    #source $i
+    #source $i # Does not work in DASH. "." is strictly more portable.
+    #. $i
     . $i &>/dev/null
 done
 
@@ -219,5 +220,3 @@ export PATH
 # Stop warnings about this settingx
 # https://github.com/ansible/ansible/issues/56930
 export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore
-
-
