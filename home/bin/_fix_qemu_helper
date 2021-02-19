@@ -1,0 +1,14 @@
+#!/bin/bash
+
+CF=/usr/lib/qemu/qemu-bridge-helper
+
+if [ -f $CF ]; then
+   if stat -L -c "%A" "$CF" | cut -c4 | grep 's' > /dev/null; then
+       echo "File $CF has setuid."
+   else
+       echo "File $CF does not have setuid."
+       sudo chmod +x $CF
+   fi
+else
+  echo "File $CF does not exist"
+fi
