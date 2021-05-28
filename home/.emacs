@@ -77,3 +77,4 @@
 ;;   and further evidence that TABs in programming should immediately become 4 spaces.
 ;; --------------------------------------------------------------------------------
 (setq-default indent-tabs-mode nil)
+(put 'upcase-region 'disabled nil)

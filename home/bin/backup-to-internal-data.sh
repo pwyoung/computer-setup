@@ -6,19 +6,19 @@
 set -e
 
 SRC=/data
-DST=/mnt/data_backup_internal
+DST=/media/pwyoung/2120ab71-c818-4655-a4e7-b1a941169938/backup/internal
 
 waitforit() {
     echo "hit enter (or control-c)"
     read -p OK
 }
 
-echo "show source"
-ls -ld $SRC/* 
+echo "show destination"
+ls -ld $DST/*
 waitforit
 
-echo "show destination"
-ls -ld $DST 
+echo "show source"
+ls -ld $SRC/*
 waitforit
 
 OPTS="-avhW --no-compress --progress"
