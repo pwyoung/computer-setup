@@ -4,19 +4,18 @@
 
 Utils:
   sudo apt update
-  sudo apt upgrade  
+  sudo apt upgrade
   sudo apt install emacs-nox htop tree
 
 SSH-Keys:
   - ssh-keygen -t rsa
   - Send to github
 
-DATA, BIN AND OTHER STUFF
-  Map /data to a data drive with my git folder
-    - ln -s /data/git ~/git
-  OR
-    - mkdir -p ~/git; cd $_; git clone git@github.com:pwyoung/computer-setup.git
-  Make links
+BIN AND OTHER STUFF:
+  - mkdir -p ~/git; cd $_; git clone git@github.com:pwyoung/computer-setup.git
+  Make links:
+    - cd  ~/git/computer-setup/home/bin/ && ./setup-popos-computer.sh
+    OR
     - for i in $(ls -a ~/git/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/computer-setup/home/$i ~/$i; done
 
 Terminal
@@ -31,11 +30,7 @@ Firefox:
 # BACKUPS
 ################################################################################
 
-# Back up /data/ to a LUKS encrypted external drive
-ls -ld /mnt/data_backup_internal
-lrwxrwxrwx 1 root root 67 Nov 12 17:23 /mnt/data_backup_internal -> /media/pwyoung/2120ab71-c818-4655-a4e7-b1a941169938/backup/internal
-
-- Add timeshift
+Add timeshift
 
 ################################################################################
 # PYTHON3
@@ -45,6 +40,34 @@ Python:
   - python3 -m venv ~/venv/python3
   - Open new terminal
   - which python
+
+################################################################################
+# VIRT-MANAGER AS NON-ROOT
+################################################################################
+
+# https://computingforgeeks.com/use-virt-manager-as-non-root-user/
+systemctl status libvirtd.service
+
+# Step 1 – Create unix group to use
+sudo getent group | grep libvirt # Note: this is "libvirt", not "libvirtd" group name
+sudo groupadd --system libvirt
+# Step 2 – Add user account to the libvirt group
+sudo usermod -a -G libvirt $(whoami)
+newgrp libvirt
+# Step 3 – Edit libvirtd configuration file to add group
+sudo emacs /etc/libvirt/libvirtd.conf
+unix_sock_group = "libvirt"
+unix_sock_rw_perms = "0770"
+sudo systemctl restart libvirtd.service
+systemctl status libvirtd.service
+virt-manager
+
+################################################################################
+# Create QEMU/KVM "User Session"
+################################################################################
+
+virt-manager -> File -> Add connection
+  -> Hypervisor -> QEMU/KVM user session [set as default]
 
 
 ################################################################################
@@ -144,4 +167,3 @@ sudo apt-get install virtualbox
 sudo apt install virtualbox-ext-pack
 
 sudo apt remove virtualbox
-
