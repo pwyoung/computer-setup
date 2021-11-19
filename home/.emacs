@@ -59,7 +59,7 @@
 ;; --------------------------------------------------------------------------------
 
 ;; https://www.emacswiki.org/emacs/SmartTabs#Python
-(smart-tabs-insinuate 'c 'javascript 'python)
+;;(smart-tabs-insinuate 'c 'javascript 'python)
 
 ;; Ctrl+T: deletes trailing whitespace
 (global-set-key (kbd "C-T") 'delete-trailing-whitespace)
