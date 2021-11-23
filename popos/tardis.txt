@@ -33,6 +33,30 @@ Firefox:
 Add timeshift
 
 ################################################################################
+# COSMETIC CHANGES
+################################################################################
+
+# Gnome-Shell extensions
+https://extensions.gnome.org/extension/3088/extension-list/
+
+# Themes
+# https://www.opendesktop.org/s/Gnome/browse?cat=135&ord=latest
+
+# Add theme
+mkdir -f ~/.themes && cd $_
+git clone https://www.opendesktop.org/s/Gnome/p/1267246
+
+
+
+# Use gnome-tweaks (even though this isn't supposedly supported)
+https://www.opendesktop.org/s/Gnome/browse?cat=135&page=2&ord=latest
+gnome-tweaks
+
+# Just icon theme
+https://github.com/L4ki/Breeze-Chameleon-Icons
+
+
+################################################################################
 # PYTHON3
 ################################################################################
 
