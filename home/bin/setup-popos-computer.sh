@@ -3,12 +3,25 @@
 
 set -e
 
-PKGS="emacs-nox htop tree"
+# Path to where we installed https://github.com/pwyoung/computer-setup
+# If this exists, this program will create some convenient symlinks
+COMPUTER_SETUP=~/git/computer-setup
 
-#REPORT="N"
-REPORT="Y"
+# Things to symlink (from $COMPUTER_SETUP)
+SYMLINKS=".atom .bash_profile bin .dircolors .emacs .gitconfig .gitignore .profile.d .tmux .tmux.conf"
+
+# Convenient packages to have
+PKGS="emacs-nox tree glances htop"
+# KVM/QEMU with a two options for GUIs
+PKGS+=" gnome-boxes virt-manager"
+# For NOMAJ
+PKGS+=" python3-pip vagrant"
+
+# Verbose reporting
+VERBOSE="Y"
+
 report() {
-    if [ "$REPORT" == "Y" ]; then
+    if [ "$VERBOSE" == "Y" ]; then
         echo "$1"
     else
         return
@@ -40,7 +53,6 @@ install_docker() {
         sudo apt-get install docker-ce docker-ce-cli containerd.io
     fi
 
-
     # Test
     if docker context ls | grep 'rootless *'; then
         report "Looks like Docker rootless context is set up."
@@ -71,62 +83,33 @@ EOF
         fi
 }
 
-install_flatpaks() {
-    cat <<EOF
-# TODO...
-# flatpak list --columns=name | sort
-Codecs
-default
-ffmpeg-full
-Freedesktop Platform
-GNOME Application Platform version 41
-GNOME Boxes
-GNOME Boxes Osinfo DB
-i386
-Mesa
-nvidia-470-82-00
-openh264
-Pop Gtk theme
-Signal Desktop
-Steam
-Telegram Desktop
-ungoogled-chromium
-WebKitGTK
-Zoom
-EOF
-
+install_packages() {
+    sudo apt install -y $PKGS
 }
 
-install_packages() {
-    # KVM/QEMU GUI. Set up
-    PKGS+=" gnome-boxes virt-manager"
-
-    # For NOMAJ
-    PKGS+=" python3-pip vagrant"
-
-    sudo apt install -y $PKGS
-
-    # https://docs.flatpak.org/en/latest/using-flatpak.html
-    # flatpak list
-    if cat /etc/qemu/bridge.conf | grep 'virbr0'; then
-        report "It looks like you set up KVM/QEMU user session support already."
-    else
-        cat <<EOF
-TODO:
-  - Allow non-root user to use the QEMU/Session resources
-    - sudo mkdir -p /etc/qemu
-    - echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
-    - sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
-  - Add user (i.e. non-rot) Connection
-    - libvirt GUI -> File -> Add Connection -> Hypervisor -> KVM/QEMU user session
-    - Test this easily using something like gnome-boxes to make a new VM
-EOF
-    fi
-
+setup_python_link() {
     # For Ansible (and other things) that expect to find "python" in the path
     if ! test -f /usr/bin/python && test -f /usr/bin/python3; then
         report "Creating symbolic link from /usr/bin/python to /usr/bin/python3"
         sudo ln -s /usr/bin/python3 /usr/bin/python
+    fi
+}
+
+setup_nonroot_qemu_session() {
+    if cat /etc/qemu/bridge.conf | grep 'virbr0'; then
+        report "It looks like you set up KVM/QEMU user session support already."
+    else
+        report "Allow non-root user to use the QEMU/Session resources"
+        sudo mkdir -p /etc/qemu
+        echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
+        sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
+        cat <<EOF
+- TODO:
+  - Add user (i.e. non-rot) Connection
+    - libvirt GUI -> File -> Add Connection -> Hypervisor -> KVM/QEMU user session
+    - Test this easily using something like gnome-boxes to make a new VM
+EOF
+        sleep 9
     fi
 }
 
@@ -147,13 +130,12 @@ make_link() {
 }
 
 setup_symlinks() {
-    D=~/git/computer-setup/home
+    D=$COMPUTER_SETUP/home
     if test -d $D; then
         report "Directory $D exists"
-        F=".atom .bash_profile bin .dircolors .emacs .gitconfig .gitignore .profile.d .tmux .tmux.conf"
         cd ~/
-        for i in $F; do
-	    make_link ~/git/computer-setup/home/$i ~/$i
+        for i in $SYMLINKS; do
+	    make_link $D/$i ~/$i
         done
     else
         report "Directory $D does not exist. Skipping symlink setup"
@@ -182,3 +164,5 @@ check_sudo_timeout
 install_docker
 setup_perms
 #install_flatpaks
+setup_nonroot_qemu_session
+setup_python_link
