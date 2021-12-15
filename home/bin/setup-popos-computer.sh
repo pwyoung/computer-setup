@@ -1,15 +1,25 @@
 #!/bin/bash
-# GOAL: Set up a new PopOS machine
+# GOAL: Set up a new PopOS machine with at least the requirements needed for nomaj
 
 set -e
 
 PKGS="emacs-nox htop tree"
 
+#REPORT="N"
+REPORT="Y"
+report() {
+    if [ "$REPORT" == "Y" ]; then
+        echo "$1"
+    else
+        return
+    fi
+}
+
 # Note: On Fedora, use podman
 install_docker() {
     # Docs: https://docs.docker.com/engine/install/ubuntu/
     if docker --version >/dev/null; then
-        echo "Docker is already installed"
+        report "Docker is already installed"
     else
         sudo apt-get update
 
@@ -33,7 +43,9 @@ install_docker() {
 
     # Test
     if docker context ls | grep 'rootless *'; then
-        echo "Looks like Docker rootless context is set up. Testing it now."
+        report "Looks like Docker rootless context is set up."
+        docker context ls
+        report "Running a test now"
         docker run hello-world
     else
         sudo docker run hello-world
@@ -97,7 +109,7 @@ install_packages() {
     # https://docs.flatpak.org/en/latest/using-flatpak.html
     # flatpak list
     if cat /etc/qemu/bridge.conf | grep 'virbr0'; then
-        echo "It looks like you set up KVM/QEMU user session support already."
+        report "It looks like you set up KVM/QEMU user session support already."
     else
         cat <<EOF
 TODO:
@@ -107,17 +119,14 @@ TODO:
     - sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
   - Add user (i.e. non-rot) Connection
     - libvirt GUI -> File -> Add Connection -> Hypervisor -> KVM/QEMU user session
+    - Test this easily using something like gnome-boxes to make a new VM
 EOF
     fi
-}
 
-
-REPORT="N"
-report() {
-    if [ "$REPORT" = "Y" ]; then
-        echo "$1"
-    else
-        return
+    # For Ansible (and other things) that expect to find "python" in the path
+    if ! test -f /usr/bin/python && test -f /usr/bin/python3; then
+        report "Creating symbolic link from /usr/bin/python to /usr/bin/python3"
+        sudo ln -s /usr/bin/python3 /usr/bin/python
     fi
 }
 
@@ -138,34 +147,38 @@ make_link() {
 }
 
 setup_symlinks() {
-
-    F=".atom .bash_profile bin .dircolors .emacs .gitconfig .gitignore .profile.d .tmux .tmux.conf"
-    cd ~/
-    for i in $F; do
-	make_link ~/git/computer-setup/home/$i ~/$i
-    done
+    D=~/git/computer-setup/home
+    if test -d $D; then
+        report "Directory $D exists"
+        F=".atom .bash_profile bin .dircolors .emacs .gitconfig .gitignore .profile.d .tmux .tmux.conf"
+        cd ~/
+        for i in $F; do
+	    make_link ~/git/computer-setup/home/$i ~/$i
+        done
+    else
+        report "Directory $D does not exist. Skipping symlink setup"
+    fi
 
 }
 
 setup_perms() {
+    report "Setting exec perms on our directories"
     chmod +x ~/bin/*
     chmod +x ~/.profile.d/*
 }
 
 check_sudo_timeout() {
     if sudo cat /etc/sudoers | grep timestamp_timeout >/dev/null; then
-        echo "It looks like you already set the sudo timeout period."
+        report "It looks like you already set the sudo timeout period."
     else
-        echo "Consider extending sudo timeout"
-        echo "e.g. with"
-        echo "Defaults        env_reset, timestamp_timeout=9999"
+        report "Consider extending sudo timeout by running 'sudo visudo' and editing the env_reset line to contain"
+        report "Defaults        env_reset, timestamp_timeout=<MINUTES_TO_TIMEOUT>"
     fi
 }
 
+setup_symlinks
+install_packages
 check_sudo_timeout
 install_docker
-install_packages
-#install_flatpaks
-setup_symlinks
 setup_perms
-
+#install_flatpaks

@@ -117,6 +117,10 @@ if [ ! -z "$JAVA_HOME" ]; then
     PATH=$JAVA_HOME/bin:$PATH
 fi
 
+################################################################################
+# Manage Java installations
+################################################################################
+
 # JABBA [do not use this, read below for reasons]
 #
 # https://github.com/shyiko/jabba#installation
@@ -165,7 +169,7 @@ fi
 # MAVEN
 ################################################################################
 
-#sdk list maven^C
+#sdk list maven
 #pwyoung@tardis:spark$ sdk install maven 3.6.3
 
 MAVEN_DIRS=("/home/pwyoung/.sdkman/candidates/maven/3.6.3/")
@@ -299,4 +303,4 @@ export PATH
 # https://github.com/ansible/ansible/issues/56930
 export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore
 
-[ -s "/home/pwyoung/.jabba/jabba.sh" ] && source "/home/pwyoung/.jabba/jabba.sh"
+#[ -s "/home/pwyoung/.jabba/jabba.sh" ] && source "/home/pwyoung/.jabba/jabba.sh"
