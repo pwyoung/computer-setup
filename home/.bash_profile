@@ -1,30 +1,39 @@
 #!/bin/bash
 
-# Common setup
+################################################################################
+# Permanent/Public scipts (that's ok to put in git)
+################################################################################
+
+# Public stuff to add to PATH
+if [ -e ~/bin ]; then
+    PATH=~/bin:$PATH
+fi
+
+# Public setup scripts
 if [ -e ~/.profile.d ]; then
     SCRIPTS=$(ls -1 ~/.profile.d/*.sh 2>/dev/null)
 fi
 for i in $SCRIPTS; do
-    #echo "Running $i"
-    #source $i # Does not work in DASH. "." is strictly more portable.
-    #. $i
     . $i &>/dev/null
 done
 
-# Private/Sensitive and custom config
-if [ -e ~/.private.d ]; then
-    PWSCRIPTS=$(ls -1 ~/.private.d/*.sh 2>/dev/null)
-fi
-for i in $PWSCRIPTS; do
-    . $i &>/dev/null
-done
+################################################################################
+# Private/Sensitive/Ephemeral custom stuff (not in git)
+################################################################################
+
+# Private stuff to add to PATH
 if [ -e ~/bin-local ]; then
     PATH=~/bin-local:$PATH
 fi
 
-if [ -e ~/bin ]; then
-    PATH=~/bin:$PATH
+# Private setup scripts (e.g. things installers add to shell startup scripts like ~/.bashrc)
+if [ -e ~/.private.d ]; then
+    PWSCRIPTS=$(ls -1 ~/.private.d/*.sh 2>/dev/null)
 fi
+for i in $PWSCRIPTS; do
+    echo "Running $i"
+    . $i &>/dev/null
+done
 
 # Moved to ~/.profile.d/z
 #alias z='cd $(cat ~/.marked_path)'
