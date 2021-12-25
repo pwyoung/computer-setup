@@ -1,18 +1,9 @@
-# Setup
-- Ubuntu
-  - Git
-  - OpenSSH Client
-  - OpenSSH Server
+# Goal
 
-# Details
 
-## OpenSSH Client
-ssh-keygen -t rsa
+This documents the setup done on the Windows 10 (KVM/QEMU) machine
+to create a development environment.
 
-## OpenSSH Server
-sudo service ssh --full-restart
-cp ./id_rsa.pub authorized_keys
-chmod 600 ./authorized_keys
-ssh localhost
-Copy keys from other host
-ssh from other host
+./kvm-qemu-windows-10/README.me
+
+
