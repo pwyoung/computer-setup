@@ -69,12 +69,12 @@ Usage: $0 arg
 
 Args with their long-forms
         -x|--execute: run 'onedrive --monitor' comand (this is called by the service)
+        -i|--install: install the service
+        -u|--uninstall: uninstall the service
         -t|--start: start the service
         -p|--stop: stop the service
         -s|--status: show status of the service
         -l|--show-log:show service log
-        -i|--install: install the service
-        -u|--uninstall: uninstall the service
         -h|--help: show this help
 
 Example: Install the service, show its status and log
