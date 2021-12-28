@@ -15,7 +15,7 @@ PKGS="emacs-nox tree glances htop"
 # KVM/QEMU with a two options for GUIs
 PKGS+=" gnome-boxes virt-manager"
 # For NOMAJ
-PKGS+=" python3-pip vagrant"
+PKGS+=" python3-pip vagrant "
 
 # Verbose reporting
 VERBOSE="Y"
@@ -158,6 +158,13 @@ check_sudo_timeout() {
     fi
 }
 
+setup_onedrive() {
+    echo "Setup OneDrive"
+    mkdir -p ~/OneDrive
+    /home/pwyoung/bin/pwyoung-one-drive -i
+}
+
+
 setup_symlinks
 install_packages
 check_sudo_timeout
@@ -166,3 +173,4 @@ setup_perms
 #install_flatpaks
 setup_nonroot_qemu_session
 setup_python_link
+setup_onedrive
