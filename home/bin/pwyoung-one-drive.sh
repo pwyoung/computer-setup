@@ -7,16 +7,12 @@ SVCSCRIPT=/lib/systemd/system/$SVC.service
 
 run_command() {
     echo "This will call 'one-drive --monitor' to keep ~/OneDrive up to date"
-    # This will run in the foreground and upload/download files when change is detected.
     onedrive --monitor | tee $LOG
-    # tail -99f $LOG
 }
-
 
 install_service() {
     mkdir -p ~/OneDrive
 
-    # This script ( $0 ) should be installed at the location in ExecStart
     cat <<EOF | sudo tee $SVCSCRIPT
 [Unit]
 Description=Call script to monitor (synch) ~pwyoung/OneDrive
@@ -64,6 +60,10 @@ uninstall_service() {
 
 show_usage(){
     cat <<EOF
+This script is inteneded to be used to manage a service which runs as a local user.
+This script must be installed at the location in ExecStart and with the User and Group
+as defined int the '[Service]' section in the 'install_service' routine in this script.
+
 Usage: $0 arg
 
 Args with their long-forms
