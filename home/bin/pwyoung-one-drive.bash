@@ -18,7 +18,7 @@ install_service() {
 Description=Call script to monitor (synch) ~pwyoung/OneDrive
 
 [Service]
-ExecStart=/bin/sh -c '/home/pwyoung/bin/pwyoung-one-drive.sh -x'
+ExecStart=/bin/bash -c '/home/pwyoung/bin/pwyoung-one-drive.bash -x'
 User=pwyoung
 Group=pwyoung
 

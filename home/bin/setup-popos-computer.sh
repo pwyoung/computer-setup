@@ -161,7 +161,7 @@ check_sudo_timeout() {
 setup_onedrive() {
     echo "Setup OneDrive"
     mkdir -p ~/OneDrive
-    /home/pwyoung/bin/pwyoung-one-drive -i
+    /home/pwyoung/bin/pwyoung-one-drive.bash -i
 }
 
 
