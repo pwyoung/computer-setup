@@ -2,6 +2,8 @@
 
 LOG=/tmp/one-drive.sh.$USER.log
 
+THISSCRIPT=$0
+
 SVC=one-drive
 SVCSCRIPT=/lib/systemd/system/$SVC.service
 
@@ -15,12 +17,12 @@ install_service() {
 
     cat <<EOF | sudo tee $SVCSCRIPT
 [Unit]
-Description=Call script to monitor (synch) ~pwyoung/OneDrive
+Description=Call script to monitor (synch) ~$USER/OneDrive
 
 [Service]
-ExecStart=/bin/bash -c '/home/pwyoung/bin/pwyoung-one-drive.bash -x'
-User=pwyoung
-Group=pwyoung
+ExecStart=/bin/bash -c '$THISSCRIPT -x'
+User=$USER
+Group=$USER
 
 [Install]
 WantedBy=multi-user.target
@@ -60,9 +62,8 @@ uninstall_service() {
 
 show_usage(){
     cat <<EOF
-This script is inteneded to be used to manage a service which runs as a local user.
-This script must be installed at the location in ExecStart and with the User and Group
-as defined int the '[Service]' section in the 'install_service' routine in this script.
+This script can run a command (via -x) and manage a service to run that command as the
+current user.
 
 Usage: $0 arg
 
