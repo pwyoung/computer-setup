@@ -1,0 +1,13 @@
+#!/bin/bash
+
+run_cmd() {
+    echo "############### $1"
+    bash -c "$1"
+}
+
+run_cmd "git branch"
+run_cmd "git remote -v"
+run_cmd "git log HEAD~1..HEAD"
+run_cmd "git status"
+run_cmd "git diff | head -15"
+
