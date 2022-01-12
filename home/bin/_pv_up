@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# First connection
+#sudo protonvpn init
+#sudo protonvpn connect -cc US
+
+# Reuse saved connection info
+sudo protonvpn reconnect
+
+sudo protonvpn status

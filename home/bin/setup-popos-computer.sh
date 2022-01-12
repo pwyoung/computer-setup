@@ -69,6 +69,7 @@ install_docker() {
       - https://docs.docker.com/engine/security/rootless/
     - Steps
       - systemctl stop docker
+      - sudo apt-get install -y uidmap
       - dockerd-rootless-setuptool.sh install
       - systemctl --user start docker
       - docker context use rootless
@@ -160,17 +161,22 @@ check_sudo_timeout() {
 
 setup_onedrive() {
     echo "Setup OneDrive"
+    sudo apt install -y onedrive
     mkdir -p ~/OneDrive
     /home/pwyoung/bin/pwyoung-one-drive.bash -i
 }
 
+
+setup_onedrive
 
 setup_symlinks
 install_packages
 check_sudo_timeout
 install_docker
 setup_perms
-#install_flatpaks
-setup_nonroot_qemu_session
-setup_python_link
-setup_onedrive
+
+
+# Skip these on dev vm
+
+#setup_nonroot_qemu_session
+#setup_python_link
