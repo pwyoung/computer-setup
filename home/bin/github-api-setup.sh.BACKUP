@@ -1,0 +1,11 @@
+#!/bin/bash
+
+export GITHUB_TOKEN='<TODO-PUT-API-KEY-HERE>'
+export GITHUB_USER='pwyoung'
+
+export GITHUB_ORGS='stock-data-stuff,PhillipWillsYoungOrg'
+
+# Where to put the files
+export GITHUB_REPO_LIST=~/.private/git_repo_list.txt
+export GITHUB_TEMP_FILE=~/.private/git_temp_file.txt
+export GITHUB_LOCAL_DIR=~/git/backups
