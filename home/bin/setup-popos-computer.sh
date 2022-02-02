@@ -166,6 +166,16 @@ setup_onedrive() {
     /home/pwyoung/bin/pwyoung-one-drive.bash -i
 }
 
+postgresql() {
+    cat <<EOF
+sudo apt install postgresql postgresql-contrib
+
+Gave me this response.
+Success. You can now start the database server using:
+ pg_ctlcluster 13 main start
+EOF
+
+}
 
 setup_onedrive
 

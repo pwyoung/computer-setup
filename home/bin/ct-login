@@ -1,0 +1,2 @@
+# Login to the cloud tools image
+docker run -t -i --rm -v $DOT_AWS:/home/dev/.aws aws-tools:latest bash

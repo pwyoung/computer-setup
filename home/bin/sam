@@ -1,0 +1,8 @@
+#!/bin/bash
+ARGS="$@"
+
+if [ -z "$DOT_AWS" ]; then
+    DOT_AWS=$HOME/.aws
+fi
+
+docker run -t -i --rm -v $DOT_AWS:/home/dev/.aws aws-tools:latest bash -c "/usr/local/bin/sam $ARGS"

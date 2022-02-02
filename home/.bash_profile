@@ -31,7 +31,6 @@ if [ -e ~/.private.d ]; then
     PWSCRIPTS=$(ls -1 ~/.private.d/*.sh 2>/dev/null)
 fi
 for i in $PWSCRIPTS; do
-    echo "Running $i"
     . $i &>/dev/null
 done
 
@@ -304,3 +303,4 @@ export PATH
 export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore
 
 #[ -s "/home/pwyoung/.jabba/jabba.sh" ] && source "/home/pwyoung/.jabba/jabba.sh"
+. "$HOME/.cargo/env"
