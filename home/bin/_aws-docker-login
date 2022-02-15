@@ -1,2 +1,0 @@
-
-docker run -t -i --rm -v $DOT_AWS:/home/dev/.aws aws-tools:latest bash
