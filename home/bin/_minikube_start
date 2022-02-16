@@ -1,0 +1,49 @@
+#!/bin/bash
+
+################################################################################
+# KUBECTL
+################################################################################
+# https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+#
+# LOCAL KUBECTL
+#
+# https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+#
+#curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+# curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+#sudo mv ./kubectl /usr/local/bin/
+#chmod +x /usr/local/bin/kubectl
+#
+# Check hash
+# curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+# echo "$(<kubectl.sha256)  kubectl" | sha256sum --check
+#
+#kubectl version --client
+
+# LOCAL KUBECTL COMPLETION
+#
+# https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+# in ~/.profile.d/kubernetes.sh
+
+# LOCAL KUBECTL CONVERT
+#
+# curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl-convert"
+
+################################################################################
+# MINIKUBE
+################################################################################
+#
+# https://k8s-docs.netlify.app/en/docs/tasks/tools/install-minikube/
+#
+# curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64   && chmod +x minikube
+# sudo mv ./minikube /usr/local/bin/
+# ls -l /usr/local/bin/minikube
+minikube start --vm-driver=docker
+#
+#minikube kubectl -- get pods -A
+minikube kubectl -- get all -A
+
+
+# minikube ssh ls /
+
+
