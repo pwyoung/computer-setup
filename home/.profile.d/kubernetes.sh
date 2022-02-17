@@ -3,7 +3,9 @@
 # Since ~/.kube/config tends to become a mess due to auto-merging,
 # use separate config files and use KUBECONFIG to specify them.
 #
-# DO NOT allow ~/.kube/config to exist as it could be used accidentally.
+# Keep the original ~/kube/config files around, renamed, for recovery purposes.
+#
+# IDEALLY, do not allow ~/.kube/config to exist as it could be used accidentally.
 #
 # Suggestion: make aliases for 'k' and 'kubectl' to refer to the aliases here.
 
@@ -16,6 +18,7 @@ complete -F __start_kubectl k
 # Alias for accessing Minikube
 alias km="KUBECONFIG=~/.kube/config.minikube /usr/local/bin/kubectl"
 complete -F __start_kubectl km
+alias hm="KUBECONFIG=~/.kube/config.minikube /usr/local/bin/helm"
 
 # Setup a local dev cluster accessible only by SSH
 # KF=~/.kube/config.local
@@ -24,3 +27,4 @@ complete -F __start_kubectl km
 # Use an SSH tunnel that closes itself once it is no longer in use
 alias kl="ssh -f -L 6443:127.0.0.1:6443 k-1 'sleep 10' && KUBECONFIG=~/.kube/config.local /usr/local/bin/kubectl"
 complete -F __start_kubectl kl
+alias hl="ssh -f -L 6443:127.0.0.1:6443 k-1 'sleep 10' && KUBECONFIG=~/.kube/config.local /usr/local/bin/helm"
