@@ -41,9 +41,14 @@
 minikube start --vm-driver=docker
 #
 #minikube kubectl -- get pods -A
-minikube kubectl -- get all -A
-
+#minikube kubectl -- get all -A
 
 # minikube ssh ls /
+
+# Use KUBECONFIG to keep config files clean and separate
+# and avoid OOPS situations
+mv ~/.kube/config ~/.kube/config.minikube
+
+
 
 

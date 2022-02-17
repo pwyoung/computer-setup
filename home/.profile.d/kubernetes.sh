@@ -28,3 +28,9 @@ alias hm="KUBECONFIG=~/.kube/config.minikube /usr/local/bin/helm"
 alias kl="ssh -f -L 6443:127.0.0.1:6443 k-1 'sleep 10' && KUBECONFIG=~/.kube/config.local /usr/local/bin/kubectl"
 complete -F __start_kubectl kl
 alias hl="ssh -f -L 6443:127.0.0.1:6443 k-1 'sleep 10' && KUBECONFIG=~/.kube/config.local /usr/local/bin/helm"
+
+
+
+# status
+S='----> '
+alias k8s="echo '$S minikube' && km cluster-info; echo '$S local' && kl cluster-info"
