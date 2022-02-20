@@ -16,6 +16,10 @@ PKGS="emacs-nox tree glances htop"
 PKGS+=" gnome-boxes virt-manager"
 # For NOMAJ
 PKGS+=" python3-pip vagrant "
+# For WSL2
+PKGS+=" xdg-utils"
+# To detect if VM
+PKGS+=" dmidecode"
 
 # Verbose reporting
 VERBOSE="Y"
@@ -85,6 +89,7 @@ EOF
 }
 
 install_packages() {
+    sudo apt update
     sudo apt install -y $PKGS
 }
 
@@ -177,16 +182,61 @@ EOF
 
 }
 
-setup_onedrive
+set_globals(){
+    # dmidecode returns nothing in WSL
+    VM='false'
+    if sudo dmidecode -s system-manufacturer | egrep -i 'qemu|virt'; then
+	VM='true'
+    fi
+    echo "VM=$VM"
+
+    WSL='false'
+    if uname -a | grep WSL >/dev/null; then
+	WSL='true'
+    fi
+    echo "WSL=$WSL"
+
+}
+
+set_globals
+
+# OneDrive has problems:
+# - doesn't preserve file permissions
+# - REQUIRES syncing the desktop, which corrupts some apps
+# setup_onedrive
+
+if uname -a | grep WSL >/dev/null; then
+    echo "On WSL"
+    # https://docs.docker.com/desktop/windows/install/
+    mkdir -p ~/Downloads
+    cd ~/Downloads
+    F=~/Downloads/DockerDesktopInstaller.exe
+    URL="https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
+    if [ -f $F ]; then
+        echo "$F exists"
+    else
+        echo "$F does not exist"
+        exit 1
+        wget -O $F $URL
+    fi
+    chmod +x $F
+    export PATH=$PATH:/mnt/c/Windows/System32
+    Powershell.exe -Command "& {Start-Process Powershell.exe -Verb RunAs}"
+
+
+else
+    # Skip these on wsl (since docker-desktop for windows has special integration feature)
+    install_docker
+fi
+
+exit 1
 
 setup_symlinks
 install_packages
 check_sudo_timeout
-install_docker
 setup_perms
 
 
 # Skip these on dev vm
-
 #setup_nonroot_qemu_session
 #setup_python_link

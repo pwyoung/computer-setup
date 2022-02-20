@@ -1,7 +1,21 @@
 #!/bin/sh
 
+# Python recommends "venv" (not pyenv) but
+# venv doesn't seem to be able to install older versions
+# of python unless I build them first and then use them to
+# make a venv.
+#
+# Pyenv makes it easy to download many python versions. To see them, run:
+#   pyenv install --list
+# This includes [ana|mini]conda, pypy, and others
+#
+# It is also possible to use pyenv to get a python version,
+# and then use venv as Python recommends, and then stop using pyenv
+# and activate the resulting python version using venv.
+#
+# Pyenv has a virtualenv wrapper, but that seems overly complex given that we can
+# remove pyenv completely after using it to make a venv we want
 setup_venv(){
-    echo "python.sh: start"
     VENV_DIR=~/venv/python3
 
     if [ ! -d ${VENV_DIR} ]; then
@@ -13,69 +27,56 @@ setup_venv(){
     export set PYTHONUNBUFFERED=1
 
     . ${VENV_DIR}/bin/activate
-
-    echo "python.sh: end"
 }
 
-# Document this here in case we need it again
 install_pyenv(){
-    PKGS=build-essential libssl-dev zlib1g-dev libbz2-dev
-    PKGS+=libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev
-    PKGS+=xz-utils tk-dev libffi-dev liblzma-dev git
-    PKGS+=openssl libssl-dev
+    PKGS=build-essential libssl-dev zlib1g-dev libbz2-dev \
+        libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+        xz-utils tk-dev libffi-dev liblzma-dev git \
+        openssl libssl-dev
 
     sudo apt-get install -y $PKGS
 
-    pip install virtualenvwrapper
-
     git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-    git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv
-    git clone https://github.co
 }
 
 setup_pyenv(){
     export PYENV_ROOT="$HOME/.pyenv"
 
-    #export PATH="$PYENV_ROOT/bin:$PATH"
     export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 
     if command -v pyenv 1>/dev/null 2>&1; then
         eval "$(pyenv init -)"
     fi
 
-    export PYENV_VIRTUALENVWRAPPER_PREFER_PYENV="true"
-    export WORKON_HOME=$HOME/.virtualenvs
-    eval "$(pyenv virtualenv-init -)"
-    pyenv virtualenvwrapper_lazy
 }
 
-check_python(){
-    ls -l `which python`
-    python --version
-    python -c"import ssl" # Check that this does not error out
-
-    pyenv install --list
-
-    # 3.8.12
-    # pyenv install --list | grep 3.8
-    # https://lmccrone.com/cheat-sheets-pyenv/
-    # pyenv install 3.8.12
-
+install_pyenv_global_version(){
+    pyenv install 3.8.12
+    pyenv global 3.8.12
     pyenv versions
 }
 
-activate_pyenv(){
-    echo "" >/dev/null
-
-    # create an env
-    #pyenv virtualenv 3.8.12 pyenv-3.8.12
-
-    # delete env
-    #pyenv virtualenv-delete 3.8.12/envs/pyenv-3.8.12
+# Install as venv
+# This supports running without pyenv and its shims
+use_pyenv_to_install_venv_version() {
+    cd ~/venv
+    pyenv shell 3.8.12
+    python3.8 -m venv 3.8.12
+    echo "consider commenting out setup_pyenv and using setup_venv with this instead"
 }
 
-# setup_venv
 
-# install_pyenv
+if [ "$1" == "pyenv" ]; then
+    install_pyenv
+    setup_pyenv
+    install_pyenv_global_version
+    use_pyenv_to_install_venv_version
+fi
+
+# Use Pyenv
 setup_pyenv
-# activate_pyenv
+
+# Use venv
+#setup_venv
+

@@ -303,7 +303,10 @@ export PATH
 export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore
 
 #[ -s "/home/pwyoung/.jabba/jabba.sh" ] && source "/home/pwyoung/.jabba/jabba.sh"
-. "$HOME/.cargo/env"
 
+# Rust (todo. move to ~/.profile.d/rust.sh if possible. test since maybe this failed b4)
+if [ -d $HOME/.cargo ]; then
+    . "$HOME/.cargo/env"
+fi
 
 
