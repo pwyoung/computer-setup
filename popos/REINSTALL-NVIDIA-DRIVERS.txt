@@ -1,0 +1,29 @@
+# PROBLEM
+
+################################################################################
+Nvidia drivers/packages are FUBARED.
+
+Can't update normal OS due to inability to update Nvidia.
+Can't update/repair nvidia normally.
+Nvidia fractional scaling (on this new Asus laptop) does not work anyway.
+
+################################################################################
+
+
+#https://forums.developer.nvidia.com/t/bug-470-42-01-1-dgpu-can-not-be-initialized/183627/12
+
+#remove the current NVIDIA driver
+sudo apt remove nvidia*
+sudo reboot now
+
+#disable the noveau driver
+sudo bash -c “echo blacklist nouveau > /etc/modprobe.d/blacklist-nvidia-nouveau.conf”
+sudo bash -c “echo options nouveau modeset=0 >> /etc/modprobe.d/blacklist-nvidia-nouveau.conf”
+sudo update-initramfs -u
+sudo reboot now
+
+#install NVIDIA 465 driver
+#downloaded from nvidia.com 1
+chmod +x NVIDIA-Linux-x86_64-465.31.run
+sudo ./NVIDIA-Linux-x86_64-465.31.run
+sudo reboot now
