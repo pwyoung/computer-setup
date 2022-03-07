@@ -9,7 +9,7 @@ MAKEFILE_PATH=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 # Set default shell as bash
 SHELL:=/bin/bash
 
-all: 
+all:
 	node ./get-github-repos.js
 
 deps:

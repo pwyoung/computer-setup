@@ -8,11 +8,13 @@ const { Octokit } = require("@octokit/rest");
 // --------------------------------------------------------------------------------
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await
 function resolveAfterHalfASecond(x) {
+
   return new Promise(resolve => {
     setTimeout(() => {
       resolve(x);
     }, 500);
   });
+
 }
 
 async function f1() {
@@ -38,4 +40,3 @@ async function f2() {
 console.log("Start")
 f1()
 console.log("End")
-
