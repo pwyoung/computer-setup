@@ -8,7 +8,7 @@
 VM_NAME=popos-vm
 ISO_NAME=pop-os_21.10_amd64_intel_7.iso
 CPU=2
-SSH_PORT=2222
+SSH_PORT=2223
 ################################################################################
 
 # Useful Resources
