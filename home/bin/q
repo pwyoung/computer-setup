@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# GOAL:
+
+################################################################################
+# CUSTOMIZE THESE
+################################################################################
+VM_NAME=popos-vm
+ISO_NAME=pop-os_21.10_amd64_intel_7.iso
+CPU=2
+SSH_PORT=2222
+################################################################################
+
+# Useful Resources
+# - https://www.arthurkoziel.com/qemu-ubuntu-20-04/
+# - https://raw.githubusercontent.com/yoonsikp/vm_configs/master/ubuntu.xml
+
+set -e
+set -x
+
+QEMU_DIR=~/QEMU
+mkdir -p $QEMU_DIR
+
+VM_DIR=$QEMU_DIR/$VM_NAME
+mkdir -p $VM_DIR
+
+# QEMU DISK
+DISK=$VM_DIR/$VM_NAME.qcow2
+
+# OS ISO
+ISO=$QEMU_DIR/isos/$ISO_NAME
+
+# sysctl -n machdep.cpu.brand_string
+# Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
+
+create_disk() {
+    qemu-img create -f qcow2 $DISK 20G
+}
+
+run_vm() {
+    qemu-system-x86_64 \
+        -machine type=q35,accel=hvf \
+        -smp $CPU \
+        -hda $DISK \
+        -m 4G \
+        -usb \
+        -device usb-tablet \
+        -display default,show-cursor=on \
+        -vga virtio \
+        -device virtio-vga,xres=1680,yres=1050 \
+        -device rtl8139,netdev=mynet0 \
+        -netdev user,id=mynet0,hostfwd=tcp::$SSH_PORT-:22
+}
+
+if uname | grep Darwin >/dev/null; then
+    echo "Ok, running on Mac"
+else
+    echo "Not running on Mac"
+    exit 1
+fi
+
+if [ -f $DISK ]; then
+    echo "Disk exists"
+else
+    create_disk
+fi
+
+run_vm

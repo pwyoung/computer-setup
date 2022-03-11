@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Run the VM
+if VBoxManage list runningvms | grep pwydev >/dev/null; then
+    echo "VM is already running"
+else
+    VBoxManage startvm "pwydev"
+fi
+
+ssh vb
+
+
+
+
