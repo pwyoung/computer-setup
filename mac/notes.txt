@@ -1,0 +1,3 @@
+
+Q for I:
+- Can I add an "insight" appleID (so that I can fully benefit from the keychain)?
