@@ -1,5 +1,7 @@
 #!/bin/bash
 
+TMPFILE=~/.tmp_file_aws.txt
+
 IMAGE="aws-tools:latest"
 
 # If $DOT_AWS is not defined then set it to the default dir
@@ -20,4 +22,10 @@ DARGS+=" -v /tmp/shared:/tmp/shared"
 # Specify the command to run, aws cli version 2
 CMD="/usr/local/bin/aws-v2"
 
-docker run $DARGS $IMAGE $CMD $@
+docker run $DARGS $IMAGE $CMD $@ > $TMPFILE
+
+# Fix hosed output, and keep results
+cat $TMPFILE | dos2unix
+
+
+
