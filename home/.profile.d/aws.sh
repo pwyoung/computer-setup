@@ -9,12 +9,17 @@ IMAGE="aws-tools:latest"
 
 SHARED=/tmp/shared && mkdir -p $SHARED
 
+# If $DOT_AWS is defined then use it
 if [ -z "$DOT_AWS" ]; then
     DOT_AWS=$HOME/.aws
 fi
 
-AWS=/usr/local/bin/aws-v2
-alias aws="docker run -t -i --rm -v $SHARED:$SHARED -v $DOT_AWS:/home/dev/.aws $IMAGE /usr/local/bin/aws-v2"
+if [ -f ~/bin/aws ]; then
+    echo "use ~/bin/aws to run aws commands"
+    unalias aws
+else
+    alias aws="docker run -t -i --rm -v $SHARED:$SHARED -v $DOT_AWS:/home/dev/.aws $IMAGE /usr/local/bin/aws-v2"
+fi
 
 alias aws-shell="docker run -t -i --rm -v $DOT_AWS:/home/dev/.aws $IMAGE /usr/bin/bash -c 'aws-shell'"
 
