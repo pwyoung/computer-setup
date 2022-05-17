@@ -31,21 +31,49 @@ target
 # Vagrant
 **/.vagrant
 
-# TERRAFORM
-**/.terraform
-
 # VSCODE
 **/.vscode
 
-# All terraform files
-# Compiled files
-**/*.tfstate
-**/*.tfstate.backup
-# Module directory
-**/.terraform/
-# Sensitive Files
-**/variables.tf
-# Custom
-**/*.tfplan
+# Terraform (TF)
+#
+# Exclude all .tfvars files, which are likely to contain sentitive data, such as
+# password, private keys, and other secrets. These should not be part of version
+# control as they are data points which are potentially sensitive and subject
+# to change depending on the environment.
+#
+# TF local state.
+# TF state should be in remote datastores for any serious use-case.
+**/.terraform/*
+# .tfstate files
+**/terraform.tfstate
+**/*.tfstate.*
+#
+# TF Plan files.
+# These are the names used by convention
+**/tfplan
+# and in the code here
+**/.tfplan
+#
+# Be paranoid about secrets.
+#   Shell script devs sometimes use .env files for this.
+**/*.env
+# These are often are used to inject secrets (or other local dev config)
+**/*.tfvars
+**/override.tf
+**/override.tf.json
+**/*_override.tf
+**/*_override.tf.json
 
-
+# Terragrunt (TG)
+#
+# Keep this per TG recommendation.
+#   It pins the version of the provider used.
+#**/.terraform.lock.hcl
+#
+#
+# Exclude this per TG recommendation.
+#   The TG cache can be delete at anytime and TG will recreate it
+**/.terragrunt-cache
+#
+# debug output
+**/terragrunt-debug.tfvars.json
