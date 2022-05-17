@@ -5,65 +5,84 @@
 Utils:
   sudo apt update
   sudo apt upgrade
-  sudo apt install emacs-nox htop tree
+  sudo apt install emacs-nox htop tree glances
+
+Firefox:
+  - T1Q2B3
+  - sync
+  - log into github, add keys, clone this repo
 
 SSH-Keys:
-  - ssh-keygen -t rsa
+  - ssh-keygen -t ed25519
   - Send to github
+
+Terminal
+  - Set create/destroy/next/previous tabs
+  - Edit profile:
+    - set "command as login shell"
+    - set colors to use system theme
 
 BIN AND OTHER STUFF:
   - mkdir -p ~/git; cd $_; git clone git@github.com:pwyoung/computer-setup.git
   Make links:
-    - cd  ~/git/computer-setup/home/bin/ && ./setup-popos-computer.sh
-    OR
     - for i in $(ls -a ~/git/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/computer-setup/home/$i ~/$i; done
+  Setup
+    - cd  ~/git/computer-setup/home/bin/ && ./setup-popos-computer.sh
 
-Terminal
-  Set create/destroy/next/previous tabs
-  Edit profile and set "command as login shell"
-
-Firefox:
-  - sync
-  - log into github, add keys, clone this repo
 
 ################################################################################
 # BACKUPS
 ################################################################################
 
 Add timeshift
+sudo apt-get install timeshift
+sudo timeshift-gtk
 
-################################################################################
-# COSMETIC CHANGES
-################################################################################
-
-# Gnome-Shell extensions
-https://extensions.gnome.org/extension/3088/extension-list/
-
-# Themes
-# https://www.opendesktop.org/s/Gnome/browse?cat=135&ord=latest
-
-# Add theme
-mkdir -f ~/.themes && cd $_
-git clone https://www.opendesktop.org/s/Gnome/p/1267246
-
-
-
-# Use gnome-tweaks (even though this isn't supposedly supported)
-https://www.opendesktop.org/s/Gnome/browse?cat=135&page=2&ord=latest
-gnome-tweaks
-
-# Just icon theme
-https://github.com/L4ki/Breeze-Chameleon-Icons
+# Just make a snapshot
+#sudo timeshift --create
 
 
 ################################################################################
 # PYTHON3
 ################################################################################
 
-Python:
-  - python3 -m venv ~/venv/python3
-  - Open new terminal
-  - which python
+# VENV
+#
+#Python:
+#  - sudo apt install python3-venv
+#  - python3 -m venv ~/venv/python3
+#  - Open new terminal
+#  - open new termainal (~/.profile.d/python.sh activates venv)
+#  - which python
+
+
+# PYENV
+# https://realpython.com/intro-to-pyenv/
+# curl https://pyenv.run | bash
+- open new termainal
+  ~/.profile.d/python.sh activates pyenv since it has a version of the following:
+    export PATH="$HOME/.pyenv/bin:$PATH"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+- pyenv versions
+- pyenv install --list
+- Install deps
+  sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
+    libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
+    libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl
+- pyenv install -v 3.10.4
+    WARNING: The scripts pip3 and pip3.10 are installed in '/home/pwyoung/.pyenv/versions/3.10.4/bin' which is not on PATH.
+
+################################################################################
+# NOMAJ DEPS
+################################################################################
+
+sudo apt install openssh-server ansible vagrant docker-ce virt-manager gnome-boxes
+
+# Allow 'ssh localhost whoami' to work
+cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
+chmod 0600 ~/.ssh/authorized_keys
+
 
 ################################################################################
 # VIRT-MANAGER AS NON-ROOT
@@ -73,10 +92,10 @@ Python:
 systemctl status libvirtd.service
 
 # Step 1 – Create unix group to use
-sudo getent group | grep libvirt # Note: this is "libvirt", not "libvirtd" group name
-sudo groupadd --system libvirt
+sudo getent group | grep libvirt # Note: the group name here is "libvirt", not "libvirtd" (per some docs/OSes)
+sudo groupadd --system libvirt # "Already exists" (per some other tool setup)
 # Step 2 – Add user account to the libvirt group
-sudo usermod -a -G libvirt $(whoami)
+sudo usermod -a -G libvirt $(whoami) # cat /etc/group  | grep 'libvirt:'
 newgrp libvirt
 # Step 3 – Edit libvirtd configuration file to add group
 sudo emacs /etc/libvirt/libvirtd.conf
@@ -90,30 +109,17 @@ virt-manager
 # Create QEMU/KVM "User Session"
 ################################################################################
 
+NOTE: reboot might be needed before doing this
+
 virt-manager -> File -> Add connection
-  -> Hypervisor -> QEMU/KVM user session [set as default]
-
-
-################################################################################
-# KVM SUPPORT FOR EVERYTHING (Nesting and device pass-through)
-################################################################################
-
-https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
-https://stafwag.github.io/blog/blog/2018/06/04/nested-virtualization-in-kvm/
-
-virt-host-validate | grep -v PASS
-  QEMU: Checking if IOMMU is enabled by kernel                               : WARN (IOMMU appears to be disabled in kernel. Add intel_iommu=on to kernel cmdline arguments)
-
-sudo kernelstub -a intel_iommu=on
-
-virt-host-validate # ALL PASS
-
-TODO: PASSTHROUGH
-  https://access.redhat.com/documentation/en-us/red_hat_virtualization/4.1/html/installation_guide/appe-configuring_a_hypervisor_host_for_pci_passthrough
+  -> Hypervisor -> "QEMU/KVM user session" [set as default]
 
 ################################################################################
-# NOMAJ DEPS
+# NOMAJ SETUP
 ################################################################################
+
+NOPE: SNAFU... #@$@#ing vagrant is broken (yes, part of it, that I need)
+https://github.com/hashicorp/vagrant/issues/12751
 
 This sets up:
 - ansible
@@ -121,8 +127,14 @@ This sets up:
 - virt-manager, libvirt, kvm, qemu
 - QEMU/Session (network bridge to virbr0)
 
+python --version # make sure this shows python3 is available
+
+# Per https://github.com/hashicorp/vagrant/issues/12751
+# DO NOT RUN: apt install vagrant-libvirt
+# INSTEAD, run: (as the normal user) vagrant plugin install vagrant-libvirt
+
 Packages:
-  - sudo apt-get install python3-venv vagrant-libvirt ansible qemu qemu-kvm bridge-utils virt-manager
+  - sudo apt-get install ansible qemu qemu-kvm bridge-utils virt-manager
   - sudo ln -s /etc/apparmor.d/usr.sbin.libvirtd /etc/apparmor.d/disable/usr.sbin.libvirtd && reboot
   - QEMU/Session (for Libvirt/KVM as non-root)
     - sudo mkdir -p /etc/qemu
@@ -138,7 +150,7 @@ Packages:
 sudo apt-get update
 sudo apt-get auto-remove
 
-apt-get install docker-compose
+sudo apt-get install docker-compose
 
 # Run as non-root
 sudo usermod -aG docker $USER
@@ -183,6 +195,28 @@ https://www.reddit.com/r/VFIO/comments/7zcn5g/kvm_windows_10_guest_cpu_pinning_r
 # VFIO
 https://gist.github.com/hflw/ed9590f4c79daaeb482c2419f74ed897
 
+
+################################################################################
+# COSMETIC CHANGES
+################################################################################
+
+# Gnome-Shell extensions
+https://extensions.gnome.org/extension/3088/extension-list/
+
+# Themes
+# https://www.opendesktop.org/s/Gnome/browse?cat=135&ord=latest
+
+# Add theme
+mkdir -f ~/.themes && cd $_
+git clone https://www.opendesktop.org/s/Gnome/p/1267246
+
+# Use gnome-tweaks (even though this isn't supposedly supported)
+https://www.opendesktop.org/s/Gnome/browse?cat=135&page=2&ord=latest
+gnome-tweaks
+
+# Just icon theme
+https://github.com/L4ki/Breeze-Chameleon-Icons
+
 ################################################################################
 # TODO: TEST NOMAJ AGAIN W/VIRTUALBOX
 ################################################################################
@@ -191,3 +225,4 @@ sudo apt-get install virtualbox
 sudo apt install virtualbox-ext-pack
 
 sudo apt remove virtualbox
+ed25519

@@ -20,6 +20,8 @@ PKGS+=" python3-pip vagrant "
 PKGS+=" xdg-utils"
 # To detect if VM
 PKGS+=" dmidecode"
+# For XFS
+PKGS+=" xfsprogs"
 
 # Verbose reporting
 VERBOSE="Y"

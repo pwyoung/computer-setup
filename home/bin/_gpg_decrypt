@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# Exit immediately on error
+set -e
+
+# File to encrypt
+INPUT_FILE="$1"
+echo "Encrypting $1"
+
+# File with one-line, the passphrase
+GPG_PASS_FILE=~/.private/gpg_pass_file.txt
+
+# Encrypt the credentials file using a password stored in another file and apply ASCII Armour
+#cat $GPG_PASS_FILE | gpg --batch --yes --passphrase-fd 0 -a --symmetric --cipher-algo AES256 $INPUT_FILE
+
+# Decrypt
+cat $GPG_PASS_FILE | gpg  --batch --yes --passphrase-fd 0 -d ${INPUT_FILE}.asc > $INPUT_FILE.decrypted
+

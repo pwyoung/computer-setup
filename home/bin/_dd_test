@@ -1,0 +1,4 @@
+#!/bin/bash
+
+dd if=/dev/zero of=./dd.test bs=1M count=1024 oflag=dsync
+rm ./dd.test

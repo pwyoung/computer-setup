@@ -1,4 +1,7 @@
-#!/bin/sh
+#!/bin/bash
+
+PYTHON_MAJOR_VERSION="3.10"
+PYTHON_VERSION="${PYTHON_MAJOR_VERSION}.4"
 
 # Python recommends "venv" (not pyenv) but
 # venv doesn't seem to be able to install older versions
@@ -30,10 +33,17 @@ setup_venv(){
 }
 
 install_pyenv(){
-    PKGS=build-essential libssl-dev zlib1g-dev libbz2-dev \
-        libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-        xz-utils tk-dev libffi-dev liblzma-dev git \
-        openssl libssl-dev
+    # POPOS 21.10
+    # PKGS=build-essential libssl-dev zlib1g-dev libbz2-dev \
+         libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+         xz-utils tk-dev libffi-dev liblzma-dev git \
+         openssl libssl-dev
+
+    # POPOS 22.04
+    PKGS=make build-essential libssl-dev zlib1g-dev \
+         libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
+         libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl
+
 
     sudo apt-get install -y $PKGS
 
@@ -47,13 +57,15 @@ setup_pyenv(){
 
     if command -v pyenv 1>/dev/null 2>&1; then
         eval "$(pyenv init -)"
+
+        eval "$(pyenv virtualenv-init -)"
     fi
 
 }
 
 install_pyenv_global_version(){
-    pyenv install 3.8.12
-    pyenv global 3.8.12
+    pyenv install -v ${PYTHON_VERSION}
+    pyenv global ${PYTHON_VERSION}
     pyenv versions
 }
 
@@ -61,8 +73,8 @@ install_pyenv_global_version(){
 # This supports running without pyenv and its shims
 use_pyenv_to_install_venv_version() {
     cd ~/venv
-    pyenv shell 3.8.12
-    python3.8 -m venv 3.8.12
+    pyenv shell ${PYTHON_VERSION}
+    python3.8 -m venv ${PYTHON_VERSION}
     echo "consider commenting out setup_pyenv and using setup_venv with this instead"
 }
 
