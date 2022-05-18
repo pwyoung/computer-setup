@@ -235,3 +235,10 @@ sudo apt install virtualbox-ext-pack
 
 sudo apt remove virtualbox
 ed25519
+
+################################################################################
+# CUSTOMIZE QEMU/KVM Linux Desktop VM
+################################################################################
+Built it with Gnome Boxes
+Run/Manage it with virt-manager
+Share the clipboard with the host: sudo apt install spice-vdagent
