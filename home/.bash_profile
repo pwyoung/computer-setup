@@ -36,6 +36,8 @@ done
 
 # Moved to ~/.profile.d/z
 #alias z='cd $(cat ~/.marked_path)'
+# Put here again too, for now
+alias z='cd $(cat ~/.marked_path)'
 
 ################################################################################
 # PROMPT (PS1)
