@@ -200,22 +200,31 @@ https://gist.github.com/hflw/ed9590f4c79daaeb482c2419f74ed897
 # COSMETIC CHANGES
 ################################################################################
 
-# Gnome-Shell extensions
-https://extensions.gnome.org/extension/3088/extension-list/
+# Use gnome-tweaks (even though this isn't supposedly supported)
+#   https://www.opendesktop.org/s/Gnome/browse?cat=135&page=2&ord=latest
+apt install gnome-tweaks
+Use gnome-tweaks to:
+- not turn off laptop when the lid is closed
+- show the weekday in the top bar
 
+# Turn off animations (to speed things up)
+gsettings set org.gnome.desktop.interface enable-animations false
+
+
+
+# SKIPPED THIS
+# Gnome-Shell extensions
+#https://extensions.gnome.org/extension/3088/extension-list/
 # Themes
 # https://www.opendesktop.org/s/Gnome/browse?cat=135&ord=latest
-
+#
 # Add theme
-mkdir -f ~/.themes && cd $_
-git clone https://www.opendesktop.org/s/Gnome/p/1267246
-
-# Use gnome-tweaks (even though this isn't supposedly supported)
-https://www.opendesktop.org/s/Gnome/browse?cat=135&page=2&ord=latest
-gnome-tweaks
+#mkdir -f ~/.themes && cd $_
+#git clone https://www.opendesktop.org/s/Gnome/p/1267246
+#
 
 # Just icon theme
-https://github.com/L4ki/Breeze-Chameleon-Icons
+#https://github.com/L4ki/Breeze-Chameleon-Icons
 
 ################################################################################
 # TODO: TEST NOMAJ AGAIN W/VIRTUALBOX
