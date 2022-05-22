@@ -1,0 +1,88 @@
+################################################################################
+# Initial Setup
+################################################################################
+
+Utils:
+  sudo apt update
+  sudo apt upgrade
+  sudo apt install emacs-nox htop tree glances
+
+Firefox:
+  - T1Q2B3
+  - sync
+  - log into github, add keys, clone this repo
+
+SSH-Keys:
+  - ssh-keygen -t ed25519 or
+    - ssh-keygen -t rsa
+  - Send to github
+
+Terminal
+  - Set create/destroy/next/previous tabs
+  - Edit profile:
+    - set "command as login shell"
+    - set colors to use system theme
+
+BIN AND OTHER STUFF:
+  - mkdir -p ~/git; cd $_; git clone git@github.com:pwyoung/computer-setup.git
+  Make links:
+    - for i in $(ls -a ~/git/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/computer-setup/home/$i ~/$i; done
+  Setup
+    - cd  ~/git/computer-setup/home/bin/ && ./setup-popos-computer.sh
+
+
+################################################################################
+# BACKUPS
+################################################################################
+
+Use VM snapshotting
+
+################################################################################
+# PYTHON3
+################################################################################
+
+# PYENV
+  ~/.profile.d/python.sh activates pyenv since it has a version of the following:
+    export PATH="$HOME/.pyenv/bin:$PATH"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+- pyenv versions
+- pyenv install --list
+- Install deps
+  sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
+    libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
+    libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl
+- https://realpython.com/intro-to-pyenv/
+  curl https://pyenv.run | bash
+- Find a Python Version
+  pyenv install --list | tr -d ' ' | egrep '^3' | grep -v '[a-z]' | tail -1
+- pyenv install -v 3.10.4
+    WARNING: The scripts pip3 and pip3.10 are installed in '/home/pwyoung/.pyenv/versions/3.10.4/bin' which is not on PATH.
+
+################################################################################
+# DOCKER (docker-ce)
+################################################################################
+
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04
+
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+
+apt-cache policy docker-ce
+
+sudo apt install docker-ce docker-compose
+
+sudo systemctl status docker
+
+sudo usermod -aG docker ${USER}
+
+# reboot
+
+groups
+
+################################################################################
