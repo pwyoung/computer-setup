@@ -6,7 +6,7 @@ IMAGE="dev-tools:latest"
 DARGS="-t -i --rm"
 
 # Share files here
-DARGS+=" -v /Users/pyoung/home_dev:/home/dev"
+DARGS+=" -v ${HOME}/home_dev:/home/dev"
 
 # Set hostname
 DARGS+=" --hostname dev-tools"

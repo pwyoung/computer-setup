@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Assume:
+# - there is only one VM running
+# - it is set up for passwordless-ssh as user 'dev'
+
+set -e
+
+NETWORKS=$(virsh net-list | grep yes | cut -d' ' -f 2)
+IPS=$(for i in $NETWORKS; do virsh net-dhcp-leases $i | grep ipv4 | perl -pe 's/^.*ipv4[\s]*(.*?)\/.*/$1/'; done)
+DEVIP=${IPS[0]}
+
+echo "Setup and test ssh to VM (dev@$DEVIP)"
+ssh dev@$DEVIP 'mkdir -p $HOME/kvm_sshfs && date > $HOME/kvm_sshfs/date.txt'
+
+REMOTE=/home/dev/kvm_sshfs
+LOCAL=$HOME/kvm_sshfs
+sshfs -o allow_other,default_permissions dev@$DEVIP:$REMOTE $LOCAL
+
+cat $LOCAL/date.txt
+
+# for /etc/fstab
+# dev@your_other_server:~/ /mnt/droplet fuse.sshfs noauto,x-systemd.automount,_netdev,reconnect,identityfile=/home/sammy/.ssh/id_rsa,allow_other,default_permissions 0 0

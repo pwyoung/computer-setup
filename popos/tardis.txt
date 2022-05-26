@@ -242,3 +242,10 @@ ed25519
 Built it with Gnome Boxes
 Run/Manage it with virt-manager
 Share the clipboard with the host: sudo apt install spice-vdagent
+
+
+################################################################################
+# Footpedal
+# lsusb # Bus 003 Device 032: ID 1a86:e026 QinHeng Electronics FootSwitch
+# install https://github.com/rgerganov/footswitch
+# sudo footswitch -2 -x 2 # program pedal to move cursor right 2 pixels
