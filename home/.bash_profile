@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 ################################################################################
 # Permanent/Public scipts (that's ok to put in git)
 ################################################################################
@@ -11,11 +12,12 @@ fi
 
 # Public setup scripts
 if [ -e ~/.profile.d ]; then
-    SCRIPTS=$(ls -1 ~/.profile.d/*.sh 2>/dev/null)
-fi
-for i in $SCRIPTS; do
+  for i in `ls -1 ~/.profile.d/*.sh`
+  do
+    #echo "Running --- $i"
     . $i &>/dev/null
-done
+  done
+fi
 
 ################################################################################
 # Private/Sensitive/Ephemeral custom stuff (not in git)
@@ -27,12 +29,14 @@ if [ -e ~/bin-local ]; then
 fi
 
 # Private setup scripts (e.g. things installers add to shell startup scripts like ~/.bashrc)
+# Public setup scripts
 if [ -e ~/.private.d ]; then
-    PWSCRIPTS=$(ls -1 ~/.private.d/*.sh 2>/dev/null)
-fi
-for i in $PWSCRIPTS; do
+  for i in `ls -1 ~/.private.d/*.sh`
+  do
+    #echo "Running --- $i"
     . $i &>/dev/null
-done
+  done
+fi
 
 # Moved to ~/.profile.d/z
 #alias z='cd $(cat ~/.marked_path)'
@@ -113,6 +117,7 @@ if command -v jenv; then
     fi
 fi
 
+# Update PATH for Java
 if [ ! -z "$JAVA_HOME" ]; then
     echo "JAVA_HOME is $JAVA_HOME"
     PATH=$JAVA_HOME/bin:$PATH
@@ -318,4 +323,3 @@ export SDKMAN_DIR="$HOME/.sdkman"
 #if [ -e /Users/pyoung/.rd/bin ]; then
 #  export PATH="/Users/pyoung/.rd/bin:$PATH"
 #fi
-
