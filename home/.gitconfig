@@ -9,7 +9,8 @@
 
 [user]
 	name = phillip young
-	email = phil.w.young@gmail.com
+#	email = phil.w.young@gmail.com
+	email = phil.young@insight.com
 
 [core]
 	excludesfile = ~/.gitignore
