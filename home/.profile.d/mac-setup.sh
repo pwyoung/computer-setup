@@ -1,5 +1,8 @@
 #!/bin/bash
 
+L=~/mac-setup.log
+
+echo "Running $0" | tee $L
 
 F=~/.custom-mouse-scaling.txt
 
@@ -51,12 +54,11 @@ setup_mac_openjdk() {
 
 # If this is a mac, and $F does not exist, then set the mouse sensitivity
 if uname | grep Darwin >/dev/null; then
-    if [ ! -f $F ]; then
-        #defaults write .GlobalPreferences com.apple.mouse.scaling -1
 
-        #defaults write -g com.apple.mouse.scaling 15.0
-        #defaults read -g com.apple.mouse.scaling > $F
-    fi
+    # Set the mouse scaling. This can exceed the valyes the GUI supports.
+    defaults write .GlobalPreferences com.apple.mouse.scaling -1
+    defaults write -g com.apple.mouse.scaling 16.0
+    defaults read -g com.apple.mouse.scaling > $F
 
     # "open" does not work on html files properly
     alias browse='open -a "/Applications/Google Chrome.app"'
