@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Open a journal file, wherever it is
+
+L=(~/data/private/journal.txt ~/.private/journal.txt)
+
+for i in ${L[@]}; do
+  if [ -e $i ]; then
+    J=$i
+    quit
+  else
+    echo "Not found in $i"
+  fi
+done
+
+if [ -z "$J" ]; then
+   echo "Journal file was not found"
+   echo "Searched: ${L[@]}"
+else
+  emacs $J
+fi
+
