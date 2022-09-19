@@ -1,0 +1,262 @@
+################################################################################
+# DISK TESTS
+
+# Samsung 256 PRO
+dd if=/dev/zero of=./dd.test bs=1M count=100 oflag=direct
+100+0 records in
+100+0 records out
+104857600 bytes (105 MB, 100 MiB) copied, 3.52234 s, 29.8 MB/s
+
+
+
+################################################################################
+# Original Raspberry pi os
+
+cat /etc/os-release
+PRETTY_NAME="Raspbian GNU/Linux 11 (bullseye)"
+NAME="Raspbian GNU/Linux"
+VERSION_ID="11"
+VERSION="11 (bullseye)"
+VERSION_CODENAME=bullseye
+ID=raspbian
+ID_LIKE=debian
+HOME_URL="http://www.raspbian.org/"
+SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
+BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
+
+pyoung@raspberrypi:~ $ uname -a
+Linux raspberrypi 5.15.32-v7l+ #1538 SMP Thu Mar 31 19:39:41 BST 2022 armv7l GNU/Linux
+
+################################################################################
+# 64-bit raspberry os
+
+cat /etc/os-release
+PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
+NAME="Debian GNU/Linux"
+VERSION_ID="11"
+VERSION="11 (bullseye)"
+VERSION_CODENAME=bullseye
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+
+pyoung@raspberrypi:~ $ uname -a
+Linux raspberrypi 5.15.61-v8+ #1579 SMP PREEMPT Fri Aug 26 11:16:44 BST 2022 aarch64 GNU/Linux
+
+Youtube "what is ranger" test.
+Audio went to bluetooth.
+- Chromium did not stutter (unlike ubuntu)
+- Firefox could play it well.
+
+https://browserbench.org/Speedometer2.1/
+- Chromium: 18.1 (v 14.5 from ubuntu)
+- Firefox 14.1 (same as ubuntu)
+
+
+################################################################################
+# PINN
+
+Worked.
+Installed from "Raspberry Pi Imager"
+onto USB
+
+Worked from inside PINN:
+- Raspberry Pi 64 bit OS
+- Twister OS
+  - Themed Raspberry Pi OS.
+  - Dark theme XFCE looks like Mac.
+  - Seems slow
+  - Tyrns out to be Buster (debian 10) running Kernel v5.10... ugh
+
+Failed from inside PINN:
+- Ubuntu 21.10
+
+################################################################################
+# Manjaro (arm kde plasma)
+
+Worked after installed from "Raspberry Pi Imager"
+On USB drive
+Took a LONG time to boot up the first time.
+
+Kernel v5.15.56 aarch64
+
+https://browserbench.org/Speedometer2.1/
+-Firefox: 13.0
+-Chromium: ?
+
+
+################################################################################
+# Ubuntu Desktop 22.04.1
+
+Maybe Failed after installed from "Raspberry Pi Imager"
+Maybe let have more time on initial boot, like manjaro
+
+system
+ubuntu-20.04.01
+micro-SD
+
+Linux pi 5.15.0-1014-raspi #16-Ubuntu SMP PREEMPT Thu Aug 25 09:50:55 UTC 2022 aarch64 aarch64 aarch64 GNU/Linux
+
+
+Youtube "what is ranger" test.
+Audio went to bluetooth.
+- Firefox could play it well.
+- Chromium was very bad (stuttered >1x per second)
+
+https://browserbench.org/Speedometer2.1/
+- Firefox 14.5
+- Chromium (did not test since the ranger test failed)
+
+#
+# Installed onto new micro-sd card
+#
+
+Linux pi 5.15.0-1014-raspi #16-Ubuntu SMP PREEMPT Thu Aug 25 09:50:55 UTC 2022 aarch64 aarch64 aarch64 GNU/Linux
+
+https://browserbench.org/Speedometer2.1/
+- Firefox: 14.6
+
+sudo apt-get install chromium-browser # installs snap and some os packages
+chromium
+
+https://browserbench.org/Speedometer2.1/
+- Chromium (without libcanberra-gtk-module): 22.2 (sig faster than FF)
+
+sudo apt-get install libcanberra-gtk-module
+sudo apt-get install canberra-* # Installs a LOT. TODO: be efficient here.
+https://browserbench.org/Speedometer2.1/
+- Chromium (without libcanberra-gtk-module):
+
+dd if=/dev/zero of=./dd.test bs=1M count=100 oflag=direct
+# 30MB/s
+
+#
+# Installed onto Samsung Fit 256 GB USB
+#
+
+sudo apt-get install -y ssh curl tree htop fio
+sudo systemctl start ssh
+sudo systemctl enable ssh
+
+ssh-copy-id pyoung@192.168.2.19
+
+https://browserbench.org/Speedometer2.1/
+- Firefox: 14.1
+
+
+
+# Check packages
+
+sudo apt list --installed | grep -i raspb
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+libraspberrypi-bin/jammy-updates,now 0~20220324+gitc4fd1b8-0ubuntu1~22.04.1 arm64 [installed,automatic]
+libraspberrypi0/jammy-updates,now 0~20220324+gitc4fd1b8-0ubuntu1~22.04.1 arm64 [installed,automatic]
+
+
+################################################################################
+# JETSON NANO
+
+ cat /etc/os-release
+NAME="Ubuntu"
+VERSION="20.04.5 LTS (Focal Fossa)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 20.04.5 LTS"
+VERSION_ID="20.04"
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=focal
+UBUNTU_CODENAME=focal
+
+uname -a
+Linux nano 4.9.253-tegra #1 SMP PREEMPT Mon Jul 26 12:13:06 PDT 2021 aarch64 aarch64 aarch64 GNU/Linux
+
+Youtube "what is ranger" test.
+Audio went to bluetooth.
+- todo:Firefox could play it well.
+
+https://browserbench.org/Speedometer2.1/
+- Firefox 16.2
+
+################################################################################
+# My Linux Laptop
+
+https://browserbench.org/Speedometer2.1/
+- Firefox: 211
+
+
+
+################################################################################
+
+Bootable disk
+
+https://wiki.archlinux.org/title/USB_flash_installation_medium#Without_overwriting_the_USB_drive
+
+dd bs=4M if=./my.iso of=/dev/sda1 conv=fsync oflag=direct status=progress
+
+
+
+
+
+################################################################################
+# XRDP
+# https://linuxize.com/post/how-to-install-xrdp-on-raspberry-pi/
+
+# remote connection
+sudo apt-get install xrdp
+systemctl show -p SubState --value xrdp # running
+
+sudo ls -l /etc/ssl/private/ssl-cert-snakeoil.key
+-rw-r----- 1 root ssl-cert 1704 Apr  4 07:56 /etc/ssl/private/ssl-cert-snakeoil.key
+
+sudo usermod -a -G ssl-cert pyoung
+cat /etc/group | grep ssl-cert
+
+hostname -I # 192.168.2.19
+
+
+
+################################################################################
+# Boot from USB
+
+https://pimylifeup.com/raspberry-pi-boot-from-usb/
+echo program_usb_boot_mode=1 | sudo tee -a /boot/config.txt
+# reboot
+vcgencmd otp_dump | grep 17:
+17:000008b0
+#
+sudo sed -i 's/program_usb_boot_mode=1//g' /boot/config.txt
+
+################################################################################
+# Install PI Operating systems
+
+Use Raspberry-pi-imager
+Install from (user/non-system) flatpack.
+(deb failed/crashes, system-flatpak did not install)
+
+# This failed, but USB might not have been set up properly.
+sudo popsicle ./Fedora-Workstation-36-1.5.armhfp.raw.xz /dev/sda1
+
+
+################################################################################
+# Balena?
+
+https://www.capterra.com/p/201443/Balena/
+Starting From:
+Not provided by vendor
+Pricing Model: Per Feature
+No free trial
+No free version
+
+PRICING DETAILS (Provided by Vendor):
+Balena has not provided pricing details yet.
+PRICING RESOURCES:
+Be an Informed Buyer: Understanding the True Cost of Business Software
+IoT Software Pricing Guide
+
+################################################################################
