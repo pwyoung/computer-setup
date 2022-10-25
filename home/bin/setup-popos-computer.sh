@@ -8,7 +8,7 @@ set -e
 COMPUTER_SETUP=~/git/computer-setup
 
 # Things to symlink (from $COMPUTER_SETUP)
-SYMLINKS=".atom .bash_profile bin .dircolors .emacs .gitconfig .gitignore .profile.d .tmux .tmux.conf"
+SYMLINKS=".bash_profile bin .dircolors .emacs .gitconfig .gitignore .profile.d .tmux .tmux.conf"
 
 # Convenient packages to have
 PKGS="emacs-nox tree glances htop"
@@ -34,6 +34,7 @@ report() {
     fi
 }
 
+# Setup Docker on Ubuntu or PopOS
 # Note: On Fedora, use podman
 install_docker() {
     # Docs: https://docs.docker.com/engine/install/ubuntu/
@@ -88,6 +89,31 @@ default      Current DOCKER_HOST based configuration   unix:///var/run/docker.so
 rootless *   Rootless mode                             unix:///run/user/1002/docker.sock
 EOF
         fi
+}
+
+# Setup docker on WSL (windows) or Linux
+setup_docker() {
+    if uname -a | grep WSL >/dev/null; then
+        echo "On WSL"
+        # https://docs.docker.com/desktop/windows/install/
+        mkdir -p ~/Downloads
+        cd ~/Downloads
+        F=~/Downloads/DockerDesktopInstaller.exe
+        URL="https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
+        if [ -f $F ]; then
+            echo "$F exists"
+        else
+            echo "$F does not exist"
+            exit 1
+            wget -O $F $URL
+        fi
+        chmod +x $F
+        export PATH=$PATH:/mnt/c/Windows/System32
+        Powershell.exe -Command "& {Start-Process Powershell.exe -Verb RunAs}"
+    else
+        # Skip these on wsl (since docker-desktop for windows has special integration feature)
+        install_docker
+    fi
 }
 
 install_packages() {
@@ -205,40 +231,19 @@ set_globals
 # OneDrive has problems:
 # - doesn't preserve file permissions
 # - REQUIRES syncing the desktop, which corrupts some apps
+# So, don't use it
 # setup_onedrive
 
-if uname -a | grep WSL >/dev/null; then
-    echo "On WSL"
-    # https://docs.docker.com/desktop/windows/install/
-    mkdir -p ~/Downloads
-    cd ~/Downloads
-    F=~/Downloads/DockerDesktopInstaller.exe
-    URL="https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
-    if [ -f $F ]; then
-        echo "$F exists"
-    else
-        echo "$F does not exist"
-        exit 1
-        wget -O $F $URL
-    fi
-    chmod +x $F
-    export PATH=$PATH:/mnt/c/Windows/System32
-    Powershell.exe -Command "& {Start-Process Powershell.exe -Verb RunAs}"
-
-
-else
-    # Skip these on wsl (since docker-desktop for windows has special integration feature)
-    install_docker
-fi
-
-exit 1
+setup_docker
 
 setup_symlinks
+
 install_packages
+
 check_sudo_timeout
+
 setup_perms
 
-
 # Skip these on dev vm
-#setup_nonroot_qemu_session
+setup_nonroot_qemu_session
 #setup_python_link
