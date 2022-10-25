@@ -136,7 +136,8 @@ setup_nonroot_qemu_session() {
         report "Allow non-root user to use the QEMU/Session resources"
         sudo mkdir -p /etc/qemu
         echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
-        sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
+        # Set permissions AND setuid bit
+        sudo chmod 4755 /usr/lib/qemu/qemu-bridge-helper
         cat <<EOF
 - TODO:
   - Add user (i.e. non-rot) Connection
