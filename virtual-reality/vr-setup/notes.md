@@ -19,12 +19,11 @@ Facebook/Meta:
 It is standalone/wireless, with better clarity, but it intentionally allows light in from the bottom of the lenses. It is not well received by those who have used it. It does support apps that allow rendering to happen on the PC so you can interface with your desktop, or use a PC's GPU to render a VR game and display it on the HMD. The good thing about this is that it works without a PC, and like the Quest-2, has advanced hand-tracking and a nice GUI. Microsoft and FB have partnered to put Office-365 on this thing, but as I mentioned, you can do that with any PC-VR headset (using the app "Virtual Desktop").
 
 Pimax:
-- The 12X-QLED, if it releases next year or so, could be amazing. It is a wish-list of features that people hope/expect the Steam Index successor, (Deckard) might be if that thing turns out to be more than a rumor (Steam is famous for just releasing things with no announcements). They claim it will be released 2022-Q4, but that quarter ends in a few weeks, and no word on this yet. https://pimax.com/pimaxs-next-generation-reality-12k-qled-vr-headset-defies-belief/
+- The 12K-QLED, if it releases next year or so, could be amazing. It is a wish-list of features that people hope/expect the Valve Index successor, (Deckard) might be if that thing turns out to be more than a rumor (Steam is famous for just releasing things with no announcements). They claim it will be released 2022-Q4, but that quarter ends in a few weeks, and no word on this yet. https://pimax.com/pimaxs-next-generation-reality-12k-qled-vr-headset-defies-belief/
 - Pimax Crystal HMD
   This is their newest HMD. It was not expected. Perhaps it is a comprimise for what the 12X should have been.
 - The PimaX 8KX is famous for its super large FOV. It has distortion at the edges and takes a long time to set up, but could be worth it for flying.
 - Warning: Pimax has a reputation for:
-  - bad support
   - over-promising (their controllers were very late to market compared to promised date, for example)
   - inconsistent hardware (some people have had to return multiple times to get good hw)
   - generally catering more to their customers in China.
@@ -79,7 +78,7 @@ Step #5: Option - VR Car Racing (improve your driving skillz)
 
 IRacing simulator software
 https://www.iracing.com/
-This is not the highest fidelity graphics but it is the best physics engine to learn real racing skills.
+This is not the highest fidelity graphics racing app, but it is the best physics engine to learn real racing skills.
 FWIW, I did this for a few weeks and then went go-kart racing and came in 1st and 2nd in all races.
 
 Andy and I have raced with some friends from his racing league.
