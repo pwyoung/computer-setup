@@ -165,3 +165,11 @@ Best software to get, IMO:
     https://www.bhaptics.com/experiences/vr
 
 
+Step 10: Learn about VR
+
+Content creators:
+- Fun, practical videos
+  https://www.youtube.com/channel/UCSbdMXOI_3HGiFviLZO6kNA
+- Primary source for all other influencers on reading the tea-leaves (code changes, tech, corp activity)
+  https://www.youtube.com/c/SadlyItsBradley
+
