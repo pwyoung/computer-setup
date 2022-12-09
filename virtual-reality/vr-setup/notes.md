@@ -3,24 +3,35 @@ Top-end VR setup
 The Varjo headsets are the best HMDs (head-mounted displays) in terms of optics, both in terms of pixels-per-degree (PPD) and their use of pancake (non-fresnel) lenses.
 
 They are the only ones that can be used as a substitute for actual flight time in training toward a pilots license.
-
+https://varjo.com/vr-lab/xr-and-vr-in-future-pilot-training-and-simulation-solutions/
 
 Recommendation: Varjo Aero
 It is the only consumer device they sell.
 
 Other HMDs:
 
-The Varjo XR3 is the best stand-alone/wireless headset, but it costs a lot more, has an annual fee, and is technically only sold to a business.
+Varjo:
+- The Varjo XR3 is the best stand-alone/wireless headset, but it costs a lot more, has an annual fee, and is technically only sold directly to business, and you would have to deal with export/import paperwork.
+- The Varjo VR3 is the wired version of the XR3. It has two pairs of lenses, for even clearer imaging, but it requires two cables, and is much heavier than the Aero.
 
-The Varjo VR3 is the wired version of the XR3. It has two pairs of lenses, for even clearer imaging, but it requires two cables, and is much heavier than the Aero.
+Facebook/Meta:
+- Now has released the Quest Pro.
+It is standalone/wireless, with better clarity, but it intentionally allows light in from the bottom of the lenses. It is not well received by those who have used it. It does support apps that allow rendering to happen on the PC so you can interface with your desktop, or use a PC's GPU to render a VR game and display it on the HMD. The good thing about this is that it works without a PC, and like the Quest-2, has advanced hand-tracking and a nice GUI. Microsoft and FB have partnered to put Office-365 on this thing, but as I mentioned, you can do that with any PC-VR headset (using the app "Virtual Desktop").
 
-Facebook/Meta now has released the Quest Pro.
-It is standalone/wireless, with better clarity, but it intentionally allows
-light in from the bottom of the lenses. It is not well received by those who have used it. It does support apps that allow rendering to happen on the PC so you can interface with your desktop, or use a PC's GPU to render a VR game and display it on the HMD.
+Pimax:
+- The 12X-QLED, if it releases next year or so, could be amazing. It is a wish-list of features that people hope/expect the Steam Index successor, (Deckard) might be if that thing turns out to be more than a rumor (Steam is famous for just releasing things with no announcements). They claim it will be released 2022-Q4, but that quarter ends in a few weeks, and no word on this yet. https://pimax.com/pimaxs-next-generation-reality-12k-qled-vr-headset-defies-belief/
+- Pimax Crystal HMD
+  This is their newest HMD. It was not expected. Perhaps it is a comprimise for what the 12X should have been.
+- The PimaX 8KX is famous for its super large FOV. It has distortion at the edges and takes a long time to set up, but could be worth it for flying.
+- Warning: Pimax has a reputation for:
+  - bad support
+  - over-promising (their controllers were very late to market compared to promised date, for example)
+  - inconsistent hardware (some people have had to return multiple times to get good hw)
+  - generally catering more to their customers in China.
 
-Pimax Crystal and their 8KX are somewhat on par with the Aero, but the company is famous for bad support, inconsistent hardware, and generally catering more to their customers in China. Their 12KX, if it releases next year or so, could be amazing. This is potenti
-
-The Valve Index is 2 years old but is still the choice for e-sports VR competitive players due to the FOV and high frame rate (120 Hz). The down side for this is the resolution and screen-door-effect (SDE) meaning you can see a grid of lines between the pixels if you focus hard enough.
+Valve Index:
+  This is 2 years old but is still the choice for e-sports VR competitive players due to the FOV and high frame rate (120 Hz) and ability to do that on low-end hardware. The down-side for this is the resolution and screen-door-effect (SDE) meaning you can see a grid of lines between the pixels if you focus hard enough.
+  Valve is the company that owns "Steam" and the Index Knuckle controllers and Half-Life Alyx game were released with this HMD and are still unsurpassed.
 
 
 Links:
@@ -57,3 +68,100 @@ https://www.dell.com/en-us/shop/gaming-and-games/alienware-aurora-r13-gaming-des
 But now, the 4090 GPUs are out:
 Here is an Intel+NVidia monster,
 https://www.bestbuy.com/site/clx-set-gaming-desktop-intel-core-i9-13900kf-32gb-ddr5-4800-memory-geforce-rtx-4090-1tb-nvme-m-2-ssd-4tb-hdd-white/6524502.p?skuId=6524502
+
+Step #4: Audio Solution
+The Aero is only the HMD, and needs a solution for speakers and microphone.
+You can use a BlueTooth headset, but that introduced some lag and distortion that I did not like. I have one of these:
+https://www.amazon.com/dp/B08DVCNYJC?ref=nb_sb_ss_w_as-reorder-t1_ypp_rep_k0_1_9&amp=&crid=1X70HBVR3C3W1&amp=&sprefix=bose+qc35
+
+Step #5: Option - VR Car Racing (improve your driving skillz)
+
+
+IRacing simulator software
+https://www.iracing.com/
+This is not the highest fidelity graphics but it is the best physics engine to learn real racing skills.
+FWIW, I did this for a few weeks and then went go-kart racing and came in 1st and 2nd in all races.
+
+Andy and I have raced with some friends from his racing league.
+This is very fun. e.g. https://varjo.com/vr-sim-racing/
+You can practice heel-toe maneuvers etc if you have a proper chair, wheel, gearbox setup.
+
+Wheels and wheel-bases (for feedback)
+https://fanatec.com/us-en/racing-wheels-wheel-bases/
+
+Chair-1: this is decent for a folding chair. You can mount pedals to it.
+https://www.amazon.com/Playseat-RC0002-Challenge/dp/B009ZELZDS
+
+Chair-2: this is better, but doesn't fold up
+https://www.wayfair.com/Inbox-Zero--Racing-Simulator-Cockpit-Stand-fit-Logitech-Thrustmaster-NO-Seat-Steering-Wheel-Pedal-Shifter-X118918743-L861-K~W007807632.html?refid=GX561915042221-W007807632&device=c&ptid=1647204637901&network=g&targetid=aud-1795413561267:pla-1647204637901&channel=GooglePLA&ireid=184504396&fdid=1817&gclid=Cj0KCQiA1sucBhDgARIsAFoytUuUutEerruvAnJ4qHtj11PONxJPRjx1UNG45jqkMBjbUJYuQnJ6zIcaAp_xEALw_wcB
+
+Step #6: Option - Motion Simulator chair/environment
+
+These range from ~$3k to $70k
+https://shop.yawvr.com/
+https://nextlevelracing.com/products/next-level-racing-motion-platform-v3/
+
+
+Step #7: Option - run in VR
+
+There are a lot of these options.
+
+Step #8: Haptic feedback suits and gloves
+
+BHaptics
+- Tactsuit gloves (coming soon)
+  https://www.bhaptics.com/?utm_source=wm_googlesearch&utm_medium=wm_Visit&utm_campaign=Search_2210&utm_content=Search_Ad&gclid=Cj0KCQiA1sucBhDgARIsAFoytUsAhwXAtXT6Kec0uWGYju_nKSvri3mCPPZCdnaaXhNuUO4M3VLGn6MaAsHeEALw_wcB
+- 16 vibration motors
+  https://www.amazon.com/bHaptics-TactSuit-X16-Accessories-Replacement/dp/B0BFX54PG1/ref=sr_1_2?keywords=haptic+vest&qid=1670620787&sr=8-2&ufe=app_do%3Aamzn1.fos.ac2169a1-b668-44b9-8bd0-5ec63b24bcb5
+- 40 vibration motors
+  https://www.amazon.com/bHaptics-TactSuit-X40-Accessories-Replacement-PC/dp/B0BFCBGW9M/ref=sr_1_1?keywords=haptic+vest&qid=1670620787&sr=8-1&ufe=app_do%3Aamzn1.fos.4dd97f68-284f-40f5-a6f1-1e5b3de13370
+
+Higher-end, Tactsuit
+https://www.youtube.com/watch?v=81GQFMknSc4
+
+Step #9: Software
+
+Step #9a: Get a Steam account and install Steam app.
+PC VR (as opposed to Quest or PlayStation) uses "Steam" software.
+Steam is the company and marketplace for PC software.
+
+Step #9b: Install SteamVR
+This software gives you the ability to run VR games on the PC.
+
+Varjo's GUI/runtime can run games without it.
+
+But you will want to use this sometimes since there is an ecosystem of apps and devices that work with it.
+Examples are:
+- full body trackers (for vloggers that dance in VRChat)
+- apps that will persist on your wrist to show desktop apps
+- apps that show your CPU/GPU stats
+
+There are two "drivers" for VR: SteamVR and OpenXR.
+You probably don't need to know that or set any configuration to make it work,
+but every once in a while, you might want to set up a config for a particular app.
+
+
+Step 9c: Install some apps
+
+Best software to get, IMO:
+- Half-Life Alyx
+  Arguably the only AAA VR game. Great story, graphics, VR-integration
+  https://store.steampowered.com/app/546560/HalfLife_Alyx/
+- Microsoft Flight Simulator
+  https://store.steampowered.com/app/1250410/Microsoft_Flight_Simulator_40th_Anniversary_Edition/
+- Population One
+  Outstanding competitive team shooter (like fort night and PubG, which I do not like. This is tons of fun)
+  https://store.steampowered.com/app/691260/POPULATION_ONE/
+- Beat Saber
+  https://store.steampowered.com/search/?term=beat+saber
+- Walking Dead: saints and sinners
+  https://store.steampowered.com/app/916840/The_Walking_Dead_Saints__Sinners/
+- Space Pilot Trainer
+  https://store.steampowered.com/app/418650/Space_Pirate_Trainer/
+- Modded stuff
+  There is an explosion of VR games that are traditional flat-screen games, built with certain 3-D game engines,
+  that can be modified to be playable in VR. For a list of popular mods and games in general, check the ones supported
+  by the BHaptics vest:
+    https://www.bhaptics.com/experiences/vr
+
+
