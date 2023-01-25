@@ -1,4 +1,42 @@
 #!/bin/bash
 
-dd if=/dev/zero of=./dd.test bs=1M count=1024 oflag=dsync
-rm ./dd.test
+# Good docs on 'dd'
+# https://www.cyberciti.biz/faq/howto-linux-unix-test-disk-performance-with-dd-command/
+
+LOG=./dd_test.log.txt
+echo '' > $LOG
+
+function reset_test() {
+    echo '' > ./dd_test.img
+    echo "---------------" >> $LOG
+}
+
+reset_test
+echo 'Test write throughput (direct io)' >> $LOG
+dd if=/dev/zero of=./dd_test.img bs=1G count=1 oflag=dsync &>> $LOG
+
+reset_test
+echo 'Test latency (1000 512-byte blocks)' >> $LOG
+dd if=/dev/zero of=./dd_test.img bs=512 count=1000 oflag=dsync &>> $LOG
+
+reset_test
+echo 'Test latency (1 64Mb block)' >> $LOG
+dd if=/dev/zero of=./dd_test.img bs=64M count=1 oflag=dsync &>> $LOG
+
+reset_test
+echo 'Test latency (256 1Mb blocks)' >> $LOG
+dd if=/dev/zero of=./dd_test.img bs=1M count=256 conv=fdatasync &>> $LOG
+
+reset_test
+echo 'Test latency (10k 8kb blocks)' >> $LOG
+dd if=/dev/zero of=./dd_test.img bs=8k count=10k &>> $LOG
+
+## OR alternate syntax for GNU/dd ##
+# reset_test
+#dd if=/dev/zero of=./dd_test_testALT.img bs=1G count=1 conv=fdatasync
+
+reset_test
+
+echo "Results are logged in $LOG"
+
+cat "$LOG"

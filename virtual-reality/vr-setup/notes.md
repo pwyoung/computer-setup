@@ -172,3 +172,6 @@ Content creators:
 - Primary source for all other influencers on reading the tea-leaves (code changes, tech, corp activity)
   https://www.youtube.com/c/SadlyItsBradley
 
+What is popular (on PC-VR) and how many people are currently playing?
+- https://steamdb.info/search/?a=app&q=vr
+- https://vrlfg.net/Players

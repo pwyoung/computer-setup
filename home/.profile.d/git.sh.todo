@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Set the default (to something other than 'master')
+git config --global init.defaultBranch main
