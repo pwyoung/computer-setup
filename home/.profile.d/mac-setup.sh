@@ -64,6 +64,12 @@ if uname | grep Darwin >/dev/null; then
     alias browse='open -a "/Applications/Google Chrome.app"'
     alias o='open -a "/Applications/Google Chrome.app"'
 
+    # For nomaj, specifically for
+    # https://github.com/mcgrof/update_ssh_config_vagrant/blob/master/tasks/main.yml#L25-L33
+    #if [ -f '/usr/local/bin/gsed' ]; then
+    #    alias sed='gsed'
+    #fi
+
     #return
     setup_mac_openjdk
 
