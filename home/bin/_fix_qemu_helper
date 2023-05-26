@@ -7,8 +7,15 @@ if [ -f $CF ]; then
        echo "File $CF has setuid."
    else
        echo "File $CF does not have setuid."
-       sudo chmod +x $CF
+       sudo chmod 4755 /usr/lib/qemu/qemu-bridge-helper
    fi
 else
   echo "File $CF does not exist"
 fi
+
+
+# This is a separate concern, to help track if we orphan storage.
+D=/var/lib/libvirt/images
+echo "Additionally, show Libvirt images, in $D"
+sudo ls -l $D/
+

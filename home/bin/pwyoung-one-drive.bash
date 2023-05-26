@@ -1,5 +1,12 @@
 #!/usr/bin/bash
 
+# NOTES:
+#
+# This script can be run with different args to do the following (see show_usage for details):
+# 1: Interactively call "run_command()" to execute the commands we care about, e.g. invoke onedrive
+# 2: Install a service which calls this script (so that it will invoke "run_command()")
+
+
 LOG=/tmp/one-drive.sh.$USER.log
 
 THISSCRIPT=$0

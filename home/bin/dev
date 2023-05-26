@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# docker system prune
+#
+# docker ps -a
+# docker images -a
+#
+# systemctl status docker
+# sudo systemctl restart docker
+
 IMAGE="dev-tools:latest"
 
 # Run once and terminate

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+flatpak kill org.telegram.desktop
+flatpak run org.telegram.desktop &
+

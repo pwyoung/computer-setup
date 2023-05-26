@@ -1,0 +1,24 @@
+
+sudo emacs /etc/gdm3/custom.conf
+# PWY: commented out 20220516_1344
+#WaylandEnable=false
+WaylandEnable=true
+
+
+sudo emacs /usr/lib/udev/rules.d/61-gdm.rules
+LABEL="gdm_prefer_xorg"
+# PWY
+#RUN+="/usr/libexec/gdm-runtime-config set daemon PreferredDisplayServer xorg"
+GOTO="gdm_end"
+
+LABEL="gdm_disable_wayland"
+# PWY
+#RUN+="/usr/libexec/gdm-runtime-config set daemon WaylandEnable false"
+GOTO="gdm_end"
+
+
+# Show Driver
+nvidia-settings
+PopOs-Gnome-Shell->Settings->[bottom]->Windowing Settings
+
+
