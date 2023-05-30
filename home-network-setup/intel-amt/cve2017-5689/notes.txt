@@ -1,0 +1,2 @@
+# Intel links to vendor reactions to bug
+https://www.intel.com/content/www/us/en/architecture-and-technology/intel-amt-vulnerability-announcement.html

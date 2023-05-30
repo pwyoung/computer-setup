@@ -1,0 +1,22 @@
+#!/usr/bin/bash
+
+# Run meshcommander, install if necessary
+# per https://www.npmjs.com/package/meshcommander
+
+
+D=~/meshcommander
+if [ ! -e $D ]; then
+  mkdir -p $D
+fi
+cd $D
+
+D2=./node_modules/meshcommander
+if [ ! -e $D2 ]; then
+  npm install meshcommander
+fi
+cd ./node_modules/meshcommander
+
+#node meshcommander &> $LOG &&
+#google-chrome http://localhost:3000/default.htm
+
+node meshcommander
