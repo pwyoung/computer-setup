@@ -37,7 +37,7 @@ Machines:
   - IP-wireless: 192.168.2.181
   - Apparent Cores: 4
   - RAM: 8 GB
-- system76:
+- system76/pyoung-Oryx-Pro:
   - IP-lan: 
   - IP-wireless: 192.168.2.253
   - Apparent Cores: 20
