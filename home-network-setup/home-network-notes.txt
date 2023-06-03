@@ -33,23 +33,23 @@ Network Switch:
 
 Machines:
 - Mele:
-  - IP-lan: 
+  - IP-lan:
   - IP-wireless: 192.168.2.181
   - Apparent Cores: 4
   - RAM: 8 GB
 - system76/pyoung-Oryx-Pro:
-  - IP-lan: 
+  - IP-lan:
   - IP-wireless: 192.168.2.253
-  - Apparent Cores: 20
-  - RAM: 64 GB
+  - Apparent Cores: ?
+  - RAM: ? GB
 - nuc:
-  - IP-lan: 
+  - IP-lan:
   - IP-wireless:
   - Apparent Cores: ?
   - RAM: 32 GB
 - nano:
-  - IP-lan: 
-  - IP-wireless: 
+  - IP-lan:
+  - IP-wireless:
   - Apparent Cores: 4
   - RAM: 4 GB
 - tardis
@@ -60,5 +60,3 @@ Machines:
   - IP: 192.168.2.204
   - Apparent Cores: 20
   - RAM:  32 GB
-
-
