@@ -33,19 +33,15 @@ Network Switch:
 
 Machines:
 - Mele:
-  - IP: 192.168.2.192
+  - IP-lan: 
+  - IP-wireless: 192.168.2.181
   - Apparent Cores: 4
   - RAM: 8 GB
 - nano:
-  - IP: 192.168.2.172
+  - IP-lan: 
+  - IP-wireless: 
   - Apparent Cores: 4
   - RAM: 4 GB
-- pi:
-  - IP: 192.168.2.159
-  - Apparent Cores: 4
-  - RAM: 4 GB
-- popos:
-  - IP: 192.168.2.211
 - tardis
   - IP: 192.168.2.74
   - Apparent Cores: 16
