@@ -37,6 +37,16 @@ Machines:
   - IP-wireless: 192.168.2.181
   - Apparent Cores: 4
   - RAM: 8 GB
+- system76:
+  - IP-lan: 
+  - IP-wireless: 192.168.2.253
+  - Apparent Cores: 20
+  - RAM: 64 GB
+- nuc:
+  - IP-lan: 
+  - IP-wireless:
+  - Apparent Cores: ?
+  - RAM: 32 GB
 - nano:
   - IP-lan: 
   - IP-wireless: 
