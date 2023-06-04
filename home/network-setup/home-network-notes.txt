@@ -1,0 +1,69 @@
+#######
+#
+#
+#######
+Router to ISP:
+- Model: Unifi Dream Machine
+- Docs: https://store.ui.com/us/en/products/udm
+- Access (via top right hamburger icon -> network)
+  - URL: https://192.168.2.1/network/default/dashboard
+  - user/pw: <personal gmail address>/Ubiquity<stuff>
+- Config
+  - Networks:
+    - Default-pwy
+      - CIDR: 192.168.2.1/24
+      - DHCP Range: 192.168.2.100-192.168.2.254
+#######
+#
+#
+Network Switch:
+- Model: tl-sg108e
+- Docs: https://www.tp-link.com/us/business-networking/easy-smart-switch/tl-sg108e/
+- Access:
+  - http://192.168.2.165
+  - user/pw = admin/
+  - Does not show up in Ubiquity client devices
+- Config:
+  - Port Connections:
+    1: uplink <to unifi>
+    2: tardis
+    3: mele
+    4: nano
+    5: pi
+    6: popos
+    7: not-connected
+    8: not-connected
+  - Default puts all ports in VLAN 1
+
+Port-based VLAN
+  - VLAN ID 2: port 2,3,6
+#######
+#
+#
+Machines:
+- Mele:
+  - IP: 192.168.2.192
+  - Apparent Cores: 4
+  - RAM: 8 GB
+- nano:
+  - IP: 192.168.2.172
+  - Apparent Cores: 4
+  - RAM: 4 GB
+- pi:
+  - IP: 192.168.2.159
+  - Apparent Cores: 4
+  - RAM: 4 GB
+- popos:
+  - IP: 192.168.2.211
+  - MAC: 80:fa:5b:74:f0:fc
+- gallifrey
+  - IP: 192.168.2.204
+  - Apparent Cores: 20
+  - RAM:  32 GB
+- tardis
+  - IP: 192.168.2.74
+  - Apparent Cores: 16
+  - RAM: 64 GB
+#######
+#
+#

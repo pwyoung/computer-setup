@@ -1,6 +1,5 @@
 
-
-Router to ISP:
+Router to Internet:
 - Model: Unifi Dream Machine
 - Docs: https://store.ui.com/us/en/products/udm
 - Access (via top right hamburger icon -> network)
@@ -10,53 +9,87 @@ Router to ISP:
   - Networks:
     - Default-pwy
       - CIDR: 192.168.2.1/24
-      - DHCP Range: 192.168.2.17-192.168.2.254
-
-Network Switch:
-- Model: tl-sg108e
-- Docs: https://www.tp-link.com/us/business-networking/easy-smart-switch/tl-sg108e/
-- Access:
-  - http://192.168.2.165
-  - Does not show up in Ubiquity client devices
-- Config:
-  - Port Connections:
-    1: uplink <to unifi>
-    2: Asus Rog
-    3: MeLe
-    4: Jetson nano
-    5: Raspberry Pi4b
-    6: System76 laptop
-    7: not-connected
-    8: not-connected
-  - Default puts all ports in VLAN 1
-
-
-Machines:
-- Mele:
-  - IP-lan:
-  - IP-wireless: 192.168.2.181
-  - Apparent Cores: 4
-  - RAM: 8 GB
-- system76/pyoung-Oryx-Pro:
-  - IP-lan:
-  - IP-wireless: 192.168.2.253
-  - Apparent Cores: ?
-  - RAM: ? GB
-- nuc:
-  - IP-lan:
-  - IP-wireless:
-  - Apparent Cores: ?
-  - RAM: 32 GB
-- nano:
-  - IP-lan:
-  - IP-wireless:
-  - Apparent Cores: 4
-  - RAM: 4 GB
-- tardis
-  - IP: 192.168.2.74
-  - Apparent Cores: 16
-  - RAM: 64 GB
-- gallifrey
-  - IP: 192.168.2.204
-  - Apparent Cores: 20
-  - RAM:  32 GB
+      - DHCP Range: 192.168.2.100-192.168.2.254
+    - Devices:
+      - Port #1
+        - Apple TV
+      - Port #2
+        - Switch
+          - Model: Netgear gigabit switch
+          - Features: plain 1GB switch
+          - Purpose: stuff on right side of the room
+          - Speed: 900 Mbps
+          - Devices:
+            - Desktop
+              - Name: gallifrey
+              - LAN:
+                - IP: 192.168.2.204
+              - CPU: 20
+              - RAM: 32 GB
+            - Printer
+              - Name: Epson_WF_4820_Series
+            - Speaker
+              - Name: Sonos
+            - Switch
+              - Model: TP-Link tl-sg108e
+              - Features: switch, not router, firewall, or DHCP server
+              - Purpose: Stuff on left side of room, High-speed ports, VLAN support
+              - Speed: 900 Mbps
+              - Docs: https://www.tp-link.com/us/business-networking/easy-smart-switch/tl-sg108e/
+              - Access:
+                - URL: http://192.168.2.149
+                - Note: Does not show as active in Ubiquity client devices
+              - Devices
+                - Port 1:
+                  - tardis:
+                    - LAN:
+                      - IP: 192.168.8.3 # static
+                      - MAC: FC:34:97:4D:48:DD
+                    - IP-wireless:
+                    - CPU: 16
+                    - RAM: 64 GB
+                - Port 2:
+                  - nano:
+                    - LAN:
+                    - CPU: 4
+                    - RAM: 4 GB
+                - Port 3:
+                  - Firewall/VPN:
+                    - Model: GL-AR300M-769 (DD-WRT Router)
+                    - Purpose: Isolation for testing PXE booting
+                    - Features: Firewall with support for WIFI and VPN
+                    - Speed: 85 Mbps
+                    - Docs: https://www.tp-link.com/us/business-networking/easy-smart-switch/tl-sg108e/
+                    - Access:
+                      - default interface:
+                        - URL: http://192.168.2.149
+                        - user/pw=admin/Glinet<more>
+                      - luci/enabled/advanced interface:
+                        - http://192.168.2.149/cgi-bin/luci/
+                        - user/pw=same as default interface
+                    - Devices
+                      - Switch
+                        - Model: Netgear
+                        - Purpose: Isolation for testing PXE booting
+                        - Speed: 100 Mbps
+                        - Devices
+                          - Port #1:
+                            - mele:
+                              - LAN:
+                                - IP: 192.168.8.2
+                              - CPU: 4
+                              - RAM: 8 GB
+                        - Port #2:
+                            - System76 Laptop (Oryx Pro v5)
+                              - IP-LAN:
+                              - IP-wireless: 192.168.2.253
+                              - Apparent Cores: ?
+                              - RAM: ? GB
+                        - Port #3:
+                            - nuc1:
+                              - LAN:
+                                - IP 192.168.8.4 # static
+                                - MAC: 48:21:0B:55:B4:5B
+                              - wireless:
+                              - CPU: 12/16
+                              - RAM: 32 GB
