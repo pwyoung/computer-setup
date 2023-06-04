@@ -9,7 +9,8 @@ Router to Internet:
   - Networks:
     - Default-pwy
       - CIDR: 192.168.2.1/24
-      - DHCP Range: 192.168.2.100-192.168.2.254
+      - DHCP:
+        - Range: 192.168.2.100-192.168.2.254
     - Devices:
       - Port #1
         - Apple TV
@@ -33,7 +34,7 @@ Router to Internet:
             - Switch
               - Model: TP-Link tl-sg108e
               - Features: switch, not router, firewall, or DHCP server
-              - Purpose: Stuff on left side of room, High-speed ports, VLAN support
+              - Purpose: Stuff on left side of room, High-speed ports, VLAN support (so we can remove the child firewall asap)
               - Speed: 900 Mbps
               - Docs: https://www.tp-link.com/us/business-networking/easy-smart-switch/tl-sg108e/
               - Access:
@@ -41,16 +42,10 @@ Router to Internet:
                 - Note: Does not show as active in Ubiquity client devices
               - Devices
                 - Port 1:
-                  - tardis:
-                    - LAN:
-                      - IP: 192.168.8.3 # static
-                      - MAC: FC:34:97:4D:48:DD
-                    - IP-wireless:
-                    - CPU: 16
-                    - RAM: 64 GB
                 - Port 2:
                   - nano:
                     - LAN:
+                      - not setup
                     - CPU: 4
                     - RAM: 4 GB
                 - Port 3:
@@ -61,12 +56,13 @@ Router to Internet:
                     - Speed: 85 Mbps
                     - Docs: https://www.tp-link.com/us/business-networking/easy-smart-switch/tl-sg108e/
                     - Access:
-                      - default interface:
+                      - Default interface:
                         - URL: http://192.168.2.149
                         - user/pw=admin/Glinet<more>
-                      - luci/enabled/advanced interface:
+                      - Advanced interface:
                         - http://192.168.2.149/cgi-bin/luci/
                         - user/pw=same as default interface
+                    - DHCP: disabled
                     - Devices
                       - Switch
                         - Model: Netgear
@@ -76,20 +72,33 @@ Router to Internet:
                           - Port #1:
                             - mele:
                               - LAN:
-                                - IP: 192.168.8.2
+                                - IP: 192.168.8.2 (static)
+                                - MAC: 00:CE:39:D1:21:BE
                               - CPU: 4
                               - RAM: 8 GB
-                        - Port #2:
-                            - System76 Laptop (Oryx Pro v5)
-                              - IP-LAN:
-                              - IP-wireless: 192.168.2.253
-                              - Apparent Cores: ?
-                              - RAM: ? GB
-                        - Port #3:
-                            - nuc1:
+                          - Port #2:
+                            - Nuc:
                               - LAN:
-                                - IP 192.168.8.4 # static
+                                - IP 192.168.8.4 (static)
                                 - MAC: 48:21:0B:55:B4:5B
                               - wireless:
                               - CPU: 12/16
                               - RAM: 32 GB
+                              - TODO:
+                                - AMT
+                                  - test mesh commander:
+                                    - https://www.meshcommander.com/meshcentral2
+                          - Port #3:
+                            - System76 Laptop (Oryx Pro v5)
+                              - LAN:
+                                - IP: 192.168.8.3 (static)
+                                - MAC: 80:FA:5B:74:F0:FC
+                              - CPU: 12
+                              - RAM: 64 GB
+                          - Port #4:
+                            - tardis:
+                              - LAN:
+                                - IP: 192.168.8.3 # static
+                                - MAC: FC:34:97:4D:48:DD
+                              - CPU: 16
+                              - RAM: 64 GB
