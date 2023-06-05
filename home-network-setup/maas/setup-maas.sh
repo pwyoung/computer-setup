@@ -3,12 +3,15 @@
 
 show_msg() {
     MSG="$1"
-    #read  -n 1 -p "${MSG}:" invar
-    #
+
     echo "================================================================================"
     echo "${MSG}"
     echo "================================================================================"
-    sleep 1
+    
+    read  -n 1 -p "Hit any key" invar
+
+    # Sleep X seconds
+    sleep 0.1
 }
 
 maas-server-requirements() {
