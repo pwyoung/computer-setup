@@ -30,7 +30,7 @@ EOF
 install-maas() {
     show_msg "install-maas"
     
-    if which maas >/dev/null; then
+    if which maas2 >/dev/null; then
 	echo "Maas is in PATH. Assuming it is installed properly."
     else
 	cat <<EOF
@@ -67,7 +67,7 @@ setup-admin() {
     fi
 
     IP=$(hostname)
-    xdg-open http://${IP}:5240/MAAS
+    xdg-open http://${IP}:5240/MAAS &>/dev/null
 }
 
 setup-networks() {
@@ -121,7 +121,7 @@ test-dhcp() {
 }
 
 setup-lxd-host() {
-    show_msg "setup-lxd-host"
+    show_msg "setup-lxd-host - NOT on maas server"
     
     cat <<EOF
     Run this on the machine providing the LXC virtual host    
