@@ -30,8 +30,8 @@ EOF
 install-maas() {
     show_msg "install-maas"
     
-    if which maas2 >/dev/null; then
-	echo "Maas is in PATH. Assuming it is installed properly."
+    if which maas >/dev/null; then
+	echo "Command 'maas' is in PATH. Assuming it is installed properly."
     else
 	cat <<EOF
 	Installing Maas per https://maas.io/docs/how-to-do-a-fresh-install-of-maas
@@ -103,7 +103,7 @@ setup-dhcp() {
       - by default, the subnet is managed (i.e. Maas will provide DHCP)
       - To change the management of a subnet, see:
         - https://discourse.maas.io/t/subnet-management-deb-3-0-cli-test/4716#heading--controlling-subnet-management
-    IP Range: 192.168.8.100 - 192.168.8.200 (using static IPs in low range, for the Maas server itself)
+    IP Range: 192.168.8.191 - 192.168.8.254 (using static IPs in low range, for the Maas server itself)
 
     Review:
       - https://discourse.maas.io/t/how-to-manage-ip-ranges/5136
@@ -131,11 +131,11 @@ test-dhcp() {
 
 }
 
-setup-lxd-host() {
-    show_msg "setup-lxd-host - NOT on maas server"
+setup-lxd-servers() {
+    show_msg "setup-lxd-servers - NOT ON MAAS SERVER (IF IT WAS INSTALLED OUTSIDE LXC) - Directions only..."
     
     cat <<EOF
-    Run this on the machine providing the LXC virtual host    
+    Run this on each  machine providing the LXC virtualization service
     https://maas.io/docs/how-to-set-up-lxd
 
     # Install LXD from SNAP, not OS Packages
@@ -146,12 +146,12 @@ setup-lxd-host() {
     
     # Initialize LXD
     # https://maas.io/docs/how-to-set-up-lxd#heading--lxd-init
-    sudo lxd init
-    # 
-    Created default everything, but
-    storage pool has type "dir" (per docs above)
-    no connection to maas automatically
-    yes, expose to network
+    # Options for 'lxd init':
+    # - no clustering
+    # - create default storage pool of type 'dir'
+    # - NO, do not connect to Maas server now (we need to turn off DHCP etc first)
+    # - YES, make the lxc server available over the network
+    sudo lxd init 
 
     # Make sure LXD is not providing DHCP
     # 
@@ -167,21 +167,61 @@ setup-lxd-host() {
     # 10.25.155.1
 
 EOF
+
+}
+
+check-dhcp-and-dns-in-lxc-server() {
+    show_msg "Check that DHCP is off for the LXC server"
+    
+    cat <<EOF
+    # Run these blocks in the LXC server
+
+    if lxc network show lxdbr0 | grep 'dhcp' | grep 'false' | wc -l | grep 2 >/dev/null; then
+	echo "DHCP is not running in LXC"
+    else
+	show_msg "ERROR: DHCP might be running in LXC"
+    fi
+
+    if lxc network show lxdbr0 | grep 'dns' | grep 'none' | wc -l | grep 1 >/dev/null; then
+	echo "DNS is not running in LXC"
+    else
+	show_msg "ERROR: DNS might be running in LXC"
+    fi
+EOF
+    
+
 }
 
 provision-vms-in-maas() {
     show_msg "provision-vms-in-maas"
     
     cat <<EOF    
-    Provision the KVM/LXC host in Maas
+    # Add LXC "hosts/servers"
+    Go to Maas -> KVM -> LXD -> Add LXC Host
+    Add the IP of the LXC server
+    Generate new certificate
+    Copy the command to run on the LXD Server
+    Run the command to add the cert to the LXD Server
+    Click on Maas 'Check Authentication'
+    Add the Host to a project ('default' or make one)
 
-    Add VMs on top of the LXC host
+    # Create VMs from LXC hosts
+    Maas -> KVM -> <some LXC host name> -> scroll down to 'add VM' 
+    
+    ################################################################################
+    # After the VM/Machine is created it will go to "commissioning" state
+    # It will turn off after that and go to the "ready" state
+    # At this point, the machine can be "Deployed"
+    ################################################################################
 
-    Allocate the VMs 
+    # To Deploy a machine
+    # Maas -> Machines -> Select VM(s) -> Take Action -> Deploy
+     
+    # The LXC Servers/Hosts will appear as Machines, with a power state of "unknown"
+    # These should not be provisioned, so make a pool for them
+    # Put the LXC hosts in the other pool
+    # Maas -> Machines -> <LXC host> -> Configuration -> Machine/Edit
 
-    Commision the VMs
-
-    Deploy the VMs
 
     # The linux user name varies, depending on the OS/Image
     Log in via: ssh ubuntu@<IP=192.168.8.202>
@@ -192,7 +232,7 @@ EOF
 }
 
 #Uncomment to run one step at a time
-#check-status
+#check-dhcp-and-dns-in-lxc-server
 #exit 1
 
 maas-server-requirements
@@ -202,5 +242,6 @@ setup-admin
 setup-networks
 setup-dhcp
 test-dhcp
-setup-lxd-host
+setup-lxd-servers
+check-dhcp-and-dns-in-lxc-server
 provision-vms-in-maas
