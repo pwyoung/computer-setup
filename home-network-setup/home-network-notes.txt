@@ -77,7 +77,8 @@ Router to Internet:
                               - CPU: 4
                               - RAM: 8 GB
                           - Port #2:
-                            - Nuc:
+                            - nuc:
+			      - Hardware: NUC 13 (no enterprise vPRO/AMT)
                               - LAN:
                                 - IP 192.168.8.4 (static)
                                 - MAC: 48:21:0B:55:B4:5B
@@ -89,7 +90,8 @@ Router to Internet:
                                   - test mesh commander:
                                     - https://www.meshcommander.com/meshcentral2
                           - Port #3:
-                            - System76 Laptop (Oryx Pro v5)
+                            - oryx
+			      - Hardware: System76 Laptop (Oryx Pro v5)
                               - LAN:
                                 - IP: 192.168.8.3 (static)
                                 - MAC: 80:FA:5B:74:F0:FC
