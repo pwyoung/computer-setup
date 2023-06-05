@@ -80,7 +80,7 @@ Router to Internet:
                               - RAM: 8 GB
                           - Port #2:
                             - Nuc:
-                              - Model: NUC13ANHi5 (CPU i5-1340P)
+                              - Model: NUC13ANHi5 (CPU i5-1340P, No AMT)
                                 - https://www.intel.com/content/www/us/en/support/articles/000031997/intel-nuc.html
                               - LAN:
                                 - IP 192.168.8.4 (static)
