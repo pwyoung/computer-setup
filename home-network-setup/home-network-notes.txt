@@ -106,3 +106,7 @@ Router to Internet:
                                 - MAC: FC:34:97:4D:48:DD
                               - CPU: 16
                               - RAM: 64 GB
+
+Maas:
+  - 192.168.8.191-192.168.8.254
+
