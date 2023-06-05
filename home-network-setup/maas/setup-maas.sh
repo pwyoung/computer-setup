@@ -66,6 +66,14 @@ setup-admin() {
 	 - email: unused@email.com (since it is not used)
 	 - gh:<github user> (since that is my github user and the local SSH key gives access to it)
 EOF
+
+	echo "Testing your SSH credentials to Github..."
+	if ssh -T git@github.com 2>&1  | grep 'success'; then
+	    echo "The user shown above has access to github, you can use 'gh:<github user>' in Maas"
+	else
+	    echo "Warning, this OS account is not set up to acccess github via SSH"
+	fi
+	
 	sudo maas createadmin
     fi
 
