@@ -78,6 +78,8 @@ Router to Internet:
                               - RAM: 8 GB
                           - Port #2:
                             - Nuc:
+                              - Model: NUC13ANHi5 (CPU i5-1340P)
+                                - https://www.intel.com/content/www/us/en/support/articles/000031997/intel-nuc.html
                               - LAN:
                                 - IP 192.168.8.4 (static)
                                 - MAC: 48:21:0B:55:B4:5B
@@ -85,7 +87,16 @@ Router to Internet:
                               - CPU: 12/16
                               - RAM: 32 GB
                               - TODO:
-                                - AMT
+                                - AMT: not there...
+                                  - Setup:
+                                    - Go to BIOS:
+                                      - Hit "del or f2" on boot to get to bios
+                                      - Set admin and user pw (to same for system76 laptop syzy12...)
+                                    - Go to MEBX inteface
+                                      - Hit "ctrl-p" on boot to get to bios
+                                      - Wait Updates:
+                                        - OEM FMP update
+                                        - EC Firmware update
                                   - test mesh commander:
                                     - https://www.meshcommander.com/meshcentral2
                           - Port #3:
@@ -98,7 +109,7 @@ Router to Internet:
                           - Port #4:
                             - tardis:
                               - LAN:
-                                - IP: 192.168.8.3 # static
+                                - IP: 192.168.8.5 (static)
                                 - MAC: FC:34:97:4D:48:DD
                               - CPU: 16
                               - RAM: 64 GB
