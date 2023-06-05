@@ -83,7 +83,7 @@ Router to Internet:
                                 - IP 192.168.8.4 (static)
                                 - MAC: 48:21:0B:55:B4:5B
                               - wireless:
-                              - CPU: 12/16
+                              - CPU: 12/16 (real/apparent)
                               - RAM: 32 GB
                               - TODO:
                                 - AMT
@@ -100,7 +100,7 @@ Router to Internet:
                           - Port #4:
                             - tardis:
                               - LAN:
-                                - IP: 192.168.8.3 # static
+                                - IP: 192.168.8.3 (static)
                                 - MAC: FC:34:97:4D:48:DD
                               - CPU: 16
                               - RAM: 64 GB
