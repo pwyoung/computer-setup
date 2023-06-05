@@ -65,7 +65,7 @@ setup-admin() {
 	 - pw: password (for testing)
 	 - email: unused@email.com (since it is not used)
 	 - gh:<github user> (since that is my github user and the local SSH key gives access to it)
-	EOF
+EOF
 	sudo maas createadmin
     fi
 
