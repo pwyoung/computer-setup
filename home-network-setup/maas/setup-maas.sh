@@ -209,8 +209,8 @@ provision-vms-in-maas() {
     Maas -> KVM -> <some LXC host name> -> scroll down to 'add VM' 
     
     ################################################################################
-    # After the VM/Machine is created it will go to "commissioning" state
-    # It will turn off after that and go to the "ready" state
+    # After the Machine/VM is created/compposed it will go to "Commissioning" state
+    # In a minute or wo, it will turn off and go to the "Ready" state
     # At this point, the machine can be "Deployed"
     ################################################################################
 
