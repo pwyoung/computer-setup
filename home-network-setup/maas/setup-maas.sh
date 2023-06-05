@@ -1,9 +1,16 @@
 #!/usr/bin/bash
 
-# Temporary creds
-# MAAS_API_KEY
-#   - pwy-maas-apikey
-#     - pEKP2f728qJE6WQ827:WCeJaLMCLj9ZTuFCJF:8GXfauJjj8QZXJpF3xxfS9Z6mD5KfXpE
+
+maas-server-requirements() {
+    cat <<EOF 
+ Maas Server Requirements (single-node running all services)
+ - https://maas.io/docs/installation-requirements
+ - OS: Ubuntu 22.04 (was used and the latest stable version runs on it) 
+ - RAM: 8 GB RAM
+ - CPU: 8 GHz
+ - DISK: 100-200 GB (50 recommended, plus more for downloaded images)
+EOF
+}
 
 install-maas() {
     if which maas >/dev/null; then
@@ -35,7 +42,7 @@ setup-admin() {
 	sudo maas createadmin
 	# name: maasadmin
 	# pw: password
-	# email: notused@gmail.com
+	# email: notused@email.com
 	# gh:pwyoung
     fi
 
@@ -90,6 +97,7 @@ test-dhcp() {
 
 setup-lxd-host() {
     cat <<EOF
+    Run this on the machine providing the LXC virtual host    
     https://maas.io/docs/how-to-set-up-lxd
 
     Created default everything, but
@@ -106,16 +114,36 @@ setup-lxd-host() {
     # LXC bridge
     #  lxc network show lxdbr0
     # 10.25.155.1
+EOF
+}
+
+provision-vms-in-maas() {
+    cat <<EOF    
+    Provision the KVM/LXC host in Maas
+
+    Add VMs on top of the LXC host
+
+    Allocate the VMs 
+
+    Commision the VMs
+
+    Deploy the VMs
+
+    Log in via: ssh ubuntu@<IP=192.168.8.202>
 
 EOF
 }
 
-check-status
-exit 1
+#Uncomment to run one step at a time
+#check-status
+#exit 1
 
+maas-server-requirements
 install-maas
 check-status
 setup-admin
 setup-networks
 setup-dhcp
 test-dhcp
+setup-lxd-host
+provision-vms-in-maas
