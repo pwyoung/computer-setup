@@ -74,6 +74,8 @@ Router to Internet:
                               - LAN:
                                 - IP: 192.168.8.2 (static)
                                 - MAC: 00:CE:39:D1:21:BE
+		              - Wifi
+				- Speed: 235 Mbps (down)
                               - CPU: 4
                               - RAM: 8 GB
                           - Port #2:
@@ -86,28 +88,19 @@ Router to Internet:
                               - wireless:
                               - CPU: 12/16
                               - RAM: 32 GB
-                              - TODO:
-                                - AMT: not there...
-                                  - Setup:
-                                    - Go to BIOS:
-                                      - Hit "del or f2" on boot to get to bios
-                                      - Set admin and user pw (to same for system76 laptop syzy12...)
-                                    - Go to MEBX inteface
-                                      - Hit "ctrl-p" on boot to get to bios
-                                      - Wait Updates:
-                                        - OEM FMP update
-                                        - EC Firmware update
-                                  - test mesh commander:
-                                    - https://www.meshcommander.com/meshcentral2
                           - Port #3:
-                            - System76 Laptop (Oryx Pro v5)
+                            - oryx
+			      - Model: System76 Laptop Oryx Pro v5
                               - LAN:
                                 - IP: 192.168.8.3 (static)
                                 - MAC: 80:FA:5B:74:F0:FC
+		              - Wifi				
+				- Speed: Mbps (187 Mbps down)			
                               - CPU: 12
                               - RAM: 64 GB
                           - Port #4:
                             - tardis:
+			      - Model: Asus Laptop 
                               - LAN:
                                 - IP: 192.168.8.5 (static)
                                 - MAC: FC:34:97:4D:48:DD
