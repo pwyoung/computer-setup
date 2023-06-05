@@ -40,8 +40,11 @@ setup-admin() {
 
 setup-networks() {
     # https://maas.io/docs/how-to-connect-maas-networks
-    echo "The default network, 'fabric0' should be created from the local subnet"
-    
+    cat <<EOF 
+    The default network, 'fabric0' should be created from the local subnet	
+
+EOF
+   
 }
 
 setup-dhcp() {
@@ -50,7 +53,19 @@ setup-dhcp() {
     Choose the default VLAN. Click on Maas -> subnets -> untagged
     My setup:
     Subnet: 192.168.8.0/24
+    Mangement: 
+      - by default, the subnet is managed (i.e. Maas will provide DHCP)
+      - To change the management of a subnet, see:
+        - https://discourse.maas.io/t/subnet-management-deb-3-0-cli-test/4716#heading--controlling-subnet-management
     IP Range: 192.168.8.100 - 192.168.8.200 (using static IPs in low range, for the Maas server itself)
+
+    Review: 
+      - https://discourse.maas.io/t/how-to-manage-ip-ranges/5136
+      - https://discourse.maas.io/t/maas-glossary/5416#heading--ip-ranges 
+      - https://discourse.maas.io/t/subnet-management-deb-3-0-cli-test/4716
+      - https://discourse.maas.io/t/subnet-management-deb-3-0-cli-test/4716#heading--controlling-subnet-management 
+
+
 EOF
 }
 
