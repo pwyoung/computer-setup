@@ -59,14 +59,17 @@ setup-admin() {
     if sudo maas apikey --username maasadmin >/dev/null; then
 	echo "Maas admin user exists"
     else
+	cat <<EOF
+	 Params I use for maas admin user:
+	 - name: maasadmin
+	 - pw: password (for testing)
+	 - email: unused@email.com (since it is not used)
+	 - gh:<github user> (since that is my github user and the local SSH key gives access to it)
+	EOF
 	sudo maas createadmin
-	# name: maasadmin
-	# pw: password
-	# email: notused@email.com
-	# gh:pwyoung
     fi
 
-    IP=$(hostname)
+    IP=$(hostname -i)
     xdg-open http://${IP}:5240/MAAS &>/dev/null
 }
 
@@ -111,7 +114,7 @@ test-dhcp() {
         sudo apt install dhcpcd5
     fi
     F=/tmp/dhcpcd.out
-    sudo dhcpcd -T enp8s0 -t 2 &> $F #| tee $F
+    sudo dhcpcd -T enp8s0 -t 2 &> $F 
     echo "Scanning results of DHCP test at $F"
     echo "Look at the file via: cat $F"
     if cat $F | grep 'new_filename' | grep 'lpxelinux.0' >/dev/null; then
