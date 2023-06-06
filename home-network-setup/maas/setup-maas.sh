@@ -207,6 +207,10 @@ provision-vms-in-maas() {
 
     # Create VMs from LXC hosts
     Maas -> KVM -> <some LXC host name> -> scroll down to 'add VM' 
+    # Make sure to set:
+    # - Ethernet interface ! (if you don't, the VM may work temporarily and then stop showing its IP)
+    # - CPU
+    # - RAM
     
     ################################################################################
     # After the Machine/VM is created/compposed it will go to "Commissioning" state
@@ -229,6 +233,15 @@ provision-vms-in-maas() {
     # Read up on Maas projects
     # https://maas.io/docs/how-to-set-up-lxd#heading--projects-tutorial
 EOF
+}
+
+todo-nvidia-gpu-passthrough-using-kvm() {
+    cat <<EOF
+    TODO: set up GPU passthrough on a bare-metal VM, using KVM.
+    RHEL uses/made KVM, but it does run on Ubuntu also.
+EOF
+
+
 }
 
 #Uncomment to run one step at a time
