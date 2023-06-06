@@ -7,7 +7,7 @@ show_msg() {
     echo "================================================================================"
     echo "${MSG}"
     echo "================================================================================"
-    
+
     read  -n 1 -p "Hit any key" invar
 
     # Sleep X seconds
@@ -16,11 +16,11 @@ show_msg() {
 
 maas-server-requirements() {
     show_msg "maas-server-requirements"
-    
-   cat <<EOF 
+
+   cat <<EOF
  Maas Server Requirements (single-node running all services)
  - https://maas.io/docs/installation-requirements
- - OS: Ubuntu 22.04 (was used and the latest stable version runs on it) 
+ - OS: Ubuntu 22.04 (was used and the latest stable version runs on it)
  - RAM: 8 GB RAM
  - CPU: 8 GHz
  - DISK: 100-200 GB (50 recommended, plus more for downloaded images)
@@ -31,7 +31,7 @@ EOF
 # Install Maas to this host directly, using OS packages
 install-maas-via-os-packages() {
     show_msg "install-maas"
-    
+
     if which maas >/dev/null; then
 	echo "Command 'maas' is in PATH. Assuming it is installed properly."
     else
@@ -48,12 +48,12 @@ EOF
 # Install LXD and make a container to run Maas
 install-maas-via-lxd() {
     # https://discourse.maas.io/t/install-with-lxd/757
-    # 
+
 }
 
 check-status() {
     show_msg "check-status"
-    
+
     # systemctl status --no-pager | grep '.service' | grep maas
     for i in maas-regiond maas-syslog maas-proxy maas-http maas-rackd; do
 	echo $i
@@ -63,7 +63,7 @@ check-status() {
 
 setup-admin() {
     show_msg "setup-admin"
-    
+
     if sudo maas apikey --username maasadmin >/dev/null; then
 	echo "Maas admin user exists"
     else
@@ -81,7 +81,7 @@ EOF
 	else
 	    echo "Warning, this OS account is not set up to acccess github via SSH"
 	fi
-	
+
 	sudo maas createadmin
     fi
 
@@ -91,7 +91,7 @@ EOF
 
 setup-networks() {
     show_msg "setup-networks"
-    
+
     cat <<EOF
     # https://maas.io/docs/how-to-connect-maas-networks
     The default network, 'fabric0' should be created from the local subnet
@@ -101,7 +101,7 @@ EOF
 
 setup-dhcp() {
     show_msg "setup-dhcp"
-    
+
     # https://maas.io/docs/how-to-enable-dhcp
     cat <<EOF
     Choose the default VLAN. Click on Maas -> subnets -> untagged
@@ -125,12 +125,13 @@ EOF
 
 test-dhcp() {
     show_msg "test-dhcp"
-    
+
     if ! which dhcpcd >/dev/null; then
         sudo apt install dhcpcd5
     fi
     F=/tmp/dhcpcd.out
-    sudo dhcpcd -T enp8s0 -t 2 &> $F 
+    #sudo dhcpcd -T enp8s0 -t 2 &> $F # Specify NIC
+    sudo dhcpcd -t 2 &> $F
     echo "Scanning results of DHCP test at $F"
     echo "Look at the file via: cat $F"
     if cat $F | grep 'new_filename' | grep 'lpxelinux.0' >/dev/null; then
@@ -141,7 +142,7 @@ test-dhcp() {
 
 setup-lxd-servers() {
     show_msg "setup-lxd-servers - NOT ON MAAS SERVER (IF IT WAS INSTALLED OUTSIDE LXD) - Directions only..."
-    
+
     cat <<EOF
     Run this on each  machine providing the LXC virtualization service
     https://maas.io/docs/how-to-set-up-lxd
@@ -151,7 +152,7 @@ setup-lxd-servers() {
     sudo apt-get autoremove -y
     sudo snap install lxd
     sudo snap refresh
-    
+
     # Initialize LXD
     # https://maas.io/docs/how-to-set-up-lxd#heading--lxd-init
     # Options for 'lxd init':
@@ -159,10 +160,10 @@ setup-lxd-servers() {
     # - create default storage pool of type 'dir'
     # - NO, do not connect to Maas server now (we need to turn off DHCP etc first)
     # - YES, make the lxc server available over the network
-    sudo lxd init 
+    sudo lxd init
 
     # Make sure LXD is not providing DHCP
-    # 
+    #
     lxc network show lxdbr0
     lxc network set lxdbr0 dns.mode=none
     lxc network set lxdbr0 ipv4.dhcp=false
@@ -180,7 +181,7 @@ EOF
 
 check-dhcp-and-dns-in-lxc-server() {
     show_msg "Check that DHCP is off for the LXC server"
-    
+
     cat <<EOF
     # Run these blocks in the LXC server
 
@@ -196,14 +197,14 @@ check-dhcp-and-dns-in-lxc-server() {
 	show_msg "ERROR: DNS might be running in LXC"
     fi
 EOF
-    
+
 
 }
 
 provision-vms-in-maas() {
     show_msg "provision-vms-in-maas"
-    
-    cat <<EOF    
+
+    cat <<EOF
     # Add LXC "hosts/servers"
     Go to Maas -> KVM -> LXD -> Add LXC Host
     Add the IP of the LXC server
@@ -214,12 +215,12 @@ provision-vms-in-maas() {
     Add the Host to a project ('default' or make one)
 
     # Create VMs from LXC hosts
-    Maas -> KVM -> <some LXC host name> -> scroll down to 'add VM' 
+    Maas -> KVM -> <some LXC host name> -> scroll down to 'add VM'
     # Make sure to set:
     # - Ethernet interface ! (if you don't, the VM may work temporarily and then stop showing its IP)
     # - CPU
     # - RAM
-    
+
     ################################################################################
     # After the Machine/VM is created/compposed it will go to "Commissioning" state
     # In a minute or wo, it will turn off and go to the "Ready" state
@@ -228,7 +229,7 @@ provision-vms-in-maas() {
 
     # To Deploy a machine
     # Maas -> Machines -> Select VM(s) -> Take Action -> Deploy
-     
+
     # The LXC Servers/Hosts will appear as Machines, with a power state of "unknown"
     # These should not be provisioned, so make a pool for them
     # Put the LXC hosts in the other pool
@@ -252,9 +253,30 @@ EOF
 
 }
 
+purge_lxd_snap() {
+    cat <<EOF
+    lxc list
+    lxc delete <whatever came from list>
+    lxc image list
+    lxc image delete <whatever came from list>
+    lxc network list
+    lxc network delete <whatever came from list>
+    echo ‘{“config”: {}}’ | lxc profile edit default
+    lxc storage volume list default
+    lxc storage volume delete default <whatever came from list>
+    lxc storage delete default
+EOF
+
+    for i in lxc list | egrep -v '+--|NAME' | cut -d'|' -f 2 | tr -d ' '; do
+        lxc delete $i --force
+    done
+
+
+}
+
 #Uncomment to run one step at a time
-#check-dhcp-and-dns-in-lxc-server
-#exit 1
+purge_lxd_snap
+exit 1
 
 maas-server-requirements
 #install-maas-via-os-packages
