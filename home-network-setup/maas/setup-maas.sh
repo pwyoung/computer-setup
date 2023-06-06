@@ -27,7 +27,9 @@ maas-server-requirements() {
 EOF
 }
 
-install-maas() {
+
+# Install Maas to this host directly, using OS packages
+install-maas-via-os-packages() {
     show_msg "install-maas"
     
     if which maas >/dev/null; then
@@ -41,6 +43,12 @@ EOF
 	sudo apt update -y
 	sudo apt-get -y install maas -y
     fi
+}
+
+# Install LXD and make a container to run Maas
+install-maas-via-lxd() {
+    # https://discourse.maas.io/t/install-with-lxd/757
+    # 
 }
 
 check-status() {
@@ -132,7 +140,7 @@ test-dhcp() {
 }
 
 setup-lxd-servers() {
-    show_msg "setup-lxd-servers - NOT ON MAAS SERVER (IF IT WAS INSTALLED OUTSIDE LXC) - Directions only..."
+    show_msg "setup-lxd-servers - NOT ON MAAS SERVER (IF IT WAS INSTALLED OUTSIDE LXD) - Directions only..."
     
     cat <<EOF
     Run this on each  machine providing the LXC virtualization service
@@ -249,7 +257,8 @@ EOF
 #exit 1
 
 maas-server-requirements
-install-maas
+#install-maas-via-os-packages
+install-maas-via-lxd
 check-status
 setup-admin
 setup-networks
