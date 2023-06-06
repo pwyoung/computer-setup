@@ -1,112 +1,81 @@
 
+Internet:
+- Xfinity Router
+- 10.0.0.1
+
 Router to Internet:
 - Model: Unifi Dream Machine
 - Docs: https://store.ui.com/us/en/products/udm
 - Access (via top right hamburger icon -> network)
   - URL: https://192.168.2.1/network/default/dashboard
   - user/pw: <personal gmail address>/Ubiquity<stuff>
-- Config
-  - Networks:
-    - Default-pwy
-      - CIDR: 192.168.2.1/24
-      - DHCP:
-        - Range: 192.168.2.100-192.168.2.254
+- Networks:
+  - Default-pwy
+    - CIDR: 192.168.2.1/24
+    - DHCP:
+      - Range: 192.168.2.100-192.168.2.254
+  - holodeck
+    - CIDR: 192.168.3.1/24
+    - DHCP:
+      - Range: 192.168.3.100-192.168.2.254
+- Devices:
+  - Port #1
     - Devices:
-      - Port #1
-        - Apple TV
-      - Port #2
+      - Apple TV
+        - LAN:
+          - IP: 192.168.2.129
+  - Port #2
+    - Network: holodeck
+    - Switch
+      - Model: Netgear gigabit switch
+      - Features: plain 1GB switch
+      - Purpose: stuff on right side of the room
+      - Speed: 900 Mbps
+      - Devices:
+        - Desktop
+          - Name: gallifrey
+          - LAN:
+            - IP: 192.168.3.?
+          - CPU: 20
+          - RAM: 32 GB
         - Switch
-          - Model: Netgear gigabit switch
-          - Features: plain 1GB switch
-          - Purpose: stuff on right side of the room
+          - Model: TP-Link tl-sg108e
+          - Features: Switch, vlan-support. not router, firewall, or DHCP server
+          - Purpose: Stuff on left side of room
           - Speed: 900 Mbps
-          - Devices:
-            - Desktop
-              - Name: gallifrey
-              - LAN:
-                - IP: 192.168.2.204
-              - CPU: 20
-              - RAM: 32 GB
-            - Printer
-              - Name: Epson_WF_4820_Series
-            - Speaker
-              - Name: Sonos
-            - Switch
-              - Model: TP-Link tl-sg108e
-              - Features: switch, not router, firewall, or DHCP server
-              - Purpose: Stuff on left side of room, High-speed ports, VLAN support (so we can remove the child firewall asap)
-              - Speed: 900 Mbps
-              - Docs: https://www.tp-link.com/us/business-networking/easy-smart-switch/tl-sg108e/
-              - Access:
-                - URL: http://192.168.2.149
-                - Note: Does not show as active in Ubiquity client devices
-              - Devices
-                - Port 1:
-                - Port 2:
-                  - nano:
-                    - LAN:
-                      - not setup
-                    - CPU: 4
-                    - RAM: 4 GB
-                - Port 3:
-                  - Firewall/VPN:
-                    - Model: GL-AR300M-769 (DD-WRT Router)
-                    - Purpose: Isolation for testing PXE booting
-                    - Features: Firewall with support for WIFI and VPN
-                    - Speed: 85 Mbps
-                    - Docs: https://www.tp-link.com/us/business-networking/easy-smart-switch/tl-sg108e/
-                    - Access:
-                      - Default interface:
-                        - URL: http://192.168.2.149
-                        - user/pw=admin/Glinet<more>
-                      - Advanced interface:
-                        - http://192.168.2.149/cgi-bin/luci/
-                        - user/pw=same as default interface
-                    - DHCP: disabled
-                    - Devices
-                      - Switch
-                        - Model: Netgear
-                        - Purpose: Isolation for testing PXE booting
-                        - Speed: 100 Mbps
-                        - Devices
-                          - Port #1:
-                            - mele:
-                              - LAN:
-                                - IP: 192.168.8.2 (static)
-                                - MAC: 00:CE:39:D1:21:BE
-		              - Wifi
-				- Speed: 235 Mbps (down)
-                              - CPU: 4
-                              - RAM: 8 GB
-                          - Port #2:
-                            - Nuc:
-                              - Model: NUC13ANHi5 (CPU i5-1340P, No AMT)
-                                - https://www.intel.com/content/www/us/en/support/articles/000031997/intel-nuc.html
-                              - LAN:
-                                - IP 192.168.8.4 (static)
-                                - MAC: 48:21:0B:55:B4:5B
-                              - wireless:
-                              - CPU: 12/16
-                              - RAM: 32 GB
-                          - Port #3:
-                            - oryx
-			      - Model: System76 Laptop Oryx Pro v5
-                              - LAN:
-                                - IP: 192.168.8.3 (static)
-                                - MAC: 80:FA:5B:74:F0:FC
-		              - Wifi				
-				- Speed: Mbps (187 Mbps down)			
-                              - CPU: 12
-                              - RAM: 64 GB
-                          - Port #4:
-                            - tardis:
-			      - Model: Asus Laptop 
-                              - LAN:
-                                - IP: 192.168.8.5 (static)
-                                - MAC: FC:34:97:4D:48:DD
-                              - CPU: 16
-                              - RAM: 64 GB
-
-Maas:
-  - 192.168.8.191-192.168.8.254
-
+          - Docs: https://www.tp-link.com/us/business-networking/easy-smart-switch/tl-sg108e/
+          - Devices
+            - Port #2:
+              - tardis:
+                - Model: Asus Laptop
+                - LAN:
+                  - IP: 192.168.3.2 (static)
+                  - MAC: FC:34:97:4D:48:DD
+                - CPU: 16
+                - RAM: 64 GB
+            - Port #3:
+              - oryx
+                - Model: System76 Laptop Oryx Pro v5
+                - LAN:
+                  - IP: 192.168.3.5 (static)
+                  - MAC: 80:FA:5B:74:F0:FC
+                - CPU: 12
+                - RAM: 64 GB
+            - Port #4:
+              - mele
+                - Model: Mele 3q
+                - LAN:
+                  - IP: 192.168.3.6 (static)
+                  - MAC: 00:ce:39:d1:21:be
+                - CPU: 4
+                - RAM: 8 GB
+             - Port #5:
+              - Nuc:
+                - Model: NUC13ANHi5 (CPU i5-1340P, No AMT)
+                  - https://www.intel.com/content/www/us/en/support/articles/000031997/intel-nuc.html
+                - LAN:
+                  - IP 192.168.3.4 (static)
+                  - MAC: 48:21:0B:55:B4:5B
+                - wireless:
+                - CPU: 12/16
+                - RAM: 32 GB
