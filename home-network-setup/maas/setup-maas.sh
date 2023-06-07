@@ -35,10 +35,8 @@ install-maas-via-os-packages() {
     if which maas >/dev/null; then
 	echo "Command 'maas' is in PATH. Assuming it is installed properly."
     else
-	cat <<EOF
-	Installing Maas per https://maas.io/docs/how-to-do-a-fresh-install-of-maas
-	via <3.3 packages> (as opposed to snap)
-EOF
+	#Installing Maas per https://maas.io/docs/how-to-do-a-fresh-install-of-maas
+	#via <3.3 packages> (as opposed to snap)
 	sudo apt-add-repository ppa:maas/3.3-next
 	sudo apt update -y
 	sudo apt-get -y install maas -y
@@ -46,10 +44,48 @@ EOF
 }
 
 # Install LXD and make a container to run Maas
-install-maas-via-lxd() {
-    # https://discourse.maas.io/t/install-with-lxd/757
-    echo "sudo snap install lxd"
-}
+# https://discourse.maas.io/t/install-with-lxd/757
+#install-maas-via-lxd() {
+#    show_msg "Follow the steps below on the maas server"
+#    
+#    cat <<EOF
+#    # https://discourse.maas.io/t/install-with-lxd/757
+#    sudo snap install lxd
+#
+#    lxd init # Took defaults, but storage type is dir
+#    
+#    #  Deactivate DHCP and DNS
+#    lxc network set lxdbr0 dns.mode=none
+#    lxc network set lxdbr0 ipv4.dhcp=false
+#    lxc network set lxdbr0 ipv6.dhcp=false
+#    lxc network show lxdbr0
+#    
+#    # Set up a network for things like libvirt KVMs
+#    lxc profile copy default maas-profile
+#    lxc profile device set maas-profile eth0 network lxdbr0
+#    
+#    # Make a container to run Maas. Launch with '--profile maas-profile'for the network for maas
+#    # lxc launch --profile maas-profile ubuntu:20.04 focal-maas
+#    # lxc exec focal-maas bash
+#    # Use ubuntu 22.04 (for Maas 3.3)     
+#    lxc launch --profile maas-profile ubuntu:22.04 jammy-maas
+#    # Run the container and install maas to is
+#    lxc exec jammy-maas bash
+#
+#    # Install Maas per https://maas.io/docs/how-to-do-a-fresh-install-of-maas
+#    # via <3.3 packages> (as opposed to snap)
+#    if which maas >/dev/null; then
+# 	echo "Command 'maas' is in PATH. Assuming it is installed properly."
+#    else
+# 	sudo apt-add-repository ppa:maas/3.3-next
+# 	sudo apt update -y
+# 	sudo apt-get -y install maas -y
+#    fi
+#EOF
+#
+#    show_msg "the server should be running now"
+#
+#}
 
 check-status() {
     show_msg "check-status"
@@ -59,6 +95,8 @@ check-status() {
 	echo $i
 	 systemctl status $i --no-pager
     done
+
+    show_msg "check-status: done"    
 }
 
 setup-admin() {
@@ -97,6 +135,8 @@ setup-networks() {
     The default network, 'fabric0' should be created from the local subnet
 EOF
 
+    show_msg "setup-networks: done"
+
 }
 
 setup-dhcp() {
@@ -118,9 +158,9 @@ setup-dhcp() {
       - https://discourse.maas.io/t/maas-glossary/5416#heading--ip-ranges
       - https://discourse.maas.io/t/subnet-management-deb-3-0-cli-test/4716
       - https://discourse.maas.io/t/subnet-management-deb-3-0-cli-test/4716#heading--controlling-subnet-management
-
-
 EOF
+
+    show_msg "setup-dhcp: done"
 }
 
 test-dhcp() {
@@ -130,14 +170,14 @@ test-dhcp() {
         sudo apt install dhcpcd5
     fi
     F=/tmp/dhcpcd.out
-    #sudo dhcpcd -T enp8s0 -t 2 &> $F # Specify NIC
-    sudo dhcpcd -t 2 &> $F
+    sudo dhcpcd -T enp8s0 -t 2 &> $F # Specify expected NIC name
     echo "Scanning results of DHCP test at $F"
     echo "Look at the file via: cat $F"
     if cat $F | grep 'new_filename' | grep 'lpxelinux.0' >/dev/null; then
 	echo "Looks good"
     fi
 
+    show_msg "test-dhcp: done"    
 }
 
 setup-lxd-servers() {
@@ -148,8 +188,9 @@ setup-lxd-servers() {
     https://maas.io/docs/how-to-set-up-lxd
 
     # Install LXD from SNAP, not OS Packages
-    sudo apt-get purge -y *lxd* *lxc*
-    sudo apt-get autoremove -y
+    # 
+    #sudo apt-get purge -y *lxd* *lxc*
+    #sudo apt-get autoremove -y
     sudo snap install lxd
     sudo snap refresh
 
@@ -164,19 +205,14 @@ setup-lxd-servers() {
 
     # Make sure LXD is not providing DHCP
     #
-    lxc network show lxdbr0
     lxc network set lxdbr0 dns.mode=none
     lxc network set lxdbr0 ipv4.dhcp=false
     lxc network set lxdbr0 ipv6.dhcp=false
     lxc network show lxdbr0
 
-    # IP: 192.168.8.100 (DHCP)
-    # LXC bridge
-    #  lxc network show lxdbr0
-    # 10.25.155.1
-
 EOF
 
+    show_msg "setup-lxd-servers: done"
 }
 
 check-dhcp-and-dns-in-lxc-server() {
@@ -198,6 +234,7 @@ check-dhcp-and-dns-in-lxc-server() {
     fi
 EOF
 
+    show_msg "Check that DHCP is off for the LXC server: done"    
 
 }
 
@@ -206,20 +243,14 @@ provision-vms-in-maas() {
 
     cat <<EOF
     # Add LXC "hosts/servers"
-    Go to Maas -> KVM -> LXD -> Add LXC Host
-    Add the IP of the LXC server
-    Generate new certificate
-    Copy the command to run on the LXD Server
-    Run the command to add the cert to the LXD Server
-    Click on Maas 'Check Authentication'
-    Add the Host to a project ('default' or make one)
+    # READ THIS 
+    #   https://maas.io/docs/how-to-manage-vm-hosts#heading--adding-a-vm-host
+    # KEY POINT
+    #   Add the LXD bridge gateway address
+    #  "Enter the LXD address as the gateway address of the bridge for that LXD instance. For example, if lxdbr0 has address 10.4.241.0, the default gateway address is 10.4.241.1."
+    # See:     lxc network show lxdbr0
+    # Try: lxc network show lxdbr0 | grep ipv4.address | cut -d' ' -f 4 | cut -d'/' -f 1 
 
-    # Create VMs from LXC hosts
-    Maas -> KVM -> <some LXC host name> -> scroll down to 'add VM'
-    # Make sure to set:
-    # - Ethernet interface ! (if you don't, the VM may work temporarily and then stop showing its IP)
-    # - CPU
-    # - RAM
 
     ################################################################################
     # After the Machine/VM is created/compposed it will go to "Commissioning" state
@@ -242,31 +273,11 @@ provision-vms-in-maas() {
     # Read up on Maas projects
     # https://maas.io/docs/how-to-set-up-lxd#heading--projects-tutorial
 EOF
-}
 
-todo-nvidia-gpu-passthrough-using-kvm() {
-    cat <<EOF
-    TODO: set up GPU passthrough on a bare-metal VM, using KVM.
-    RHEL uses/made KVM, but it does run on Ubuntu also.
-EOF
-
-
+    show_msg "provision-vms-in-maas: done"    
 }
 
 purge_lxd_snap() {
-    cat <<EOF
-    lxc list
-    lxc delete <whatever came from list>
-    lxc image list
-    lxc image delete <whatever came from list>
-    lxc network list
-    lxc network delete <whatever came from list>
-    echo ‘{“config”: {}}’ | lxc profile edit default
-    lxc storage volume list default
-    lxc storage volume delete default <whatever came from list>
-    lxc storage delete default
-EOF
-
     echo "Remove VMs"
     V=$(lxc list | grep 'VIRTUAL' | cut -d' ' -f 2 | tr '\n' ' ')
     echo "VMs: ${V}"
@@ -305,24 +316,42 @@ EOF
     show_msg "Volumes should be gone"
 
     echo "Remove lxd snap"
-    sudo snap remove lxd
-
-   
-    exit 1
+    #sudo snap remove lxd
+    sudo snap remove --purge lxd # Needed for one box... Maybe this is all that is needed?
 }
 
-#Uncomment to run one step at a time
-purge_lxd_snap
-exit 1
+################################################################################
+# Call this to set up MaaS Server
+################################################################################
+setup_maas_server() {
+    maas-server-requirements
+    
+    install-maas-via-os-packages
+    
+    #purge_lxd_snap # For clean install
+    #install-maas-via-lxd
+    
+    check-status
+    
+    setup-admin
+    
+    setup-networks
+    
+    setup-dhcp
+    
+    test-dhcp
+}
 
-maas-server-requirements
-#install-maas-via-os-packages
-install-maas-via-lxd
-check-status
-setup-admin
-setup-networks
-setup-dhcp
-test-dhcp
-setup-lxd-servers
-check-dhcp-and-dns-in-lxc-server
-provision-vms-in-maas
+################################################################################
+# Steps to set up an LXD host to provide VMs for use by Maas
+################################################################################
+setup_maas_lxd_hosts() {
+    setup-lxd-servers 
+    check-dhcp-and-dns-in-lxc-server
+    provision-vms-in-maas
+}
+
+
+setup_maas_server
+
+
