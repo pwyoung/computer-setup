@@ -48,7 +48,7 @@ EOF
 # Install LXD and make a container to run Maas
 install-maas-via-lxd() {
     # https://discourse.maas.io/t/install-with-lxd/757
-
+    echo "sudo snap install lxd"
 }
 
 check-status() {
@@ -267,11 +267,48 @@ purge_lxd_snap() {
     lxc storage delete default
 EOF
 
-    for i in lxc list | egrep -v '+--|NAME' | cut -d'|' -f 2 | tr -d ' '; do
+    echo "Remove VMs"
+    V=$(lxc list | grep 'VIRTUAL' | cut -d' ' -f 2 | tr '\n' ' ')
+    echo "VMs: ${V}"
+    for i in $V; do
         lxc delete $i --force
     done
+    lxc list
+    show_msg "VMs should be gone now"    
 
+    echo "Remove images"
+    # TODO
+    lxc image list
+    show_msg "Images should be gone now"        
 
+    echo "Remove networks"
+    if lxc network list | egrep 'YES' | wc -l | grep 0; then
+	echo "no networks"
+    else
+	lxc network detach-profile lxdbr0 default
+	lxc network delete lxdbr0
+    fi
+    #N=$(lxc network list | egrep 'YES' | cut -d' ' -f 2 | tr '\n' ' ')
+    #for i in $V; do
+    #    lxc network delete $i --force-local
+    #done
+    lxc network list
+    show_msg "MANAGED networks should be gone now"
+
+    echo "Remove volumes"
+    V=$(lxc storage volume list default | egrep 'maas' | cut -d' ' -f 4 | tr '\n' ' ')
+    for i in $V; do
+        lxc storage volume delete default $i #--force-local
+    done
+    # lxc storage delete default # Fails, lying that this is in use    
+    # lxd sql global "SELECT * FROM storage_volumes;"
+    show_msg "Volumes should be gone"
+
+    echo "Remove lxd snap"
+    sudo snap remove lxd
+
+   
+    exit 1
 }
 
 #Uncomment to run one step at a time
