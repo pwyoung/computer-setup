@@ -1,14 +1,10 @@
 #!/usr/bin/bash
 
 # Goal:
-#   Setup Maas, using KVM
-#
+#   Setup Maas, using KVM (rathr than LXD)
 # Background
-#   Prefer KVM since it supports GUIs (see: virt-manager, virt-viewer, gnome-boxes, etc)
-#   KVM is not fully supported with multipass.
-#      Specifically, multipass only supports the '--network' command on LXD
-#      The '--network' command is needed to connect to a bridge in order to provide a static IP
-#      The static IP of the brige needs to be given to the Maas server to let maas provision VMs.
+#   Had trouble connecting LXC hosts
+#   Prefer KVM since full GUI install
 
 show_msg() {
     MSG="$1"
@@ -25,123 +21,78 @@ show_msg() {
 
 
 
-# Install KVM
-#
+# Install Maas
+#   To understand Linux virtualizatio, read about Qemu, KVM, Libvirt, and so on here:
+#   https://ubuntu.com/server/docs/virtualization-qemu
 install-maas-via-kvm() {
     show_msg "install-maas-via-kvm"
 
-    # Make sure this host supports virtualization
-    if ! which kvm-ok; then
-        sudo apt install -y cpu-checker
-        if ! sudo kvm-ok; then
-            echo "This host does not support virtualization, check BIOS settings and CPU features"
-            exit 1
-        fi
-    fi
-
-    # Install KVM
-    #   https://help.ubuntu.com/community/KVM/Installation
-    if ! kvm --version && libvirtd --version; then
-        sudo apt update -y
-        sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
-    fi
-
-    # Check ownership of important files
+    cat <<EOF
+    # Install Libvirt (KVM and Qemu) and set it up for use by tools like multipass and virt-manager
     #
-    # sudo ls -la /var/run/libvirt/libvirt-sock
-    # srw-rw---- 1 root libvirt 0 Jun  7 17:10 /var/run/libvirt/libvirt-sock
-    G=$(stat -c '%G' /var/run/libvirt/libvirt-sock)
-    GE="libvirt"
-    if [ !  "$G" == "$GE" ]; then
-        show_msg "Check ownership of /var/run/libvirt/libvirt-sock, group is $G, expected $GE"
-        exit 1
-    fi
-    #
-    # Docs say to match the owner
-    # sudo chown root:libvirtd /dev/kvm
-    #
-    # But the detault looks ok, maybe add the user to the kvm group too
-    # ls -l /dev/kvm
-    # crw-rw----+ 1 root kvm 10, 232 Jun  8 01:20 /dev/kvm
-    G=$(stat -c '%G' /dev/kvm)
-    GE="kvm"
-    if [ !  "$G" == "$GE" ]; then
-        show_msg "Check ownership of /var/run/libvirt/libvirt-sock, group is $G, expected $GE"
-        exit 1
-    fi
+    # Basic Libvirt
+    #   https://ubuntu.com/server/docs/virtualization-libvirt
+    # With multipass
+    #   https://multipass.run/docs/set-up-the-driver#heading--linux-use-libvirt
 
-    # Check user's group(s)
+EOF
+
     if groups | grep libvirt; then
-        echo "User has group: libvirt"
+        echo "User $USER is in group libvirt. Assuming libvirt is installed"
     else
+        echo "User $USER is not in group libvirt. Assuming libvirt is not installed"
+        sudo apt update -y
+        sudo apt install -y qemu-kvm libvirt-daemon-system
         sudo adduser $USER libvirt
-        #sudo adduser $USER kvm
+
         show_msg "Log out and back in again"
+        groups | grep libvirt
+    fi
+
+    # Install multipass
+    #   https://multipass.run/docs/installing-on-linux
+    if ! which multipass; then
+        sudo snap install -y multipass
+    fi
+
+    # Make sure the multipass socket is accessible by sudo group and this user is in it
+    if ! groups | grep sudo; then
+        echo "The user should be in the sudo group"
+        exit 1
+    fi
+    F=/var/snap/multipass/common/multipass_socket
+    if ! ls -l $F | grep sudo; then
+        echo "The file $F should be owned by the group sudo"
         exit 1
     fi
 
-    # KVM Networking - ASSUMES WE ARE USING NETWORK MANAGER
-    #   https://help.ubuntu.com/community/KVM/Networking
-    #
-    # Show that 'nmcli' is installed, and is part of the network-manager tool
-    # If it is not installed, don't install it, something else must be managing the network.
-    if ! sudo dpkg -S `which nmcli`; then
-        sudo apt list --installed | grep 'network-manager'
-        show_msg "This assumes we are using network manager."
-        exit 1
-    fi
-    # Make a bridge 'localbr' using the network manager toolset
-    if ! ip -c -br addr show dev localbr; then
-        sudo nmcli connection add type bridge con-name localbr ifname localbr ipv4.method manual ipv4.addresses 192.168.3.10/24
-        # Show the bridge exists (but is down)
-        ip -c -br addr show dev localbr
-        # Bring up the bridge
-        sudo nmcli connection up localbr
-        # Show the bridge is up
-        ip -c -br addr show dev localbr
-        ping -c 1 192.168.3.10
-        show_msg "make sure you can ping that from another host too"
-    fi
-    # To Delete the bridge
-    # sudo nmcli connection down localbr
-    # sudo nmcli connection delete localbr
+    # connect the libvirt interface/plug
+    sudo snap connect multipass:libvirt
+
+    # Make a bridge for this VM so that it can have a static IP - CAN'T... "--network" only works with LXD...
+    # https://multipass.run/docs/configure-static-ips
 
 
-    # Create KVM machines:
-    #   From CloudImages:
-    #     uvt:
-    #       https://ubuntu.com/server/docs/virtualization-uvt
-    #   From ISO:
-    #     virt-install:
-    #       https://ubuntu.com/server/docs/virtualization-virt-tools
-    #   Via GUI:
-    #     virt-manager:
-    #       https://ubuntu.com/server/docs/virtualization-virt-tools
-    #       https://ubuntu.com/server/docs/virtualization-libvirt
-    #   From existing machines
-    #     virt-clone:
-    #       https://ubuntu.com/server/docs/virtualization-virt-tools
+    sudo nmcli connection add type bridge con-name localbr ifname localbr ipv4.method manual ipv4.addresses 192.168.4.1/24
+    ip -c -br addr show dev localbr
 
-
-    # Also useful:
-    #   Viewer only
-    #     virt-viewer:
-    #       https://ubuntu.com/server/docs/virtualization-virt-tools
-    #   Optimizing libvirt machines
-    #      https://ubuntu.com/server/docs/virtualization-libvirt
-    #   Migrating VMs
-    #     https://ubuntu.com/server/docs/virtualization-libvirt
-
-    # GUI
-    #
+    # Launch with the instance
+    multipass launch --name test1 --network name=localbr,mode=manual,mac="99:00:00:00:00:01"
 
 
 
+    # Launch a basic instance
+    #   network
+    #     https://multipass.run/docs/create-an-instance#heading--create-an-instance-with-multiple-network-interfaces
+    #   static IPs
+    #     https://multipass.run/docs/configure-static-ips
+    multipass launch --name maas-server --cpus 4 --disk 100G --memory 8G --network en0 --network name=maasbridge0
 
-
-
-
-
+    # Test the multipass instance
+    # multipass list
+    # Name                    State             IPv4             Image
+    # reciprocal-bontebok     Running           192.168.122.38   Ubuntu 22.04 LTS
+    multipass info reciprocal-bontebok
 
     # Show that the instance is in libvirt
     virsh list
@@ -150,10 +101,8 @@ install-maas-via-kvm() {
     # 1    reciprocal-bontebok   running
 
 
-
-
-
-
+    multipass delete reciprocal-bontebok
+    # multipass purge # remove all deleted instances
 
 
     # https://releases.ubuntu.com/jammy/
@@ -276,6 +225,63 @@ test-dhcp() {
     show_msg "test-dhcp: done"
 }
 
+setup-lxd-servers() {
+    show_msg "setup-lxd-servers - NOT ON MAAS SERVER (IF IT WAS INSTALLED OUTSIDE LXD) - Directions only..."
+
+    cat <<EOF
+    Run this on each  machine providing the LXC virtualization service
+    https://maas.io/docs/how-to-set-up-lxd
+
+    # Install LXD from SNAP, not OS Packages
+    #
+    #sudo apt-get purge -y *lxd* *lxc*
+    #sudo apt-get autoremove -y
+    sudo snap install lxd
+    sudo snap refresh
+
+    # Initialize LXD
+    # https://maas.io/docs/how-to-set-up-lxd#heading--lxd-init
+    # Options for 'lxd init':
+    # - no clustering
+    # - create default storage pool of type 'dir'
+    # - NO, do not connect to Maas server now (we need to turn off DHCP etc first)
+    # - YES, make the lxc server available over the network
+    sudo lxd init
+
+    # Make sure LXD is not providing DHCP
+    #
+    lxc network set lxdbr0 dns.mode=none
+    lxc network set lxdbr0 ipv4.dhcp=false
+    lxc network set lxdbr0 ipv6.dhcp=false
+    lxc network show lxdbr0
+
+EOF
+
+    show_msg "setup-lxd-servers: done"
+}
+
+check-dhcp-and-dns-in-lxc-server() {
+    show_msg "Check that DHCP is off for the LXC server"
+
+    cat <<EOF
+    # Run these blocks in the LXC server
+
+    if lxc network show lxdbr0 | grep 'dhcp' | grep 'false' | wc -l | grep 2 >/dev/null; then
+	echo "DHCP is not running in LXC"
+    else
+	show_msg "ERROR: DHCP might be running in LXC"
+    fi
+
+    if lxc network show lxdbr0 | grep 'dns' | grep 'none' | wc -l | grep 1 >/dev/null; then
+	echo "DNS is not running in LXC"
+    else
+	show_msg "ERROR: DNS might be running in LXC"
+    fi
+EOF
+
+    show_msg "Check that DHCP is off for the LXC server: done"
+
+}
 
 provision-vms-in-maas() {
     show_msg "provision-vms-in-maas"
@@ -310,11 +316,55 @@ provision-vms-in-maas() {
     # The linux user name varies, depending on the OS/Image
     Log in via: ssh ubuntu@<IP=192.168.8.202>
 
+    # Read up on Maas projects
+    # https://maas.io/docs/how-to-set-up-lxd#heading--projects-tutorial
 EOF
 
     show_msg "provision-vms-in-maas: done"
 }
 
+purge_lxd_snap() {
+    echo "Remove VMs"
+    V=$(lxc list | grep 'VIRTUAL' | cut -d' ' -f 2 | tr '\n' ' ')
+    echo "VMs: ${V}"
+    for i in $V; do
+        lxc delete $i --force
+    done
+    lxc list
+    show_msg "VMs should be gone now"
+
+    echo "Remove images"
+    # TODO
+    lxc image list
+    show_msg "Images should be gone now"
+
+    echo "Remove networks"
+    if lxc network list | egrep 'YES' | wc -l | grep 0; then
+	echo "no networks"
+    else
+	lxc network detach-profile lxdbr0 default
+	lxc network delete lxdbr0
+    fi
+    #N=$(lxc network list | egrep 'YES' | cut -d' ' -f 2 | tr '\n' ' ')
+    #for i in $V; do
+    #    lxc network delete $i --force-local
+    #done
+    lxc network list
+    show_msg "MANAGED networks should be gone now"
+
+    echo "Remove volumes"
+    V=$(lxc storage volume list default | egrep 'maas' | cut -d' ' -f 4 | tr '\n' ' ')
+    for i in $V; do
+        lxc storage volume delete default $i #--force-local
+    done
+    # lxc storage delete default # Fails, lying that this is in use
+    # lxd sql global "SELECT * FROM storage_volumes;"
+    show_msg "Volumes should be gone"
+
+    echo "Remove lxd snap"
+    #sudo snap remove lxd
+    sudo snap remove --purge lxd # Needed for one box... Maybe this is all that is needed?
+}
 
 ################################################################################
 # Call this to set up MaaS Server
@@ -332,6 +382,15 @@ setup_maas_server() {
     setup-dhcp
 
     test-dhcp
+}
+
+################################################################################
+# Steps to set up an LXD host to provide VMs for use by Maas
+################################################################################
+setup_maas_lxd_hosts() {
+    setup-lxd-servers
+    check-dhcp-and-dns-in-lxc-server
+    provision-vms-in-maas
 }
 
 
