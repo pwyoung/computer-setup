@@ -35,7 +35,8 @@ Router to Internet:
         - Desktop
           - Name: gallifrey
           - LAN:
-            - IP: 192.168.3.?
+            - IP: 192.168.3.7 # windows
+            - IP: 192.168.3.9 # linux, I think, TODO: check
           - CPU: 20
           - RAM: 32 GB
         - Switch
