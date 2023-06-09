@@ -1,14 +1,20 @@
 #!/usr/bin/bash
 
 # Goal:
-#   Setup Maas, using KVM
+#   Setup Maas server and manage both bare-metal and virtual machines.
 #
 # Background
-#   Prefer KVM since it supports GUIs (see: virt-manager, virt-viewer, gnome-boxes, etc)
+#   Prefer KVM over LXD since:
+#     - KVM supports GUIs (see: virt-manager, virt-viewer, gnome-boxes, etc)
+#     - Maas will configure a machine from PXE-boot into a working, connected KVM server.
+#     - KVM is popular among RedHat and other distros
 #   KVM is not fully supported with multipass.
 #      Specifically, multipass only supports the '--network' command on LXD
 #      The '--network' command is needed to connect to a bridge in order to provide a static IP
 #      The static IP of the brige needs to be given to the Maas server to let maas provision VMs.
+#   Maas is popular among Banks and Telcos and other folks running private clouds.
+#   Maas can be set up using Docker, and even run on K8S (via a bridge),
+#     e.g. via https://github.com/att-comdev/dockerfiles/blob/master/maas/docker-compose.yml
 
 show_msg() {
     MSG="$1"
@@ -24,153 +30,8 @@ show_msg() {
 }
 
 
-
-# Install KVM
-#
-install-maas-via-kvm() {
-    show_msg "install-maas-via-kvm"
-
-    # Make sure this host supports virtualization
-    if ! which kvm-ok; then
-        sudo apt install -y cpu-checker
-        if ! sudo kvm-ok; then
-            echo "This host does not support virtualization, check BIOS settings and CPU features"
-            exit 1
-        fi
-    fi
-
-    # Install KVM
-    #   https://help.ubuntu.com/community/KVM/Installation
-    if ! kvm --version && libvirtd --version; then
-        sudo apt update -y
-        sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
-    fi
-
-    # Check ownership of important files
-    #
-    # sudo ls -la /var/run/libvirt/libvirt-sock
-    # srw-rw---- 1 root libvirt 0 Jun  7 17:10 /var/run/libvirt/libvirt-sock
-    G=$(stat -c '%G' /var/run/libvirt/libvirt-sock)
-    GE="libvirt"
-    if [ !  "$G" == "$GE" ]; then
-        show_msg "Check ownership of /var/run/libvirt/libvirt-sock, group is $G, expected $GE"
-        exit 1
-    fi
-    #
-    # Docs say to match the owner
-    # sudo chown root:libvirtd /dev/kvm
-    #
-    # But the detault looks ok, maybe add the user to the kvm group too
-    # ls -l /dev/kvm
-    # crw-rw----+ 1 root kvm 10, 232 Jun  8 01:20 /dev/kvm
-    G=$(stat -c '%G' /dev/kvm)
-    GE="kvm"
-    if [ !  "$G" == "$GE" ]; then
-        show_msg "Check ownership of /var/run/libvirt/libvirt-sock, group is $G, expected $GE"
-        exit 1
-    fi
-
-    # Check user's group(s)
-    if groups | grep libvirt; then
-        echo "User has group: libvirt"
-    else
-        sudo adduser $USER libvirt
-        #sudo adduser $USER kvm
-        show_msg "Log out and back in again"
-        exit 1
-    fi
-
-    # KVM Networking - ASSUMES WE ARE USING NETWORK MANAGER
-    #   https://help.ubuntu.com/community/KVM/Networking
-    #
-    # Show that 'nmcli' is installed, and is part of the network-manager tool
-    # If it is not installed, don't install it, something else must be managing the network.
-    if ! sudo dpkg -S `which nmcli`; then
-        sudo apt list --installed | grep 'network-manager'
-        show_msg "This assumes we are using network manager."
-        exit 1
-    fi
-    # Make a bridge 'localbr' using the network manager toolset
-    if ! ip -c -br addr show dev localbr; then
-        sudo nmcli connection add type bridge con-name localbr ifname localbr ipv4.method manual ipv4.addresses 192.168.3.10/24
-        # Show the bridge exists (but is down)
-        ip -c -br addr show dev localbr
-        # Bring up the bridge
-        sudo nmcli connection up localbr
-        # Show the bridge is up
-        ip -c -br addr show dev localbr
-        ping -c 1 192.168.3.10
-        show_msg "make sure you can ping that from another host too"
-    fi
-    # To Delete the bridge
-    # sudo nmcli connection down localbr
-    # sudo nmcli connection delete localbr
-
-
-    # Create KVM machines:
-    #   From CloudImages:
-    #     uvt:
-    #       https://ubuntu.com/server/docs/virtualization-uvt
-    #   From ISO:
-    #     virt-install:
-    #       https://ubuntu.com/server/docs/virtualization-virt-tools
-    #   Via GUI:
-    #     virt-manager:
-    #       https://ubuntu.com/server/docs/virtualization-virt-tools
-    #       https://ubuntu.com/server/docs/virtualization-libvirt
-    #   From existing machines
-    #     virt-clone:
-    #       https://ubuntu.com/server/docs/virtualization-virt-tools
-
-
-    # Also useful:
-    #   Viewer only
-    #     virt-viewer:
-    #       https://ubuntu.com/server/docs/virtualization-virt-tools
-    #   Optimizing libvirt machines
-    #      https://ubuntu.com/server/docs/virtualization-libvirt
-    #   Migrating VMs
-    #     https://ubuntu.com/server/docs/virtualization-libvirt
-
-    # GUI
-    #
-
-
-
-
-
-
-
-
-
-    # Show that the instance is in libvirt
-    virsh list
-    #  Id   Name                  State
-    # -------------------------------------
-    # 1    reciprocal-bontebok   running
-
-
-
-
-
-
-
-
-    # https://releases.ubuntu.com/jammy/
-    # Supports PXE and all other modes of installation, per
-    #   http://archive.ubuntu.com/ubuntu/dists/jammy/main/installer-amd64/20101020ubuntu629/legacy-images/
-    wget https://releases.ubuntu.com/jammy/ubuntu-22.04.2-live-server-amd64.iso
-
-    # Start a KVM instance via virsh (libvirt native)
-    # virsh start maas-server
-    #
-    # Use maas to create an instant
-
-
-    # A Gui for libvirt
-    # sudo apt install virt-manager
-
-
+# Ideall, install on a bare metal server
+install-maas-server() {
     if which maas >/dev/null; then
 	echo "Command 'maas' is in PATH. Assuming it is installed properly."
     else
@@ -201,21 +62,23 @@ setup-admin() {
     if sudo maas apikey --username maasadmin >/dev/null; then
 	echo "Maas admin user exists"
     else
-	cat <<EOF
-	 Params I use for maas admin user:
-	 - name: maasadmin
-	 - pw: password (for testing)
-	 - email: unused@email.com (since it is not used)
-	 - gh:<github user> (since that is my github user and the local SSH key gives access to it)
-EOF
+        echo "Maas admin user does not exist"
 
-	echo "Testing your SSH credentials to Github..."
+	echo "First, testing your SSH credentials to Github..."
 	if ssh -T git@github.com 2>&1  | grep 'success'; then
 	    echo "The user shown above has access to github, you can use 'gh:<github user>' in Maas"
 	else
 	    echo "Warning, this OS account is not set up to acccess github via SSH"
 	fi
 
+        cat <<EOF
+	 Params I use for maas admin user:
+	 - name: 'maasadmin'
+	 - pw: 'password' (for testing)
+	 - email: no@email.com (since it is not used)
+	 - gh:<github user from above> (since that is my github user and the local SSH key gives access to it)
+EOF
+        show_msg "create maas admin user next"
 	sudo maas createadmin
     fi
 
@@ -227,27 +90,27 @@ setup-networks() {
     show_msg "setup-networks"
 
     cat <<EOF
-    # https://maas.io/docs/how-to-connect-maas-networks
-    The default network, 'fabric0' should be created from the local subnet
+    If you are using a VLAN, it should be detected by Maas, but confirm that in Maas -> Subnets.
 EOF
 
     show_msg "setup-networks: done"
 
 }
 
-setup-dhcp() {
+setup-default-network-with-dhcp() {
     show_msg "setup-dhcp"
 
     # https://maas.io/docs/how-to-enable-dhcp
     cat <<EOF
-    Choose the default VLAN. Click on Maas -> subnets -> untagged
+    # https://maas.io/docs/how-to-connect-maas-networks
+    The default network, 'fabric0' will be created from the local subnet
+    At home, this has no VLAN, so it is "untagged", with VLAN ID=0
+
+    Choose the default VLAN. Click on Maas -> subnets -> "untagged"
     My setup:
-    Subnet: 192.168.8.0/24
-    Mangement:
-      - by default, the subnet is managed (i.e. Maas will provide DHCP)
-      - To change the management of a subnet, see:
-        - https://discourse.maas.io/t/subnet-management-deb-3-0-cli-test/4716#heading--controlling-subnet-management
-    IP Range: 192.168.8.191 - 192.168.8.254 (using static IPs in low range, for the Maas server itself)
+      Subnet: 192.168.3.0/24
+      Reserved Range: Type=Reserved (not dynamic), 192.168.3.2 - 192.168.3.20, "For Static IPs"
+      Reserved Range: Type=Dynamic, 192.168.3.100 - 192.168.3.200, "For enlisting, commisioning, and Maas-Managed DHCP"
 
     Review:
       - https://discourse.maas.io/t/how-to-manage-ip-ranges/5136
@@ -266,62 +129,28 @@ test-dhcp() {
         sudo apt install dhcpcd5
     fi
     F=/tmp/dhcpcd.out
-    sudo dhcpcd -T enp8s0 -t 2 &> $F # Specify expected NIC name
+    echo "" > $F
+    #
+    NIC='enp86s0'
+    #NIC='enp8s0'
+    sudo dhcpcd -T $NIC -t 2 &> $F
+    #
     echo "Scanning results of DHCP test at $F"
     echo "Look at the file via: cat $F"
     if cat $F | grep 'new_filename' | grep 'lpxelinux.0' >/dev/null; then
 	echo "Looks good"
+    else
+        show_msg "Error, we didn't find a DHCP server. Is it running? Is the NIC ( $NIC ) correct?"
+        exit 1
     fi
 
     show_msg "test-dhcp: done"
 }
 
 
-provision-vms-in-maas() {
-    show_msg "provision-vms-in-maas"
+setup-maas-server() {
 
-    cat <<EOF
-    # Add LXC "hosts/servers"
-    # READ THIS
-    #   https://maas.io/docs/how-to-manage-vm-hosts#heading--adding-a-vm-host
-    # KEY POINT
-    #   Add the LXD bridge gateway address
-    #  "Enter the LXD address as the gateway address of the bridge for that LXD instance. For example, if lxdbr0 has address 10.4.241.0, the default gateway address is 10.4.241.1."
-    # See:
-    #   - lxc network show lxdbr0
-    #   - ip a s dev lxdbr0 | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1
-
-
-    ################################################################################
-    # After the Machine/VM is created/compposed it will go to "Commissioning" state
-    # In a minute or wo, it will turn off and go to the "Ready" state
-    # At this point, the machine can be "Deployed"
-    ################################################################################
-
-    # To Deploy a machine
-    # Maas -> Machines -> Select VM(s) -> Take Action -> Deploy
-
-    # The LXC Servers/Hosts will appear as Machines, with a power state of "unknown"
-    # These should not be provisioned, so make a pool for them
-    # Put the LXC hosts in the other pool
-    # Maas -> Machines -> <LXC host> -> Configuration -> Machine/Edit
-
-
-    # The linux user name varies, depending on the OS/Image
-    Log in via: ssh ubuntu@<IP=192.168.8.202>
-
-EOF
-
-    show_msg "provision-vms-in-maas: done"
-}
-
-
-################################################################################
-# Call this to set up MaaS Server
-################################################################################
-setup_maas_server() {
-
-    install-maas-via-kvm
+    install-maas-server
 
     check-status
 
@@ -334,5 +163,76 @@ setup_maas_server() {
     test-dhcp
 }
 
+add-machines-to-maas() {
+    show_msg "add-machines-to-maas"
 
-setup_maas_server
+    cat <<EOF
+    # GOALS
+    #   Add physical machines to Maas (which happen to have no BMC/OOB power-management)
+    #   For some of these machines, let Maas configure them as KVM servers, connected to Maas, so that we can create VMs in them.
+    #
+    # REVIEW the "Maas Machine lifecycle"
+    # - https://maas.io/docs/about-machines#heading--Introduction-to-the-machine-life-cycle
+    # - https://discourse.maas.io/t/the-machine-lifecycle/6696
+    #
+    # Naming Conventions
+    # - Before Deploying a machine, you can rename it in Maas
+    # - I use a basic name for the physical host (e.g. 'dell' or 'mele' or '<some-hyphenated-IP-a-b-c-d>) and
+    # - if the host is a Virsh server, I name the Virsh VMs '<virsh-host>-<vm-name>' to make it easy to see the relationship in Maas
+    #
+    # Steps:
+      - Prepare DHCP:
+      -   Make sure a Dynamic IP range is configured for the DHCP on the Subnet/VLAN with the machine.
+      -   Manually add the machine, giving the power type "manual" and specifying the MAC address (and optionally, the name)
+      -
+      - Enlist a "New" machine (manually or via auto-discovery):
+      -   Automatic Enlistment:
+      -     Make sure the machine is not already in Maas. Delete it if it is.
+      -     PXE-boot the machine.
+      -     Watch the machine show up in Maas -> Machines -> Add Hardware -> Machine with a state of "New"
+      -     Edit the Machine's config via Maas -> Machines -> <machine name> -> Configuration
+      -     Set the power type (e.g. "manual" for no BMC, or AMT, etc)
+      -     It is NOT strictly necessary to set a minimum kernel. Skip that and let the user specify it on deployment.
+      -   Manual Enlistment:
+      -     Maas -> Machines -> Add Hardware -> Machine
+      -     Enter MAC, power-type ("manual" if there is no BMC), and optionally the name.
+      -     The machine will show up with state "Commissioning"
+      -     Flip on the power. Eventually it will show up as state "New"
+      -
+      - Commision the "New" machine to make it "Ready":
+      -   Click on Maas -> Machines -> <machine name> -> Take Action
+      -   You'll see, since there is only one machine selected, the GUI enforces that the only valid next state is "Commission", click that.
+      -   The machine has a state of "Commissioning", but if this is a manually powered machine, you probably need to turn it on.
+      -   The machine will PXE-boot until it says "Reached cloud-init target"
+      -   In Maas, the machine's details will show green-checks for "Commissioning" and "Tests" and have a state "Ready"
+      -
+      - Allocate the "Ready" machine to yourself:
+      -    Machines that are "Ready" are available for anyone to "Allocate" them to themselves.
+      -    By logging in as a particular Maas (admin) user, and clicking "Allocate", that user becomes the owner of the machine.
+      -    It's good Allocate the machine even if you already own it just to keep ownership in mind.
+      -
+      - You can "Deploy", or "Release" (un-allocate) a machine that is "Allocated" to you
+      -
+      - Deploy the "Allocated" machine
+      -    Click Machines -> Filters -> Owners -> <your maas admin name>
+      -    See your machine in the "Allocated" section
+      -    Click the machine -> Take Action -> "Deploy"
+      -    Choose options: OS, Release, cloud-init script, whether to configure as a KVM server, and so on.
+      -    Click Start Deployment. The machine state will be "Deploying"
+      -    Click on Logs -> Installation output.
+      -      - The logs don't show anything at first. System is booting...
+      -    Click on the general Maas -> Machines list and and optionally Filters -> Status -> Deploying to see the status with a spinner
+      -
+      - If the Machine is a KVM Host (used to create VM Machines)
+      -   Go to Maas -> KVM -> Virsh to see the KVM host. The connection string should be like: "qemu+ssh://virsh@<ip-of-kvm-host>/system"
+      -   Choose Take Action -> Compose VM
+      -   The machine state will be "Deployed"
+      -
+      - Test a Machine (physical or virtual) that is running Ubuntu with something like: "ssh ubuntu@<machine-ip> hostname"
+EOF
+
+}
+
+#test-dhcp
+setup-maas-server
+add-machines-to-maas
