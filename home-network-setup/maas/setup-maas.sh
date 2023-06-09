@@ -229,6 +229,7 @@ add-machines-to-maas() {
       -   The machine state will be "Deployed"
       -
       - Test a Machine (physical or virtual) that is running Ubuntu with something like: "ssh ubuntu@<machine-ip> hostname"
+      - Other OSes use a different default user name than 'ubuntu'
 EOF
 
 }
