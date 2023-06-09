@@ -130,9 +130,8 @@ test-dhcp() {
     fi
     F=/tmp/dhcpcd.out
     echo "" > $F
-    #
-    NIC='enp86s0'
-    #NIC='enp8s0'
+    NIC=$(ip a s | grep 'enp' | awk '{print $2}' | tr -d ':')
+    show_msg "Testing DHCP client on NIC=$NIC"
     sudo dhcpcd -T $NIC -t 2 &> $F
     #
     echo "Scanning results of DHCP test at $F"
