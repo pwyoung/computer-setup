@@ -39,7 +39,7 @@ prepare-maas-server-networking() {
     - For simplicity, Maas will be the DHCP server (although apparently other configs are possible) so...
       - Turn off any DHCP servers on the subnet that Maas will control
       - Set up static networking for the Maas Server on the interface/subnet that Maas will control
-        - Example: 
+        - Example:
           - Ubuntu -> Activities -> Settnigs -> Network
             - Address/IP=192.168.3.6
             - Netmask=255.255.255.0
@@ -59,7 +59,7 @@ install-maas-server() {
     if which maas >/dev/null; then
 	echo "Command 'maas' is in PATH. Assuming it is installed properly."
     else
-	cat <<EOF 
+	cat <<EOF
 	Installing Maas per https://maas.io/docs/how-to-do-a-fresh-install-of-maas
 	Using package repository as opposed to snap
 EOF
@@ -112,7 +112,7 @@ EOF
 	sudo maas createadmin
     fi
 
-    IP=$(hostname -i)    
+    IP=$(hostname -i)
     echo "Opening Maas UI in browser at: http://${IP}:5240/MAAS"
     xdg-open http://${IP}:5240/MAAS &>/dev/null
 }
@@ -176,10 +176,20 @@ test-dhcp() {
     show_msg "test-dhcp: done"
 }
 
+important-configuration() {
+    cat <<EOF
+    Maas failed to utilize (pxe-boot -> enlist/commision) a newer piece of hardware until I
+      updated the OS/Kernel used for Commissioning in:
+      Maas -> Settings -> Commissioning -> Default Ubuntu release used for commissioning
+
+    TODO: bootstrap from Ansible by adding a new commissioning script.
+EOF
+
+}
 
 setup-maas-server() {
     prepare-maas-server-networking
-    
+
     install-maas-server
 
     check-status
@@ -191,8 +201,9 @@ setup-maas-server() {
     setup-dhcp
 
     test-dhcp
+
+    important-configuration
 }
 
 #test-dhcp
 setup-maas-server
-
