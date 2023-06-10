@@ -37,7 +37,6 @@ add-machines-to-maas() {
     # Steps:
       - Prepare DHCP:
       -   Make sure a Dynamic IP range is configured for the DHCP on the Subnet/VLAN with the machine.
-      -   Manually add the machine, giving the power type "manual" and specifying the MAC address (and optionally, the name)
       -
       - Enlist a "New" machine (manually or via auto-discovery):
       -   Automatic Enlistment:
