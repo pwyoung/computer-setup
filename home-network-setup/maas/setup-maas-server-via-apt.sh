@@ -1,9 +1,10 @@
 #!/usr/bin/bash
 
 # Goal:
-#   Setup Maas server via Ubuntu OS (APT) packages
+#   Idempotent script that will set up a Maas server
 #
 # Background
+#   This uses Ubuntu OS (APT) packages and is tested on bare-metal
 #   Prefer KVM over LXD since:
 #     - KVM supports GUIs (see: virt-manager, virt-viewer, gnome-boxes, etc)
 #     - Maas will configure a machine from PXE-boot into a working, connected KVM server.
@@ -30,17 +31,43 @@ show_msg() {
 }
 
 
-# Ideall, install on a bare metal server
+prepare-maas-server-networking() {
+    cat <<EOF
+    Configure Maas Networking
+    Steps:
+    - Install the latest stable (Ubuntu) OS
+    - For simplicity, Maas will be the DHCP server (although apparently other configs are possible) so...
+      - Turn off any DHCP servers on the subnet that Maas will control
+      - Set up static networking for the Maas Server on the interface/subnet that Maas will control
+        - Example: 
+          - Ubuntu -> Activities -> Settnigs -> Network
+            - Address/IP=192.168.3.6
+            - Netmask=255.255.255.0
+            - Gateway=192.168.3.1
+      	    - DNS=8.8.8.8,1.1.1.1,9.9.9.9  # Turn automatic off
+            - Routes: <none set> # Turn automatic off
+
+    NOTES
+    - If the Maas server also has additional interfaces, e.g. WIFI, that's ok, Maas will not automatically
+      run DHCP on any subnet/VLAN. DHCP activation is subnet specific and set up by you in the UI.
+EOF
+    show_message "Make sure networking is set up per something like above"
+}
+
+# Ideally, install on a bare metal server
 install-maas-server() {
     if which maas >/dev/null; then
 	echo "Command 'maas' is in PATH. Assuming it is installed properly."
     else
-	#Installing Maas per https://maas.io/docs/how-to-do-a-fresh-install-of-maas
-	#via <3.3 packages> (as opposed to snap)
+	cat <<EOF 
+	Installing Maas per https://maas.io/docs/how-to-do-a-fresh-install-of-maas
+	Using package repository as opposed to snap
+EOF
 	sudo apt-add-repository ppa:maas/3.3-next
 	sudo apt update -y
 	sudo apt-get -y install maas -y
     fi
+    sudo apt list --installed 2>&1 | egrep '^maas/'
 }
 
 
@@ -60,15 +87,15 @@ setup-admin() {
     show_msg "setup-admin"
 
     if sudo maas apikey --username maasadmin >/dev/null; then
-	echo "Maas admin user exists"
+	echo "Maas user 'maasadmin' exists"
     else
-        echo "Maas admin user does not exist"
+        echo "Maas user 'maasadmin' does not exist"
 
 	echo "First, testing your SSH credentials to Github..."
 	if ssh -T git@github.com 2>&1  | grep 'success'; then
-	    echo "The user shown above has access to github, you can use 'gh:<github user>' in Maas"
+	    show_msg "The user shown above has access to github, you can use 'gh:<github user>' in Maas"
 	else
-	    echo "Warning, this OS account is not set up to acccess github via SSH"
+	    show_msg "Warning, this OS account is not set up to acccess github via SSH. You can use "
 	fi
 
         cat <<EOF
@@ -77,12 +104,16 @@ setup-admin() {
 	 - pw: 'password' (for testing)
 	 - email: no@email.com (since it is not used)
 	 - gh:<github user from above> (since that is my github user and the local SSH key gives access to it)
+
+	General maas user setup is descibed here: https://maas.io/docs/how-to-manage-user-accounts
+	Calling 'sudo maas createadmin' now
 EOF
         show_msg "create maas admin user next"
 	sudo maas createadmin
     fi
 
-    IP=$(hostname -i)
+    IP=$(hostname -i)    
+    echo "Opening Maas UI in browser at: http://${IP}:5240/MAAS"
     xdg-open http://${IP}:5240/MAAS &>/dev/null
 }
 
@@ -109,8 +140,7 @@ setup-default-network-with-dhcp() {
     Choose the default VLAN. Click on Maas -> subnets -> "untagged"
     My setup:
       Subnet: 192.168.3.0/24
-      Reserved Range: Type=Reserved (not dynamic), 192.168.3.2 - 192.168.3.20, "For Static IPs"
-      Reserved Range: Type=Dynamic, 192.168.3.100 - 192.168.3.200, "For enlisting, commisioning, and Maas-Managed DHCP"
+      Reserved Range: Type=Dynamic, 192.168.3.191 - 192.168.3.254  NOTE/Purpose:"For enlisting, commisioning, and Maas-Managed DHCP"
 
     Review:
       - https://discourse.maas.io/t/how-to-manage-ip-ranges/5136
@@ -137,7 +167,7 @@ test-dhcp() {
     echo "Scanning results of DHCP test at $F"
     echo "Look at the file via: cat $F"
     if cat $F | grep 'new_filename' | grep 'lpxelinux.0' >/dev/null; then
-	echo "Looks good"
+	echo "Looks good."
     else
         show_msg "Error, we didn't find a DHCP server. Is it running? Is the NIC ( $NIC ) correct?"
         exit 1
@@ -148,7 +178,8 @@ test-dhcp() {
 
 
 setup-maas-server() {
-
+    prepare-maas-server-networking
+    
     install-maas-server
 
     check-status
