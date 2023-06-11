@@ -91,21 +91,19 @@ setup-admin() {
     else
         echo "Maas user 'maasadmin' does not exist"
 
-	echo "First, testing your SSH credentials to Github..."
-	if ssh -T git@github.com 2>&1  | grep 'success'; then
-	    show_msg "The user shown above has access to github, you can use 'gh:<github user>' in Maas"
-	else
-	    show_msg "Warning, this OS account is not set up to acccess github via SSH. You can use "
-	fi
-
         cat <<EOF
 	 Params I use for maas admin user:
 	 - name: 'maasadmin'
 	 - pw: 'password' (for testing)
 	 - email: no@email.com (since it is not used)
-	 - gh:<github user from above> (since that is my github user and the local SSH key gives access to it)
+	 - gh:<github-user> 
+
+	Note: 
+          Above, the 'gh:<github-user>' is used by maas to fetch a public SSH key (using 'ssh-import-id')
+	  You can manually add SSH keys to a Maas user in the Maas web-ui.
 
 	General maas user setup is descibed here: https://maas.io/docs/how-to-manage-user-accounts
+
 	Calling 'sudo maas createadmin' now
 EOF
         show_msg "create maas admin user next"
@@ -178,11 +176,15 @@ test-dhcp() {
 
 important-configuration() {
     cat <<EOF
-    Maas failed to utilize (pxe-boot -> enlist/commision) a newer piece of hardware until I
+    AFTER INITIAL MAAS SETUP:
+    - Update the Commissioning OS to the latest Ubuntu OS Version
+      Maas failed to utilize (pxe-boot -> enlist/commision) a newer piece of hardware until I
       updated the OS/Kernel used for Commissioning in:
       Maas -> Settings -> Commissioning -> Default Ubuntu release used for commissioning
-
-    TODO: bootstrap from Ansible by adding a new commissioning script.
+    - Add Maas Users
+      They will be admins, but when they log in with their own username/password two things happen:
+      - Machines they Allocate will be Owned by them. This is important for tracking.
+      - Machines they Deploy will get their SSH keys installed.
 EOF
 
 }
