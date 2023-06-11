@@ -44,8 +44,8 @@ prepare-maas-server-networking() {
             - Address/IP=192.168.3.6
             - Netmask=255.255.255.0
             - Gateway=192.168.3.1
-      	    - DNS=8.8.8.8,1.1.1.1,9.9.9.9  # Turn automatic DNS off
-            - Routes: <none set> # Turn automatic Routes off
+      	    - DNS=8.8.8.8,1.1.1.1,9.9.9.9,192.168.3.6  # Tell this host to also use itself for DNS   # Turn automatic DNS off
+            - Routes: <none set>    # Turn automatic Routes off
 
     NOTES
     - If the Maas server also has additional interfaces, e.g. WIFI, that's ok, Maas will not automatically
@@ -185,6 +185,7 @@ important-configuration() {
       They will be admins, but when they log in with their own username/password two things happen:
       - Machines they Allocate will be Owned by them. This is important for tracking.
       - Machines they Deploy will get their SSH keys installed.
+    - Add Maas machines. See the other doc (add-maas-baremetal-and-virtual-machines.sh) for that
 EOF
 
 }

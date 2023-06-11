@@ -44,8 +44,10 @@ add-machines-to-maas() {
       -     PXE-boot the machine.
       -     Watch the machine show up in Maas -> Machines -> Add Hardware -> Machine with a state of "New"
       -     Edit the Machine's config via Maas -> Machines -> <machine name> -> Configuration
-      -     Set the power type (e.g. "manual" for no BMC, or AMT, etc)
-      -     It is NOT strictly necessary to set a minimum kernel. Skip that and let the user specify it on deployment.
+      -       Set the power type (e.g. "manual" for no BMC, or AMT, etc)
+      -       You can also set the machine's name, or put it in a resource pool, etc.
+      -     It is NOT strictly necessary to set a minimum kernel. But, you should have updated the general config
+      -     so that the OS used for Commissioning the machine is the latest stable OS available.
       -   Manual Enlistment:
       -     Maas -> Machines -> Add Hardware -> Machine
       -     Enter MAC, power-type ("manual" if there is no BMC), and optionally the name.
@@ -61,10 +63,11 @@ add-machines-to-maas() {
       -
       - Allocate the "Ready" machine to yourself:
       -    Machines that are "Ready" are available for anyone to "Allocate" them to themselves.
-      -    By logging in as a particular Maas (admin) user, and clicking "Allocate", that user becomes the owner of the machine.
-      -    It's good Allocate the machine even if you already own it just to keep ownership in mind.
+      -    By logging in as a particular Maas (admin) user, and clicking "Allocate", that user will:
+      -      #1: become the owner of the machine
+      -      #2: have the SSH keys for the given user added to the machine when it is deployed
       -
-      - You can "Deploy", or "Release" (un-allocate) a machine that is "Allocated" to you
+      - Note: You can "Deploy", or "Release" (un-allocate) a machine that is "Allocated" to you
       -
       - Deploy the "Allocated" machine
       -    Click Machines -> Filters -> Owners -> <your maas admin name>
