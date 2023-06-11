@@ -37,15 +37,15 @@ prepare-maas-server-networking() {
     Steps:
     - Install the latest stable (Ubuntu) OS
     - For simplicity, Maas will be the DHCP server (although apparently other configs are possible) so...
-      - Turn off any DHCP servers on the subnet that Maas will control
+      - Turn off any DHCP servers on the subnet-VLAN that Maas will control
       - Set up static networking for the Maas Server on the interface/subnet that Maas will control
         - Example:
           - Ubuntu -> Activities -> Settnigs -> Network
             - Address/IP=192.168.3.6
             - Netmask=255.255.255.0
             - Gateway=192.168.3.1
-      	    - DNS=8.8.8.8,1.1.1.1,9.9.9.9  # Turn automatic off
-            - Routes: <none set> # Turn automatic off
+      	    - DNS=8.8.8.8,1.1.1.1,9.9.9.9  # Turn automatic DNS off
+            - Routes: <none set> # Turn automatic Routes off
 
     NOTES
     - If the Maas server also has additional interfaces, e.g. WIFI, that's ok, Maas will not automatically
@@ -93,12 +93,12 @@ setup-admin() {
 
         cat <<EOF
 	 Params I use for maas admin user:
-	 - name: 'maasadmin'
-	 - pw: 'password' (for testing)
-	 - email: no@email.com (since it is not used)
-	 - gh:<github-user> 
+	 - maas-user-name: "maasadmin"
+	 - maas-user-pw: "<maas-user-name>"   (for testing)
+	 - maas-user-email: "<maas-user-name>email.com"   (since it is not used, but must be unique)
+	 - maas-user-ssh-key-name: "gh:<github-user>"   (since I prefer to use Github users to Launchpad)
 
-	Note: 
+	Note:
           Above, the 'gh:<github-user>' is used by maas to fetch a public SSH key (using 'ssh-import-id')
 	  You can manually add SSH keys to a Maas user in the Maas web-ui.
 
@@ -106,7 +106,7 @@ setup-admin() {
 
 	Calling 'sudo maas createadmin' now
 EOF
-        show_msg "create maas admin user next"
+        show_msg "Create maas admin user next."
 	sudo maas createadmin
     fi
 
