@@ -6,3 +6,9 @@ Video showing how to set up MaaS:
   - This discusses using a separate/dedicated Postgresql DB
   - This shows how to leverage an existing DHCP server to "chain-boot" to MaaS for provisioning (Enlistment).
     Example shows Ubiquity/Unifi to set DHCP options
+  - This shows how to create custom Maas-Compatible ISOs using Packer
+
+TODO:
+  - Create a Makefile and run script to build a custom ISO with a single-command
+    Put it in a separate repo.
+
