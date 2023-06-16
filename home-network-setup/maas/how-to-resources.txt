@@ -1,0 +1,8 @@
+
+Video showing how to set up MaaS:
+- URL: https://www.youtube.com/watch?v=lEqD3mRcqSo
+- Notes:
+  - This uses snap (not APT).
+  - This discusses using a separate/dedicated Postgresql DB
+  - This shows how to leverage an existing DHCP server to "chain-boot" to MaaS for provisioning (Enlistment).
+    Example shows Ubiquity/Unifi to set DHCP options
