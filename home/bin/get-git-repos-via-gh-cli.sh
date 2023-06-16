@@ -60,5 +60,12 @@ fetch_repos() {
     done
 }
 
+scan_for_openai() {
+    F=~/egrep.chatgpt.openai.out
+    egrep -ir 'chatgpt|openai' > $F
+}
+
 fetch_repo_list
 fetch_repos
+scan_for_openai
+
