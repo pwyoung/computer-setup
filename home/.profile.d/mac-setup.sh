@@ -1,8 +1,7 @@
 #!/bin/bash
 
-L=~/mac-setup.log
-
-echo "Running $0" | tee $L
+#L=~/mac-setup.log
+#echo "Running $0" | tee $L
 
 F=~/.custom-mouse-scaling.txt
 
