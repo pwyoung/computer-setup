@@ -1,0 +1,15 @@
+#!/bin/bash
+
+
+    cat <<EOF
+# Useful commands to know:
+#
+# docker system prune
+#
+# docker ps -a
+# docker images -a
+#
+# systemctl status docker
+# sudo systemctl restart docker
+EOF
+

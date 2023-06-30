@@ -5,6 +5,12 @@ IMAGE="dev-tools:latest"
 # Docker run args
 DARGS=""
 
+# Map the SSH server port
+#DARGS+=" -p 127.0.0.1:2222:22/tcp"
+DARGS+=" -p 2222:22"
+# Since we can only run one of these, might as well name it
+DARGS+=" --name dev-sshd"
+
 # Run with an interactive terminal
 DARGS+=" -t -i"
 
@@ -24,7 +30,7 @@ else
     CMD="$@"
 fi
 
-docker run $DARGS $IMAGE $CMD
-
+#docker run $DARGS $IMAGE $CMD
+docker run $DARGS $IMAGE sudo service ssh start && sleep infinity
 
 

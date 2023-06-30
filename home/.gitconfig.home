@@ -1,0 +1,48 @@
+
+# Docs to setup credential manager ON LINUX:
+#   https://github.com/GitCredentialManager/git-credential-manager#linux
+# Find the latest compatible package:
+#   https://github.com/GitCredentialManager/git-credential-manager/releases/latest -O gcmcore.deb
+#   D='https://github.com/GitCredentialManager/git-credential-manager/releases/download/v2.0.785/gcm-linux_amd64.2.0.785.deb'
+# Install Package
+#   wget $D -O ./gcmcore.deb
+#   sudo dpkg -i ./gcmcore.deb
+# Add helper to gitconfig
+#   git-credential-manager-core configure
+# Login
+#   Use 'git clone <some HTTPS URL> and enter in browser: "phil.young@insight.com"
+#   Make sure this matches the email in the user section
+[credential]
+	# PWY: Created by 'git-credential-manager-core configure'
+	helper = /usr/local/share/gcm-core/git-credential-manager-core
+        #
+        # PWY: Added manually
+        credentialStore = cache
+        #
+        #
+	# OSX
+	#helper = osxkeychain
+	#
+	# File
+        #helper = cache --timeout=220752000
+        # FILE (~/.git-credentials) CLEARTEXT no timeout
+	#helper = cache --timeout=3600000
+
+[user]
+	name = phillip young
+	#email = phil.w.young@gmail.com
+	email = phil.young@insight.com
+
+[core]
+	excludesfile = ~/.gitignore
+	editor = emacs
+	autocrlf = false
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[credential "https://dev.azure.com"]
+	useHttpPath = true
+[init]
+	defaultBranch = main
