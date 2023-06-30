@@ -1,0 +1,30 @@
+[credential]
+	helper = 
+	helper = /usr/local/share/gcm-core/git-credential-manager
+	# OSX
+	#helper = osxkeychain
+	#
+	# File
+        #helper = cache --timeout=220752000
+        # FILE (~/.git-credentials) CLEARTEXT no timeout
+	#helper = cache --timeout=3600000
+	#helper =
+
+[user]
+	name = phillip young
+#	email = phil.w.young@gmail.com
+	email = phil.young@insight.com
+
+[core]
+	excludesfile = ~/.gitignore
+	editor = emacs
+	autocrlf = false
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[credential "https://dev.azure.com"]
+	useHttpPath = true
+[init]
+	defaultBranch = main
