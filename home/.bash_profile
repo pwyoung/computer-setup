@@ -320,6 +320,10 @@ fi
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
-#if [ -e /Users/pyoung/.rd/bin ]; then
-#  export PATH="/Users/pyoung/.rd/bin:$PATH"
-#fi
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+#export PATH="/Users/pyoung/.rd/bin:$PATH"
+if [ -e ${HOME}/.rd/bin ]; then
+  export PATH="${HOME}/.rd/bin:$PATH"
+fi
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
