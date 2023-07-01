@@ -1,10 +1,40 @@
+
 # CLI-type settings
 # ssh  -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no"  ubuntu@18.205.214.96
 
+# Start with "dev-sshd"
+Host dev
+  HostName 192.168.3.2
+  User dev
+  Port 2222
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+
+# 00:ce:39:d1:21:be
+Host mele
+  HostName 192.168.3.6
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+
 # 48:21:0B:55:B4:5B
 Host nuc
-  HostName 192.168.8.4 # wired
-  User pyoung
+  HostName 192.168.3.5
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+# VMs
+Host nuc-1
+  HostName 192.168.3.7
+  User ubuntu
   Port 22
   LogLevel FATAL
   UserKnownHostsFile /dev/null
@@ -12,10 +42,27 @@ Host nuc
   PasswordAuthentication no
 
 
-# System76 Oryx-Pro-v5 laptop
+# 80:fa:5b:74:f0:fc
 Host oryx
-  HostName 192.168.8.3 # wifi
-  User pyoung
+  HostName 192.168.3.3
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+# VMs
+Host oryx-1
+  HostName 192.168.3.8
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+Host oryx-2
+  HostName 192.168.3.9
+  User ubuntu
   Port 22
   LogLevel FATAL
   UserKnownHostsFile /dev/null
@@ -23,27 +70,9 @@ Host oryx
   PasswordAuthentication no
 
 
-Host mele
-  HostName 192.168.2.181 # wifi
-  User pyoung
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
 
-
-# 192.168.8.3
-# Nano
-Host nano
-  HostName 192.168.2.172
-  User pyoung
-  Port 22
-  LogLevel FATAL
-
-
-# TODO
 # Gallifrey in Linux
+
 
 
 # Notes
@@ -66,6 +95,8 @@ Host nano
   #   debug1: Requesting X11 forwarding with authentication spoofing.
   #   DISPLAY=localhost:11.0
 
+# For SSH Tunneling
+
 
 # JumpBox settings
 Host jb
@@ -80,3 +111,24 @@ Host jb
   # Forward my SSH keys into the session so I can SSH to another host
   ForwardAgent yes
 
+#
+Host node-1
+	HostName 192.168.122.229
+	User vagrant
+	Port 22
+	IdentityFile /home/pwyoung/home_dev/git/philwyoungatinsight/ansible-playbook-ubuntu-nodeweaver/nomaj/build/vagrant/.vagrant/machines/node-1/libvirt/private_key
+	UserKnownHostsFile /dev/null
+	StrictHostKeyChecking no
+	PasswordAuthentication no
+	IdentitiesOnly yes
+	LogLevel FATAL
+Host node-2
+	HostName 192.168.122.176
+	User vagrant
+	Port 22
+	IdentityFile /home/pwyoung/home_dev/git/philwyoungatinsight/ansible-playbook-ubuntu-nodeweaver/nomaj/build/vagrant/.vagrant/machines/node-2/libvirt/private_key
+	UserKnownHostsFile /dev/null
+	StrictHostKeyChecking no
+	PasswordAuthentication no
+	IdentitiesOnly yes
+	LogLevel FATAL

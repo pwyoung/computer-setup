@@ -33,11 +33,6 @@ setup_venv(){
 }
 
 install_pyenv(){
-    # POPOS 21.10
-    # PKGS=build-essential libssl-dev zlib1g-dev libbz2-dev \
-         libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-         xz-utils tk-dev libffi-dev liblzma-dev git \
-         openssl libssl-dev
 
     # POPOS 22.04
     PKGS=make build-essential libssl-dev zlib1g-dev \
@@ -51,13 +46,11 @@ install_pyenv(){
 }
 
 setup_pyenv(){
-    export PYENV_ROOT="$HOME/.pyenv"
 
-    export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
-
-    if command -v pyenv 1>/dev/null 2>&1; then
+    if [ -e "$HOME/.pyenv" ]; then
+        export PYENV_ROOT="$HOME/.pyenv"
+        export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
         eval "$(pyenv init -)"
-
         eval "$(pyenv virtualenv-init -)"
     fi
 
@@ -74,7 +67,7 @@ install_pyenv_global_version(){
 use_pyenv_to_install_venv_version() {
     cd ~/venv
     pyenv shell ${PYTHON_VERSION}
-    python3.8 -m venv ${PYTHON_VERSION}
+    python3 -m venv ${PYTHON_VERSION}
     echo "consider commenting out setup_pyenv and using setup_venv with this instead"
 }
 
@@ -88,7 +81,3 @@ fi
 
 # Use Pyenv
 setup_pyenv
-
-# Use venv
-#setup_venv
-
