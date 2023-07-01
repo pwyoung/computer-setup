@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#IMAGE="amazon/aws-cli"
+IMAGE='public.ecr.aws/aws-cli/aws-cli'
+echo "Latest $IMAGE"
+docker run --rm -it $IMAGE --version
+
+echo "Latest via: dev aws --version"
+dev aws --version
+
