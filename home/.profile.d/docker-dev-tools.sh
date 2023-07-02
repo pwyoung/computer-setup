@@ -1,6 +1,6 @@
 #!/bin/bash
 
-L=~/docker-dev-tools.sh.out
+L=/tmp/docker-dev-tools.sh.out
 
 H=$(hostname)
 
