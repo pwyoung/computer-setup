@@ -6,7 +6,7 @@
 F=~/.custom-mouse-scaling.txt
 
 # Maybe use "jenv", but skip that for now
-notes() {
+function notes() {
 
     # Java is at /usr/bin/java according to "command -v java"
     # And "/usr/bin/java -version" gives this...
@@ -41,7 +41,7 @@ EOF
 
 }
 
-setup_mac_openjdk() {
+function setup_mac_openjdk() {
     export JAVA_HOME=/usr/local/opt/openjdk/libexec/openjdk.jdk/Contents/Home
 
     # ~/.bash_profile (linked from ~/.zprofile) will add java to $PATH
@@ -67,3 +67,5 @@ if uname | grep Darwin >/dev/null; then
     setup_mac_openjdk
 
 fi
+
+
