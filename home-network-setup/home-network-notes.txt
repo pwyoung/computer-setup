@@ -9,13 +9,15 @@ Router to Internet:
 - Access (via top right hamburger icon -> network)
   - URL: https://192.168.2.1/network/default/dashboard
   - user/pw: <personal gmail address>/Ubiquity<stuff>
+- Configuration:
+  - Port Configuration: https://192.168.2.1/network/default/devices/74:ac:b9:56:2a:97/ports/configurations
 - Networks:
   - Default-pwy
-    - CIDR: 192.168.2.1/24
+    - CIDR: 192.168.2.0/24
     - DHCP:
       - Range: 192.168.2.100-192.168.2.254
   - holodeck
-    - CIDR: 192.168.3.1/24
+    - CIDR: 192.168.3.0/24
     - DHCP:
       - Range: 192.168.3.100-192.168.2.254
 - Devices:
@@ -26,6 +28,7 @@ Router to Internet:
           - IP: 192.168.2.129
   - Port #2
     - Network: holodeck
+    - Port Isolation: false
     - Switch
       - Model: Netgear gigabit switch
       - Features: plain 1GB switch
@@ -45,12 +48,19 @@ Router to Internet:
           - Purpose: Stuff on left side of room
           - Speed: 900 Mbps
           - Docs: https://www.tp-link.com/us/business-networking/easy-smart-switch/tl-sg108e/
+          - Configuration:
+            - Login: admin/pwy(8)
+            - New Config:
+              - IP=192.168.3.2/24
+              - GW=192.168.3.1
           - Devices
             - Port #2:
               - tardis:
                 - Model: Asus Laptop
                 - LAN:
-                  - IP: 192.168.3.2 (static)
+                  - IP: 192.168.3.3/24, GW=192.168.3.1
+                  - DNS: 8.8.8.8
+                  - ROUTE: 0.0.0.0/0.0.0.0, GW=192.168.3.1
                   - MAC: FC:34:97:4D:48:DD
                 - CPU: 16
                 - RAM: 64 GB
@@ -80,3 +90,18 @@ Router to Internet:
                 - wireless:
                 - CPU: 12/16
                 - RAM: 32 GB
+
+Maas:
+  - Network
+    - Fabric-0
+      - VLAN: untagged
+        - CFG-URL: http://192.168.3.6:5240/MAAS/r/vlan/5001
+        - CIDR: 192.168.3.0/24
+        - VID: 0
+    - DHCP:
+      - MAAS provides DHCP: true
+      - Provide from DHCP Rack controller: mele
+    - Reserved dynamic range
+      - Subnet: 192.168.3.0/24
+      - Range: 192.168.3.70 - 192.168.3.98
+      - GW: 192.168.3.0/24
