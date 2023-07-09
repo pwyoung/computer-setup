@@ -1,0 +1,79 @@
+# Trouble-Shooting experiences
+
+
+Problem:
+  "Error: ServerError: 400 Bad Request (Ephemeral operating system ubuntu jammy is unavailable.)"
+  "ServerError: 400 Bad Request ({"hwe_kernel": ["focal has no kernels available which meet min_hwe_kernel(hwe-22.04)."]})"
+Root cause:
+  During Commissioning the power was not cycled in time on a manually powered device.
+  During Deployment the power was not cycled in time on a manually powered device.
+Solution:
+  If a Commissioning or Deployment step is started, turn on the power immediately.
+  If this is not done in time (less than 30 seconds), the above errors will result.
+Reproducing the problem: A
+  Run the terraform command to create the machine. TF output will be:
+    maas_machine.<TF-name>: Still creating.
+  Watch the MAAS UI show:
+    Commissioning
+  Fail to turn on the power to the machine.
+Reproducing the problem: B
+  Follow A, but turn on the power in time for Commissioning to start.
+  Watch the MAAS UI show STATUS:
+    Performing PXE boot
+    Gathering information
+    Testing
+    Ready
+  At this point the machine will be turned off.
+  Turn it on and allow TF to create a "maas_vm_host" resource
+  When the MAAS UI show STATUS shows:
+    Deploying ...
+  Fail to turn on the power to the machine.
+
+
+Problem:
+  "Ubuntu Login ... cloud init ... no datasource found ... likely bad things to come ..."
+Root cause:
+  MAAS Region Server becomes corrupted (for some unknown reason, over time, or by use)
+Solution:
+  Workaround:
+    Restart the MAAS Region Server, per
+      https://discourse.maas.io/t/error-prevents-adding-machines-to-maas-no-datasource-found/3352/6
+    e.g.
+      ssh <maas-server> 'sudo systemctl status maas-regiond'
+
+
+Problem:
+  "Error: ServerError: 409 Conflict (No machine with system ID w66p6b available.)"
+Root cause:
+  MAAS-TF resource creation failures result in corruption of the TF state.
+  The TF state is not "cleaned up" when a failure occurs.
+  This is a problem because once the TF state is corrupted, there is no good way to resync the actual state.
+  https://community.gruntwork.io/t/cleanup-of-terraform-apply-partial-fails/420
+Solution:
+  This did not work... The command succeeded, but the bogus system ID still failed.
+    terraform import maas_machine.m_1 "oryx"
+  Of course, "terraform import" has its own limitations/problems, such as this:
+    ...Terraform can not ...be determined until apply...
+    This happened because a dynamic count was used and TF can't guess what that will be.
+
+
+Problem:
+  BUG/SNAFU: can't provision a physical machine except with Ubuntu and the release that came with MAAS.
+     - Ubuntu is the only OS supported.
+       The docs say we can't specify the OS image other than Ubuntu.
+     - Even though a newer default kernel is set for Commissioning and Deployment, it is ignored.
+       Different versions work via the web interface, but terraform reverts to the old/original kernel.
+     - Setting min_hwe_kernel causes errors, even though the images are available and work via the web ui
+
+  Parameters to maas_machine:
+    min_hwe_kernel = "ga-22.04"
+      Result: Error: ServerError: 400 Bad Request ({"hwe_kernel": ["focal has no kernels available which meet min_hwe_kernel(ga-22.04)."]})
+    min_hwe_kernel = "hwe-22.04"
+      Result: Error: ServerError: 400 Bad Request ({"hwe_kernel": ["focal has no kernels available which meet min_hwe_kernel(hwe-22.04)."]})
+
+  Command:
+    maas maasadmin boot-resources read | jq . | grep subarches | grep 22.04 | head -1
+  Result:
+    "subarches": "generic,hwe-p,hwe-q,hwe-r,hwe-s,hwe-t,hwe-u,hwe-v,hwe-w,ga-16.04,ga-16.10,ga-17.04,ga-17.10,\
+ga-18.04,ga-18.10,ga-19.04,ga-19.10,ga-20.04,ga-20.10,ga-21.04,ga-21.10,ga-22.04"
+
