@@ -42,11 +42,10 @@ target
 # to change depending on the environment.
 #
 # TF local state.
-# TF state should be in remote datastores for any serious use-case.
+# TF state should be in remote datastores for any serious use-case. But, allow it anyway...
+#**/terraform.tfstate
+#**/*.tfstate.*
 **/.terraform/*
-# .tfstate files
-**/terraform.tfstate
-**/*.tfstate.*
 #
 # TF Plan files.
 # These are the names used by convention
