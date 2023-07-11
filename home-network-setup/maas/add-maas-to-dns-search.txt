@@ -1,0 +1,13 @@
+
+# Add 'maas' to the DNS search domains
+nmcli connection show
+nmcli connection show 'Wired connection 1' | grep ipv4.dns
+nmcli connection modify 'Wired connection 1' ipv4.dns-search maas
+nmcli connection down 'Wired connection 1'
+nmcli connection up 'Wired connection 1'
+nmcli connection show 'Wired connection 1' | grep ipv4.dns
+ping -c 1 oryx
+# nslookup oryx # works
+# dig oryx # fails - does not use the same mechanism(s) to resolve DNS
+ping -c 1 google.com # sanity check
+

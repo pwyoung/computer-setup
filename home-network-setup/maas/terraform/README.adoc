@@ -1,40 +1,41 @@
-# Trouble-Shooting experiences
+= Running the code
+
+Review the .tf files and edit as needed
+
+cp terraform.tfvars.EXAMPLE terraform.tfvars = and edit as needed
+
+Review the Makefile
+
+== To run 'apply' (create) resources in .tf files.
+
+Run 'make'
+
+== 'destroy' ALL resources in .tf files
+
+Run 'make clean'
+
+== To surgically remove some resources in .tf files
+
+Edit .tf files and set relevant count(s) to 0.
+
+Note some counts are derived from others and do not need to be explicitly changed.
+
+Run 'make'
 
 
-Problem:
-  "Error: ServerError: 400 Bad Request (Ephemeral operating system ubuntu jammy is unavailable.)"
-  "ServerError: 400 Bad Request ({"hwe_kernel": ["focal has no kernels available which meet min_hwe_kernel(hwe-22.04)."]})"
-Root cause:
-  During Commissioning the power was not cycled in time on a manually powered device.
-  During Deployment the power was not cycled in time on a manually powered device.
-Solution:
-  If a Commissioning or Deployment step is started, turn on the power immediately.
-  If this is not done in time (less than 30 seconds), the above errors will result.
-Reproducing the problem: A
-  Run the terraform command to create the machine. TF output will be:
-    maas_machine.<TF-name>: Still creating.
-  Watch the MAAS UI show:
-    Commissioning
-  Fail to turn on the power to the machine.
-Reproducing the problem: B
-  Follow A, but turn on the power in time for Commissioning to start.
-  Watch the MAAS UI show STATUS:
-    Performing PXE boot
-    Gathering information
-    Testing
-    Ready
-  At this point the machine will be turned off.
-  Turn it on and allow TF to create a "maas_vm_host" resource
-  When the MAAS UI show STATUS shows:
-    Deploying ...
-  Fail to turn on the power to the machine.
+
+= Trouble-Shooting
+
+== Problems experienced and solutions or workarounds
 
 
-Problem:
+==== Problem:
   "Ubuntu Login ... cloud init ... no datasource found ... likely bad things to come ..."
-Root cause:
+
+==== Root cause:
   MAAS Region Server becomes corrupted (for some unknown reason, over time, or by use)
-Solution:
+
+==== Solution:
   Workaround:
     Restart the MAAS Region Server, per
       https://discourse.maas.io/t/error-prevents-adding-machines-to-maas-no-datasource-found/3352/6
@@ -42,22 +43,32 @@ Solution:
       ssh <maas-server> 'sudo systemctl status maas-regiond'
 
 
-Problem:
-  "Error: ServerError: 409 Conflict (No machine with system ID w66p6b available.)"
-Root cause:
+==== Problem:
+
+  Error: ServerError: 409 Conflict (No machine with system ID w66p6b available.)
+
+==== Root cause:
   MAAS-TF resource creation failures result in corruption of the TF state.
   The TF state is not "cleaned up" when a failure occurs.
   This is a problem because once the TF state is corrupted, there is no good way to resync the actual state.
-  https://community.gruntwork.io/t/cleanup-of-terraform-apply-partial-fails/420
-Solution:
-  This did not work... The command succeeded, but the bogus system ID still failed.
+
+https://community.gruntwork.io/t/cleanup-of-terraform-apply-partial-fails/420
+
+==== Failed Solution:
+  This attempt to repair the state did not work.
+  
+  The command succeeded, but the bogus system ID still failed.
     terraform import maas_machine.m_1 "oryx"
+
   Of course, "terraform import" has its own limitations/problems, such as this:
     ...Terraform can not ...be determined until apply...
-    This happened because a dynamic count was used and TF can't guess what that will be.
+
+  This happened because a dynamic count was used and TF can't guess what that will be.
+  But, using the correct import (terraform import maas_machine.m_1[0] "oryx") still did not cause the resource
+  to be recognized in the job.
 
 
-Problem:
+==== Problem/Root-Cause:
   BUG/SNAFU: can't provision a physical machine except with Ubuntu and the release that came with MAAS.
      - Ubuntu is the only OS supported.
        The docs say we can't specify the OS image other than Ubuntu.
@@ -71,9 +82,54 @@ Problem:
     min_hwe_kernel = "hwe-22.04"
       Result: Error: ServerError: 400 Bad Request ({"hwe_kernel": ["focal has no kernels available which meet min_hwe_kernel(hwe-22.04)."]})
 
-  Command:
+  Command (to confirm that the hwe kernels are installed):
     maas maasadmin boot-resources read | jq . | grep subarches | grep 22.04 | head -1
   Result:
-    "subarches": "generic,hwe-p,hwe-q,hwe-r,hwe-s,hwe-t,hwe-u,hwe-v,hwe-w,ga-16.04,ga-16.10,ga-17.04,ga-17.10,\
-ga-18.04,ga-18.10,ga-19.04,ga-19.10,ga-20.04,ga-20.10,ga-21.04,ga-21.10,ga-22.04"
+    "subarches": "generic,hwe-p,hwe-q,hwe-r,hwe-s,hwe-t,hwe-u,hwe-v,hwe-w,ga-16.04,ga-16.10,ga-17.04,ga-17.10, ga-18.04,ga-18.10,ga-19.04,ga-19.10,ga-20.04,ga-20.10,ga-21.04,ga-21.10,ga-22.04"
 
+==== Workaround:
+  Manually Commission (and Deploy) the machine using the Web UI.
+
+  Let MAAS manage VMs on the machine since those do support specifying the Ubuntu Release (as long as the VMs will be Ubuntu since no other OS is supported via TF-MAAS).
+
+
+=== Problem:
+  "Error: ServerError: 400 Bad Request (Ephemeral operating system ubuntu jammy is unavailable.)"
+  "ServerError: 400 Bad Request ({"hwe_kernel": ["focal has no kernels available which meet min_hwe_kernel(hwe-22.04)."]})"
+
+==== Root cause:
+  During Commissioning the power was not cycled in time on a manually powered device.
+  During Deployment the power was not cycled in time on a manually powered device.
+
+==== Solution:
+  If a Commissioning or Deployment step is started, turn on the power immediately.
+  If this is not done in time (less than 30 seconds), the above errors will result.
+
+==== Reproducing the problem: A
+
+  Run the terraform command to create the machine. TF output will be
+    maas_machine.<TF-name>: Still creating.
+
+  Watch the MAAS UI show:
+    Commissioning
+
+  Fail to turn on the power to the machine.
+
+
+==== Reproducing the problem: B
+  Follow A, but turn on the power in time for Commissioning to start.
+
+  Watch the MAAS UI show STATUS:
+    Performing PXE boot
+    Gathering information
+    Testing
+    Ready
+
+  At this point the machine will be turned off.
+
+  Turn it on and allow TF to create a "maas_vm_host" resource
+
+  When the MAAS UI show STATUS shows:
+    Deploying ...
+
+  Fail to turn on the power to the machine.

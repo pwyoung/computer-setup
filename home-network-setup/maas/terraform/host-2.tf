@@ -4,7 +4,12 @@
 # Physical machine
 #   SNAFU: This had to be created manually
 #     The reason is that TF-MAAS does not support Commissioning with the newest Ubuntu (22.04) and this
-#     machine fails to be Commissioned with the old/default Ubuntu release (20.04)
+#     machine fails to be Commissioned with the old/default Ubuntu release (20.04).
+#     The "maas_machine" resource does not support specifying the Commissioning release and
+#     The "maas_machine" resource does not respect the default Commissioning release.
+#     So, this has to be Commissioned manually.
+#     To avoid using a "data source" (or tinkering with "terraform import") I just deployed using the Web UI too.
+#
 # resource "maas_machine" "m_2" {}
 #    Just manually create a virsh host
 # resource "maas_vm_host" "virsh_2" {}
