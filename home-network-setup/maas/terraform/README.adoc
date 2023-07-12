@@ -2,7 +2,8 @@
 
 Review the .tf files and edit as needed
 
-cp terraform.tfvars.EXAMPLE terraform.tfvars = and edit as needed
+copy terraform.tfvars.EXAMPLE to terraform.tfvars
+and edit as needed
 
 Review the Makefile
 
