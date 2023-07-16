@@ -40,8 +40,8 @@ resource "maas_vm_host_machine" "kvm_2" {
 # Deploy Ubuntu to the VMs
 # Time ~3:40
 resource "maas_instance" "kvm_2" {
-  count = length(maas_vm_host_machine.kvm_2)
-  #count = 0
+  #count = length(maas_vm_host_machine.kvm_2)
+  count = 0
 
   allocate_params {
     # Find the VM by hostname
