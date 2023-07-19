@@ -11,8 +11,3 @@ if [ -e "$D" ]; then
 else
     echo "$D does not exist. Not installing files in $D"
 fi
-
-
-
-
-
