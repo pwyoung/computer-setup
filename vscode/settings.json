@@ -1,15 +1,13 @@
 {
     "telemetry.enableTelemetry": false,
     "telemetry.enableCrashReporter": false,
-    "window.zoomLevel": 1,
-    "workbench.activityBar.visible": true,
-    "workbench.sideBar.location": "left",
 
-    "terminal.integrated.automationShell.linux": "/bin/bash",
-    "terminal.integrated.shellArgs.linux": [ "-l" ],
+    "window.zoomLevel": 1,
 
     "workbench.colorTheme": "Dracula",
     "workbench.startupEditor": "newUntitledFile",
+    "workbench.activityBar.visible": true,
+    "workbench.sideBar.location": "left",
 
     "files.watcherExclude": {
         "**/.git/objects/**": true,
@@ -21,13 +19,16 @@
     //   Allows ctrl+x,ctrl+s work in emacs in Terminal
     "terminal.integrated.allowChords": false,
 
-    // MAC/OSX
+    // MAC/OSX TERMINAL
     //
     // Use BASH in Terminal
     //"terminal.integrated.shell.osx": "/bin/bash",
     "terminal.integrated.defaultProfile.osx": "bash",
     "terminal.integrated.automationProfile.osx": {
       "path": "/bin/bash"
-    }
+    },
 
+    // LINUX TERMINAL
+    "terminal.integrated.automationShell.linux": "/bin/bash",
+    "terminal.integrated.shellArgs.linux": [ "-l" ]
 }
