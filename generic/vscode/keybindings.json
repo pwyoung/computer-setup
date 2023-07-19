@@ -3,6 +3,9 @@
 // https://code.visualstudio.com/docs/getstarted/keybindings#_accepted-keys
 //
 [
+    //
+    // EDITOR ACTIONS
+    //
     {
         "key": "ctrl+d",
         "command": "-editor.action.addSelectionToNextFindMatch",
@@ -11,53 +14,61 @@
     // shift-right for next editor tab
     {
         "key": "shift+right",
-        "command": "workbench.action.nextEditor"
+        "command": "workbench.action.nextEditor",
+        "when": "editorFocus"
     },
     // shift-left for previous editor tab
     {
         "key": "shift+left",
-        "command": "workbench.action.previousEditor"
+        "command": "workbench.action.previousEditor",
+        "when": "editorFocus"
     },
-    // Emacs undo (was omitted)
-    {
-        "key": "ctrl+shift+-",
-        "command": "undo"
-    },
-    //
-    // TERMINAL
-    //     https://code.visualstudio.com/docs/editor/integrated-terminal#_terminal-keybindings
-    //
-    //     shift-up when in editor -> increase terminal size
+    // Increase terminal size
     {
         "key": "shift+up",
         "command": "workbench.action.terminal.resizePaneUp",
         "when": "editorFocus"
     },
-    //     shift-down when in terminal -> reduce terminal size
+    // shift-down: Go to terminal
+    {
+        "key": "shift+down",
+        "command": "workbench.action.terminal.focus",
+        "when": "editorFocus"
+    },    
+    // Emacs undo (was omitted)
+    {
+        "key": "ctrl+shift+-",
+        "command": "undo",
+        "when": "editorFocus"        
+    },
+    //
+    // TERMINAL ACTIONS
+    //
+    //   reduce terminal size
     {
         "key": "shift+down",
         "command": "workbench.action.terminal.resizePaneDown",
         "when": "terminalFocus"
     },
-    //     shift-down: Go to terminal
-    {
-        "key": "shift+down",
-        "command": "workbench.action.terminal.focus",
-        "when": "editorFocus"
-    },
-    //     shift-pageup: Kill Terminal
+    //   Kill Terminal
     {
         "key": "shift+pageup",
         "command": "workbench.action.terminal.kill",
         "when": "terminalFocus"
     },
-    //     shift-up: Go to Editor
+    //   Create Terminal
+    {
+        "key": "shift+pagedown",
+        "command": "workbench.action.terminal.new",
+        "when": "terminalFocus||editorFocus"
+    },
+    //   Go to Editor
     {
         "key": "shift+up",
         "command": "workbench.action.focusActiveEditorGroup",
         "when": "terminalFocus"
     },
-    //     shift-insert: Go to Folders
+    //    Go to Folders
     {
         "key": "shift+insert",
         "command": "workbench.explorer.fileView.focus",

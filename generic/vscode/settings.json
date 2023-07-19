@@ -19,7 +19,15 @@
 
     // DISABLE CHORDS
     //   Allows ctrl+x,ctrl+s work in emacs in Terminal
-    "terminal.integrated.allowChords": false
+    "terminal.integrated.allowChords": false,
 
+    // MAC/OSX
+    //
+    // Use BASH in Terminal
+    //"terminal.integrated.shell.osx": "/bin/bash",
+    "terminal.integrated.defaultProfile.osx": "bash",
+    "terminal.integrated.automationProfile.osx": {
+      "path": "/bin/bash"
+    }
 
 }
