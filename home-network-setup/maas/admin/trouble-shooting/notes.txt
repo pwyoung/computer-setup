@@ -1,0 +1,11 @@
+
+################################################################################
+
+https://forum.proxmox.com/threads/ubuntu-cloud-init-setting-dns-not-working.111574/
+
+https://www.flexlabs.org/2019/07/setting-up-maas-and-kubernetes-in-a-virtualised-environment
+bootx64.efi
+
+# Set DNS Server via Cloud-Init (since MAAS bug hoses DHCP)
+
+################################################################################

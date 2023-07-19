@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+# TODO: ansible
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#configure-instance-to-be-managed-by-ansible
+
+################################################################################
+
+# Dir containing this script
+SCRIPT_DIR=$(dirname $(realpath "$0}"))
+
+# Cloud-Init Script
+MC="${SCRIPT_DIR}/../cloud-init/set-dns"
+
+# MAAS server
+H='192.168.3.6'
+MS="http://${H}:5240/MAAS"
+
+# MAAS user
+#MU='maasadmin'
+MU='pwyoung'
+
+# MAAS API KEY
+#  mkdir ~/.maas-api-keyfiles
+#  # Assuming passwordless sudo
+#  ssh maas-server "sudo maas apikey --username=$MU" > ~/.maas-api-keyfiles/$MU
+MK=$(head -1 ~/.maas-api-keyfiles/$MU)
+
+# Machine's netboot MAC
+MAC='48:21:0b:55:b4:5b'
+
+# Commissioned Machine to Deploy
+MM='nuc.maas'
+
+
+################################################################################
+
+login() {
+    if maas list | egrep "^${MU} " >/dev/null; then
+        echo "User $MU is already logged in"
+    else
+        echo "Logging in, user=$MU"
+        maas login $MU $MS $MK
+    fi
+}
+
+create_machine() {
+    maas $MU machines create \
+     architecture=amd64 \
+     mac_addresses=${MAC} \
+     power_type=manual
+}
+
+deploy_machine() {
+
+    if [ -e $MC ]; then
+        echo "Deploying $H using cloud-init script $MC"
+    else
+        echo "ERROR: $MC not found"
+        exit 1
+    fi
+
+    USER_DATA=$(base64 $MC)
+
+    maas $MU machine deploy $MM user_data="${USER_DATA}"
+}
+
+#login
+#deploy_machine
+
+create_machine

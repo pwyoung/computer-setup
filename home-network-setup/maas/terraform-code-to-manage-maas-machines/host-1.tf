@@ -82,7 +82,7 @@ resource "maas_vm_host_machine" "kvm_1" {
 # Deploy Ubuntu to the VMs
 # Time ~3:40
 resource "maas_instance" "kvm" {
-  count = length( maas_vm_host.virsh_1 ) > 0 ? length(maas_vm_host_machine.kvm_1) : 0
+  count = length(maas_vm_host_machine.kvm_1)
   #count = 0
 
   allocate_params {
