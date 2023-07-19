@@ -1,0 +1,12 @@
+#!/bin/bash
+S="##################################################"
+
+F=./keybindings.json
+echo "$S"
+echo "Diff of $F"
+diff $F ~/Library/Application\ Support/Code/User/
+
+F=./settings.json
+echo "$S"
+echo "Diff of $F"
+cp $F ~/Library/Application\ Support/Code/User/

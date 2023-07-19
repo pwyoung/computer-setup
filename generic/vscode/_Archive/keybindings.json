@@ -27,41 +27,52 @@
     // TERMINAL
     //     https://code.visualstudio.com/docs/editor/integrated-terminal#_terminal-keybindings
     //
+    // SHIFT-LEFT and RIGHT to change terminal windows
+    {
+        "key": "shift+left",
+        "command": "workbench.action.terminal.focusPrevious",
+        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+    },
+    {
+        "key": "shift+cmd+[",
+        "command": "-workbench.action.terminal.focusPrevious",
+        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+    }
     //     shift-up when in editor -> increase terminal size
     {
         "key": "shift+up",
         "command": "workbench.action.terminal.resizePaneUp",
-        "when": "editorFocus"                        
+        "when": "editorFocus"
     },
     //     shift-down when in terminal -> reduce terminal size
     {
         "key": "shift+down",
         "command": "workbench.action.terminal.resizePaneDown",
-        "when": "terminalFocus"                        
+        "when": "terminalFocus"
     },
     //     shift-down: Go to terminal
     {
         "key": "shift+down",
         "command": "workbench.action.terminal.focus",
-        "when": "editorFocus"                
+        "when": "editorFocus"
     },
     //     shift-pageup: Kill Terminal
     {
         "key": "shift+pageup",
         "command": "workbench.action.terminal.kill",
-        "when": "terminalFocus"                
+        "when": "terminalFocus"
     },
     //     shift-up: Go to Editor
     {
         "key": "shift+up",
         "command": "workbench.action.focusActiveEditorGroup",
-        "when": "terminalFocus"        
+        "when": "terminalFocus"
     },
     //     shift-insert: Go to Folders
     {
         "key": "shift+insert",
         "command": "workbench.explorer.fileView.focus",
-        "when": "terminalFocus"                        
+        "when": "terminalFocus"
     },
     //     FAILS: RUN HIGHLIGHTED COMMAND IN TERMINAL
     //     https://code.visualstudio.com/docs/editor/integrated-terminal#_run-selected-text
@@ -83,25 +94,5 @@
         "key": "ctrl+p",
         "command": "markdown.showPreviewToSide",
         "when": "editorLangId == 'markdown'"
-    },
-    {
-        "key": "shift+right",
-        "command": "workbench.action.terminal.focusNext",
-        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
-    },
-    {
-        "key": "shift+cmd+]",
-        "command": "-workbench.action.terminal.focusNext",
-        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
-    },
-    {
-        "key": "shift+left",
-        "command": "workbench.action.terminal.focusPrevious",
-        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
-    },
-    {
-        "key": "shift+cmd+[",
-        "command": "-workbench.action.terminal.focusPrevious",
-        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
     }
 ]

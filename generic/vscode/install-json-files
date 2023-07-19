@@ -1,0 +1,10 @@
+#!/bin/bash
+
+mkdir -p ./_Archive
+cp ~/Library/Application\ Support/Code/User/*.json ./_Archive
+
+cp ./keybindings.json ~/Library/Application\ Support/Code/User/
+
+cp ./settings.json ~/Library/Application\ Support/Code/User/
+
+

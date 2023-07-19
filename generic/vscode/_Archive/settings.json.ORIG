@@ -1,0 +1,12 @@
+{
+   "security.workspace.trust.untrustedFiles": "open",
+    "hediet.vscode-drawio.codeLinkActivated": true,
+    "terminal.integrated.autoReplies": {},
+    "terminal.integrated.defaultProfile.linux": "bash",
+    
+    // DISABLE CHORDS
+    //   Allows ctrl+x,ctrl+s work in emacs in Terminal
+    "terminal.integrated.allowChords": false
+
+
+}
