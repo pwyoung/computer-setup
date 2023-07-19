@@ -1,35 +1,47 @@
-// Place your key bindings in this file to override the defaultsauto[]
-//
-// https://code.visualstudio.com/docs/getstarted/keybindings#_accepted-keys
-//
+// CUSTOM BINDINGS
 [
-    //
-    // EDITOR ACTIONS
-    //
+    // Increase terminal size
     {
-        "key": "ctrl+d",
-        "command": "-editor.action.addSelectionToNextFindMatch",
-        "when": "editorFocus"
+        "key": "ctrl+up",
+        "command": "workbench.action.terminal.resizePaneUp",
+        "when": "editorFocus||terminalFocus"
     },
-    // shift-right for next editor tab
+    // Reduce terminal size
+    {
+        "key": "ctrl+down",
+        "command": "workbench.action.terminal.resizePaneDown",
+        "when": "terminalFocus||editorFocus"
+    },
+    // Go from to Folders
+    {
+        "key": "shift+insert",
+        "command": "workbench.explorer.fileView.focus",
+        "when": "terminalFocus||editorFocus"
+    },    
+    // Return from Folders
+    {
+        "key": "shift+insert",
+        "command": "workbench.explorer.editorView.focus",
+        "when": "context.focus == 'fileview'"
+    },    
+    //
+    // ----------------------------------------
+    // EDITOR ACTIONS
+    // ----------------------------------------
+    //
+    // Next editor tab
     {
         "key": "shift+right",
         "command": "workbench.action.nextEditor",
         "when": "editorFocus"
     },
-    // shift-left for previous editor tab
+    // Previous editor tab
     {
         "key": "shift+left",
         "command": "workbench.action.previousEditor",
         "when": "editorFocus"
     },
-    // Increase terminal size
-    {
-        "key": "shift+up",
-        "command": "workbench.action.terminal.resizePaneUp",
-        "when": "editorFocus"
-    },
-    // shift-down: Go to terminal
+    // Go to terminal
     {
         "key": "shift+down",
         "command": "workbench.action.terminal.focus",
@@ -41,55 +53,42 @@
         "command": "undo",
         "when": "editorFocus"        
     },
-    //
+    // ----------------------------------------
     // TERMINAL ACTIONS
+    // ----------------------------------------
     //
-    //   reduce terminal size
+    // Kill Terminal
     {
         "key": "shift+down",
-        "command": "workbench.action.terminal.resizePaneDown",
-        "when": "terminalFocus"
-    },
-    //   Kill Terminal
-    {
-        "key": "shift+pageup",
-        "command": "workbench.action.terminal.kill",
+        "command": "workbench.action.terminal.new",
         "when": "terminalFocus"
     },
     //   Create Terminal
-    {
-        "key": "shift+pagedown",
-        "command": "workbench.action.terminal.new",
-        "when": "terminalFocus||editorFocus"
-    },
-    //   Go to Editor
+    //{
+    //    "key": "alt+up",
+    //    "command": "workbench.action.terminal.kill",
+    //    "when": "terminalFocus"
+    //},
+    // Go to Editor
     {
         "key": "shift+up",
         "command": "workbench.action.focusActiveEditorGroup",
         "when": "terminalFocus"
     },
-    //    Go to Folders
-    {
-        "key": "shift+insert",
-        "command": "workbench.explorer.fileView.focus",
-        "when": "terminalFocus"
-    },
-    //     FAILS: RUN HIGHLIGHTED COMMAND IN TERMINAL
-    //     https://code.visualstudio.com/docs/editor/integrated-terminal#_run-selected-text
+    // FAILS: RUN HIGHLIGHTED COMMAND IN TERMINAL
+    // https://code.visualstudio.com/docs/editor/integrated-terminal#_run-selected-text
     {
         "key": "ctrl+u",
         "command": "workbench.action.terminal.sendSequence",
         "args":  { "text": "\u001b[1;5D\u007f" }
     },
-    // PYTHON
-    //     INDENT
+    // PYTHON: INDENT
     {
         "key": "alt+home",
         "command": "pyPasteIndent.pasteIndent",
         "when": "editorLangId == 'python'"
     },
-    // MARKDOWN
-    //     SHOW MARKDOWN PREVIEW
+    // SHOW MARKDOWN PREVIEW
     {
         "key": "ctrl+p",
         "command": "markdown.showPreviewToSide",
@@ -101,13 +100,14 @@
         "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
     },
     {
-        "key": "shift+cmd+]",
-        "command": "-workbench.action.terminal.focusNext",
-        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
-    },
-    {
         "key": "shift+left",
         "command": "workbench.action.terminal.focusPrevious",
+        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+    },    
+    // DEFUNCT?
+    {
+        "key": "shift+cmd+]",
+        "command": "-workbench.action.terminal.focusNext",
         "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
     },
     {
