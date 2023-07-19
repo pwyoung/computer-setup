@@ -1,10 +1,18 @@
 #!/bin/bash
 
 mkdir -p ./_Archive
-cp ~/Library/Application\ Support/Code/User/*.json ./_Archive
 
-cp ./keybindings.json ~/Library/Application\ Support/Code/User/
+D="${HOME}/Library/Application Support/Code/User/"
+if [ -e "$D" ]; then
+    echo "Installing files in $D"
+    cp "$D"/*.json ./_Archive
+    cp ./keybindings.json "$D"/
+    cp ./settings.json "$D"/
+else
+    echo "$D does not exist. Not installing files in $D"
+fi
 
-cp ./settings.json ~/Library/Application\ Support/Code/User/
+
+
 
 
