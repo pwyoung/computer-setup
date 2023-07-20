@@ -1,15 +1,21 @@
 #!/bin/bash
 
-export ARCH="amd64"
+# Dir containing this script                                                                                                                                                                                    
+SCRIPT_DIR=$(dirname $(realpath "$0}"))
 
 # Machine's netboot MAC
 export MAC='48:21:0b:55:b4:5b'
 
+export HOST_NAME='nuc'
+export DOMAIN_NAME='maas'
+
+# Cloud-Init Script                                                                                                                                                                                             
+export USER_DATA_SCRIPT="${SCRIPT_DIR}/../cloud-init/setup-ubuntu-box"
+
+export ARCH="amd64"
+
 export POWER_TYPE="manual"
 
-export HOST_NAME='nuc'
-
-export DOMAIN_NAME='maas'
 
 
 

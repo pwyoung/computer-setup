@@ -39,12 +39,12 @@ create_machine() {
 }
 
 deploy_machine() {
-    if [ -e $MC ]; then
-        echo "Deploying $H using cloud-init script $MC"
+    if [ -e $USER_DATA_SCRIPT ]; then
+        echo "Deploying $H using cloud-init script $USER_DATA_SCRIPT"
         # Encode the User Data
-        USER_DATA=$(base64 $MC)
+        USER_DATA=$(base64 $USER_DATA_SCRIPT)
     else
-        echo "ERROR: $MC not found"
+        echo "ERROR: $USER_DATA_SCRIPT not found"
         exit 1
     fi
 
