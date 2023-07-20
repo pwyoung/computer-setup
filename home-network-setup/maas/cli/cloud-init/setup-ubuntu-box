@@ -1,3 +1,7 @@
+#cloud-config
+packages:
+  - emacs-nox
+
 manage_resolv_conf: true
 
 resolv_conf:

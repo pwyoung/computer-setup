@@ -1,0 +1,15 @@
+#!/bin/bash
+
+export ARCH="amd64"
+
+# Machine's netboot MAC
+export MAC='48:21:0b:55:b4:5b'
+
+export POWER_TYPE="manual"
+
+export HOST_NAME='nuc'
+
+export DOMAIN_NAME='maas'
+
+
+
