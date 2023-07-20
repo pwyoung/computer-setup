@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # TODO: ansible
 # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#configure-instance-to-be-managed-by-ansible
@@ -8,9 +8,9 @@
 # Dir containing this script
 SCRIPT_DIR=$(dirname $(realpath "$0}"))
 
-. ${SCRIPT_DIR}/common-setup
+. "${SCRIPT_DIR}/common-setup"
 
-. ${SCRIPT_DIR}/nuc-setup
+. "${SCRIPT_DIR}/nuc-setup"
 
 
 ################################################################################
@@ -51,7 +51,7 @@ deploy_machine() {
     # Given the hostname, get the MAAS system_id
     MAAS_CMD_FILE=~/.maas-machines-read.json
     maas $MAAS_USER machines read > $MAAS_CMD_FILE
-    SYSTEM_ID=$(cat $MAAS_CMD_FILE | jq ".[] | select(.hostname == \"${HN}\")" | jq -r '.system_id')
+    SYSTEM_ID=$(cat $MAAS_CMD_FILE | jq ".[] | select(.hostname == \"${HOST_NAME}\")" | jq -r '.system_id')
 
     maas $MAAS_USER machine deploy ${SYSTEM_ID} user_data="${USER_DATA}" | tee -a $LOG_FILE
 }
@@ -65,6 +65,12 @@ open_maas_in_browser() {
     echo "open ${MAAS_WEB_URL}" | tee -a $LOG_FILE
 }
 
+get_status() {
+    #echo "MAAS_USER=$MAAS_USER" && exit 0 
+    maas $MAAS_USER machines read > $MAAS_CMD_FILE
+    cat $MAAS_CMD_FILE | jq -r ".[] | select(.hostname == \"${HOST_NAME}\")" | jq '[.status, .status_name, .network_test_status_name, .storage_test_status_name, .memory_test_status, .status_action] | @csv' | tr -d '"\\' 
+}
+
 run() {
     clear_command_log
 
@@ -75,9 +81,12 @@ run() {
     deploy_machine
 
     open_maas_in_browser
+
+    get_status
 }
 
-run
+get_status
+#run
 
 
 

@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # MAAS server
 H='192.168.3.6'
 export MAAS_SERVER="http://${H}:5240/MAAS"
@@ -12,7 +10,7 @@ export MAAS_USER='pwyoung'
 #  mkdir ~/.maas-api-keyfiles
 #  # Assuming passwordless sudo
 #  ssh maas-server "sudo maas apikey --username=$MU" > ~/.maas-api-keyfiles/$MU
-export MAAS_KEY=$(head -1 ~/.maas-api-keyfiles/$MU)
+export MAAS_KEY=$(head -1 ~/.maas-api-keyfiles/$MAAS_USER)
 
 # Command output
 export LOG_FILE=~/.maas-command-output.txt

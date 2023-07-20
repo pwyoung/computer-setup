@@ -1,4 +1,3 @@
-#!/bin/bash
 
 # Dir containing this script                                                                                                                                                                                    
 SCRIPT_DIR=$(dirname $(realpath "$0}"))
