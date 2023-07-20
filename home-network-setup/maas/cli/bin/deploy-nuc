@@ -9,7 +9,7 @@
 SCRIPT_DIR=$(dirname $(realpath "$0}"))
 
 # Cloud-Init Script
-MC="${SCRIPT_DIR}/../cloud-init/set-dns"
+MC="${SCRIPT_DIR}/../cloud-init/ansible"
 
 # MAAS server
 H='192.168.3.6'
@@ -25,12 +25,22 @@ MU='pwyoung'
 #  ssh maas-server "sudo maas apikey --username=$MU" > ~/.maas-api-keyfiles/$MU
 MK=$(head -1 ~/.maas-api-keyfiles/$MU)
 
+# REQUIRED PARAMATERS
+ARCH="amd64"
 # Machine's netboot MAC
 MAC='48:21:0b:55:b4:5b'
+# Power type
+PT="manual"
 
-# Commissioned Machine to Deploy
-MM='nuc.maas'
+# Hostname
+HN='nuc'
+# Domain Name
+DN='maas'
+# Description
+DESC="New machine: $HN $DN"
 
+# Command output
+OF=~/.maas-command-output.txt
 
 ################################################################################
 
@@ -39,32 +49,69 @@ login() {
         echo "User $MU is already logged in"
     else
         echo "Logging in, user=$MU"
-        maas login $MU $MS $MK
+        maas login $MU $MS $MK | tee -a $OF
     fi
 }
 
 create_machine() {
     maas $MU machines create \
-     architecture=amd64 \
-     mac_addresses=${MAC} \
-     power_type=manual
+         architecture=${ARCH} \
+         mac_addresses=${MAC} \
+         power_type=${PT} \
+         enable_ssh=true \
+         hostname=${HN>} \
+         domain=${DN} | tee -a $OF
+
+        # description="${DESC}"
+        # commissioning_scripts=""
+        # testing_scripts=""
 }
 
 deploy_machine() {
-
     if [ -e $MC ]; then
         echo "Deploying $H using cloud-init script $MC"
+        # Encode the User Data
+        USER_DATA=$(base64 $MC)
     else
         echo "ERROR: $MC not found"
         exit 1
     fi
 
-    USER_DATA=$(base64 $MC)
+    # Given the hostname, get the MAAS system_id
+    MCF=~/.maas-machines-read.json
+    maas $MU machines read > $MCF
+    SYSTEM_ID=$(cat $MCF | jq ".[] | select(.hostname == \"${HN}\")" | jq -r '.system_id')
 
-    maas $MU machine deploy $MM user_data="${USER_DATA}"
+    maas $MU machine deploy ${SYSTEM_ID} user_data="${USER_DATA}" | tee -a $OF
 }
 
-#login
-#deploy_machine
+clear_command_log() {
+    echo "" > $OF
+}
 
-create_machine
+open_maas_in_browser() {
+    MURL="${MS}/r/machines"
+    echo "\n\n\n open ${MURL}" | tee -a $OF
+}
+
+run() {
+    clear_command_log
+
+    # login
+
+    # create_machine
+
+    deploy_machine
+
+    open_maas_in_browser
+}
+
+run
+
+
+
+
+
+
+
+
