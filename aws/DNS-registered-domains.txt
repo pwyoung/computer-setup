@@ -1,0 +1,8 @@
+https://us-east-1.console.aws.amazon.com/route53/domains/home?region=us-east-1#/
+
+AWS AccountID: 792566780889
+Route53 zones (obliterated), but Registered Domains remain
+
+pwy2.net
+
+pwyoung.net
