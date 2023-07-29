@@ -30,5 +30,10 @@
 
     // LINUX TERMINAL
     "terminal.integrated.automationShell.linux": "/bin/bash",
-    "terminal.integrated.shellArgs.linux": [ "-l" ]
+    "terminal.integrated.shellArgs.linux": [ "-l" ],
+
+    // WTF
+    "editor.occurrencesHighlight": false,
+    "editor.selectionHighlight": false,
+    "editor.matchBrackets": "never",
 }
