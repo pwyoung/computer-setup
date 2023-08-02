@@ -1,4 +1,7 @@
 
+# Create an SSH key (using an elliptical key)
+# ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/id_ed25519
+
 # CLI-type settings
 # ssh  -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no"  ubuntu@18.205.214.96
 
@@ -11,6 +14,18 @@ Host dev
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
+
+# a4:bb:6d:67:87:3c
+# ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIChqNzmJiuEUH0jI4WLfiRSpNYcOwi/xXNeCvfyWT6qK pyoung@gallifreypyoung@gallifrey
+Host gallifrey
+  HostName 192.168.3.231
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+
 
 # 00:ce:39:d1:21:be
 Host mele

@@ -6,7 +6,7 @@
 
 if command -v kvm >/dev/null; then
 
-    L=$HOME/kvm.sh.out
+    L=$HOME/.kvm.sh.out
 
     F=/usr/lib/qemu/qemu-bridge-helper
 
