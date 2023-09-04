@@ -1,0 +1,695 @@
+
+################################################################################
+# Initial Setup
+################################################################################
+sudo apt install emacs-nox
+
+Firefox:
+  - sync
+  - log into github, add keys, clone this repo
+
+software tool:
+  - update
+  - Add timeshift
+
+sudo timeshift-gtk
+
+sudo apt-add-repository -y ppa:teejee2008/ppa
+
+sudo apt-get update
+
+sudo apt-get install xfsprogs
+sudo apt-get install timeshift
+
+SSH-Keys:
+  - ssh-keygen -t rsa
+  - Send to github
+
+Timeshift-Snapshot: After-updates
+
+################################################################################
+# LIBVIRT
+################################################################################
+
+https://www.linuxtechi.com/install-configure-kvm-ubuntu-18-04-server/
+
+sudo apt install cpu-checker
+
+sudo kvm-ok
+
+sudo apt update
+sudo apt install qemu qemu-kvm libvirt-bin bridge-utils  virt-manager
+
+# AHA: libvirt-bin failed to install on 19.10!
+
+sudo service libvirtd restart
+sudo service libvirtd status
+ libvirtd.service - Virtualization daemon
+   Loaded: loaded (/lib/systemd/system/libvirtd.service; enabled; vendor preset: enabled)
+   Active: active (running) since Sun 2019-12-08 19:43:38 EST; 1s ago
+     Docs: man:libvirtd(8)
+           https://libvirt.org
+ Main PID: 14286 (libvirtd)
+    Tasks: 19 (limit: 32768)
+   CGroup: /system.slice/libvirtd.service
+           ├─12504 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script
+           ├─12505 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script
+           └─14286 /usr/sbin/libvirtd
+
+Dec 08 19:43:38 pop-os systemd[1]: Starting Virtualization daemon...
+Dec 08 19:43:38 pop-os systemd[1]: Started Virtualization daemon.
+Dec 08 19:43:39 pop-os dnsmasq[12504]: read /etc/hosts - 3 addresses
+Dec 08 19:43:39 pop-os dnsmasq[12504]: read /var/lib/libvirt/dnsmasq/default.addnhosts - 0 addresses
+Dec 08 19:43:39 pop-os dnsmasq-dhcp[12504]: read /var/lib/libvirt/dnsmasq/default.hostsfile
+
+Timeshift-Snapshot: libvirt
+
+################################################################################
+# CREATE A BRIDGE (BR0) in QEMU/Session
+################################################################################
+
+# Q: Why not use systemctl?
+
+# Q: The above docs say /etc/netplan/50-cloud-init.yaml already exists, but it doesn't...
+
+# Network: how should I add a bridge, if I should?
+sudo tree /etc/systemd/network # empty
+sudo tree /etc/netplan # empty
+
+# ---
+ systemctl status | grep -i network
+           │ │ │ └─15729 grep --color=auto -i network
+             ├─networkd-dispatcher.service
+             │ └─1022 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
+             ├─NetworkManager.service
+             │ ├─1052 /usr/sbin/NetworkManager --no-daemon
+             │ └─1486 /sbin/dhclient -d -q -sf /usr/lib/NetworkManager/nm-dhcp-helper -pf /run/dhclient-eno1.pid -lf /var/lib/NetworkManager/dhclient-efca3a65-f60b-32b8-a6b4-4788fae677fd-eno1.lease -cf /var/lib/NetworkManager/dhclient-eno1.conf eno1
+
+# Looks like netplan is used
+#
+ cat /etc/network/interfaces
+# ifupdown has been replaced by netplan(5) on this system.  See
+# /etc/netplan for current configuration.
+# To re-enable ifupdown on this system, you can run:
+#    sudo apt install ifupdown
+
+# Check net procs
+sudo ps -ef | grep -i net
+root        82     2  0 19:15 ?        00:00:00 [netns]
+root      1022     1  0 19:15 ?        00:00:00 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
+root      1052     1  0 19:15 ?        00:00:00 /usr/sbin/NetworkManager --no-daemon
+root      1486  1052  0 19:15 ?        00:00:00 /sbin/dhclient -d -q -sf /usr/lib/NetworkManager/nm-dhcp-helper -pf /run/dhclient-eno1.pid -lf /var/lib/NetworkManager/dhclient-efca3a65-f60b-32b8-a6b4-4788fae677fd-eno1.lease -cf /var/lib/NetworkManager/dhclient-eno1.conf eno1
+pyoung   16190 15755  0 20:17 pts/4    00:00:00 grep --color=auto -i net
+
+
+# Apparently this CAN work with networkmanager,but often conflicts
+sudo systemctl status systemd-networkd
+● systemd-networkd.service - Network Service
+   Loaded: loaded (/lib/systemd/system/systemd-networkd.service; disabled; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd-networkd.service(8)
+
+
+#
+# A: It looks like netplan is used, but... review other docs
+#
+
+
+# Other docs
+#   https://netplan.io/examples#bridging
+
+
+# Confirmed:
+#   There is no bridge (per https://www.linuxtechi.com/install-configure-kvm-ubuntu-18-04-server/)
+#
+# NOTE:
+#  https://bbs.archlinux.org/viewtopic.php?id=184164
+#    You can't have systemd-networkd and NetworkManager working at the same time.
+#
+sudo networkctl status -a 2>/dev/null | grep '●'
+● 1: lo
+● 2: eno1
+● 3: virbr0
+● 4: virbr0-nic
+
+
+# https://unix.stackexchange.com/questions/475146/how-exactly-are-networkmanager-networkd-netplan-ifupdown2-and-iproute2-inter/475190
+#
+ dpkg -S /etc/network
+wpasupplicant, wireless-tools, resolvconf, netbase, ifupdown, avahi-daemon, avahi-autoipd, bridge-utils: /etc/network
+
+# Apparently, they can coexist
+https://askubuntu.com/questions/1161422/etc-network-interfaces-systemd-networkd-and-networkmanager-how-do-they-coexis
+
+#
+# Attempt 1: make bridge with netplay->NetworkManager
+#
+
+# Using network-manager
+#   https://netplan.io/examples#using-network-manager-as-a-renderer
+sudo emacs /etc/netplan/config.yaml
+# /etc/netplan/config.yaml
+# Use your own device as needed: (replace BOTH places in the file)
+#   - eno1
+#   - enp8s0
+network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    eno1:
+      dhcp4: no
+  bridges:
+    br0:
+      dhcp4: yes
+      interfaces:
+        - eno1
+#
+# Per https://fabianlee.org/2019/04/01/kvm-creating-a-bridged-network-with-netplan-on-ubuntu-bionic/
+sudo netplan generate
+sudo netplan --debug apply
+
+# EXAMPLE OF HOW TO DELETE A BRIDGE
+#  For example, if the wrong config was applied
+ifconfig br0 down
+brctl delbr br0
+
+# Review
+sudo networkctl status -a 2>/dev/null | grep '●'
+
+# YES - WE HAVE A BRIDGE!
+sudo networkctl status -a 2>/dev/null | grep '●'
+● 1: lo
+● 2: eno1
+● 3: virbr0
+● 4: virbr0-nic
+● 5: br0
+
+# This shows the brige has the IP address this host does get from the router's DHCP server
+# This works because the mac of the bridge is correct (matches the ethernet)
+#  HW Address: <same as ethernet>
+sudo networkctl status -a 2>/dev/null
+#
+● 5: br0
+       Link File: /lib/systemd/network/99-default.link
+    Network File: n/a
+            Type: ether
+           State: n/a (unmanaged)
+          Driver: bridge
+      HW Address: 9c:5c:8e:73:1a:25 (ASUSTek COMPUTER INC.)
+         Address: 10.250.0.101
+                  fe80::9e5c:8eff:fe73:1a25
+         Gateway: 10.250.0.1 (NETGEAR)
+
+# Additional confirmation
+sudo netplan ip leases br0
+lease {
+  interface "br0";
+  fixed-address 10.250.0.101;
+  option subnet-mask 255.255.255.0;
+  option routers 10.250.0.1;
+  option dhcp-lease-time 86400;
+  option dhcp-message-type 5;
+  option domain-name-servers 10.250.0.1;
+  option dhcp-server-identifier 10.250.0.1;
+  renew 1 2019/12/09 12:12:51;
+  rebind 1 2019/12/09 22:29:50;
+  expire 2 2019/12/10 01:29:50;
+}
+
+
+#
+# Configure libvirt network to use existing bridge
+#   Per https://fabianlee.org/2019/04/01/kvm-creating-a-bridged-network-with-netplan-on-ubuntu-bionic/
+#
+sudo cat << EOF > ./host-bridge.xml
+<network>
+  <name>host-bridge</name>
+  <forward mode="bridge"/>
+  <bridge name="br0"/>
+</network>
+EOF
+#
+sudo virsh net-define host-bridge.xml
+sudo virsh net-start host-bridge
+sudo virsh net-autostart host-bridge
+# state should be active, autostart, and persistent
+sudo virsh net-list --all
+
+# REBOOT
+# Wait for IP address
+ip a s
+# YES ... This is in the USER SESSION !!!
+sudo virsh --connect qemu:///session net-list
+ Name                 State      Autostart     Persistent
+----------------------------------------------------------
+ host-bridge          active     yes           yes
+
+# Actually, enabled vagrant-libvirt bridge too
+sudo virsh --connect qemu:///session net-list
+ Name                 State      Autostart     Persistent
+----------------------------------------------------------
+ default              active     yes           yes
+ host-bridge          active     yes           yes
+ vagrant-libvirt      active     yes           yes
+
+# NOTE: The connection seems to silently fail if run as non-root
+virsh --connect qemu:///session net-list # nothing
+
+# Another way to look at the bridge
+sudo virsh --connect qemu:///session net-info host-bridge
+Name:           host-bridge
+UUID:           d4b20719-c4e3-4064-951c-90c7b122f0b2
+Active:         yes
+Persistent:     yes
+Autostart:      yes
+Bridge:         br0
+
+
+# But, it seems that the qemu helper on Ubuntu is broken
+# This assumption is based on:
+#   - The error below
+#   - The fact that there are blogs saying so and showing how they recompiled libvirt
+#     to make it work.
+#     - e.g. https://jonaspfannschmidt.com/libvirt_session.html
+Error starting domain: internal error: /usr/lib/qemu/qemu-bridge-helper --br=br0 --fd=25: failed to communicate with bridge helper: Transport endpoint is not connected
+stderr=failed to write fd to unix socket: Socket operation on non-socket
+
+# ATTEMPT 2: Make yet another bridge
+# Base on this: https://github.com/vagrant-libvirt/vagrant-libvirt/issues/272
+#   - "You need to set up your bridge (let's say virbr0) independent of qemu:///session. Like via system libvirtd/qemu:///system. Then with qemu:///session give your VM device XML like:"
+emacs ~/bridge-virbr0.xml
+# ~/bridge-virbr0.xml
+<network>
+  <name>host-bridge</name>
+  <forward mode="bridge"/>
+  <bridge name="br0"/>
+</network>
+#
+sudo virsh net-define bridge-virbr0.xml
+sudo virsh net-start bridge-virbr0
+sudo virsh net-autostart bridge-virbr0
+# state should be active, autostart, and persistent
+sudo virsh net-list --all
+
+# GIVING UP ON QEMU/Session on Ubuntu (at least 18.04)
+# Perhaps "usermode networking" can be specified in vagrant-libvirt ... maybe....
+
+
+################################################################################
+# Home links
+################################################################################
+
+HOME links:
+  - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/computer-setup.git
+  - for i in $(ls -a ~/git/pwyoung/computer-setup/home | egrep -v '(^.$|^..$)' ); do echo $i; ln -s ~/git/pwyoung/computer-setup/home/$i ~/$i; done
+
+Timeshift-Snapshot: host-bridge
+
+################################################################################
+# NOMAJ
+################################################################################
+
+# GIT, ANSIBLE
+sudo apt-get install git ansible
+
+# PYTHON
+sudo apt-get install python3-dev python3-venv
+#
+# Run this on boot (e.g. ~/.profile.d/python.sh
+#
+VENV_DIR=~/venv/python3
+if [ ! -d ${VENV_DIR} ]; then
+    echo "Creating venv dir ${VENV_DIR}"
+    python3 -m venv ${VENV_DIR}
+fi
+export set PYTHONIOENCODING=UTF-8
+export set PYTHONUNBUFFERED=1
+source ${VENV_DIR}/bin/activate
+
+# Cleanup
+sudo apt autoremove
+
+Nomaj:
+  - mkdir -p ~/git/pwyoung; cd $_; git clone git@github.com:pwyoung/nomaj.git; cd nomaj
+
+# PYTHON DEPS
+cd .../nomaj/
+make deps
+
+# PASSWORDLESS SSH to localhost
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+sudo apt-get install openssh-server
+ssh localhost hostname
+
+# NOMAJ ANSIBLE TEST
+#
+# Requires passwordless ssh to localhost
+cd nomaj/tests/module-ansible
+make
+
+Timeshift-Snapshot: Nomaj-Ansible
+
+################################################################################
+# VAGRANT
+################################################################################
+
+sudo apt-get install vagrant-libvirt
+
+# Check packages
+sudo apt list --installed 2>/dev/null | egrep -i 'libvirt|kvm|qemu|virtual|vagrant'
+
+# Timeshift-Snapshot: vagrant
+
+################################################################################
+# TEST VAGRANT-LIBVIRT
+################################################################################
+
+# ERROR
+#   Call to virConnectOpen failed: Failed to connect socket to '/var/run/libvirt/libvirt-sock': Permission denied
+#
+# ls -l /var/run/libvirt/libvirt-sock
+srwxrwx--- 1 root libvirt 0 Dec  7 20:40 /var/run/libvirt/libvirt-sock
+
+sudo usermod -G libvirt-qemu -a $USER
+sudo usermod -G libvirt -a $USER
+sudo usermod -G kvm -a $USER
+reboot
+
+Timeshift-Snapshot: vagrant-reboot-1
+
+
+# Test again
+cd ~/git/pwyoung
+git clone ....
+cd ./vagrant-libvirt-testing
+make
+
+################################################################################
+# CHANGE CODE TO USE QEMU/SYSTEM - NO NVME
+################################################################################
+
+
+
+################################################################################
+# NOMAJ VAGRANT TEST
+#
+Test
+cd nomaj/tests/module-vagrant
+make
+
+# Error after "make"
+Call to virDomainCreateWithFlags failed: internal error: process exited while connecting to monitor: 2019-12-08T01:58:39.381378Z qemu-system-x86_64: -drive file=/home/pyoung/.local/share/libvirt/images/test_module_vagrant/node-2_1.qcow2,if=none,id=drv1: Could not open '/home/pyoung/.local/share/libvirt/images/test_module_vagrant/node-2_1.qcow2': Permission denied
+#
+# virt-manager
+#   Shows these were created under QEMU/system
+#
+# Change the disk path to /var/lib/libvirt/images/ still fails (did not investigate)
+#
+# PLan: update Vagrantfile to work with qemu-session
+# Reproduce above error in /home/pyoung/git/pwyoung/nomaj/tests/vagrant-qemu-session
+#
+# Experiments are in /home/pyoung/git/pwyoung/vagrant-libvirt-testing/test-qemu-session
+#
+
+# Failed OS updates...
+# dpkg --configure -a # Grub to /dev/sdb1
+
+Timeshift-Snapshot: failed-os-updates-recovered
+
+
+
+
+
+
+################################################################################
+# GNOME-BOXES
+################################################################################
+
+# Gnome-boxes
+sudo apt-get install gnome-boxes
+
+# Check packages
+sudo apt list --installed 2>/dev/null | egrep -i 'libvirt|kvm|qemu|virtual'
+#
+ipxe-qemu-256k-compat-efi-roms/eoan,eoan,now 1.0.0+git-20150424.a25a16d-0ubuntu3 all [installed,automatic]
+ipxe-qemu/eoan,eoan,now 1.0.0+git-20190109.133f4c4-0ubuntu2 all [installed,automatic]
+libvirt-daemon-driver-storage-rbd/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-daemon/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+libvirt-glib-1.0-0/eoan,now 2.0.0-1 amd64 [installed,automatic]
+libvirt0/eoan,now 5.4.0-0ubuntu5 amd64 [installed,automatic]
+qemu-block-extra/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-kvm/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-common/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-data/eoan-updates,eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 all [installed,automatic]
+qemu-system-gui/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-system-x86/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+qemu-utils/eoan-updates,now 1:4.0+dfsg-0ubuntu9.2 amd64 [installed,automatic]
+
+Timeshift-Snapshot: gnome-boxes
+
+Install Fedora-31 in a gnome-box
+
+Timeshift-Snapshot: gnome-boxes completed
+
+
+################################################################################
+# KVM Checks/Attempts
+################################################################################
+
+https://help.ubuntu.com/community/KVM/Installation
+sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
+# Above only installed bridge-utils
+#   dpkg -S bridge-utils
+#   e /usr/share/doc/bridge-utils/HOWTO
+
+lsmod | grep kvm
+kvm_intel             278528  0
+kvm                   651264  1 kvm_intel
+irqbypass              16384  1 kvm
+
+kvm-ok
+INFO: /dev/kvm exists
+KVM acceleration can be used
+
+reboot
+TimeShift Snapshot: Before-building-libvirt
+
+################################################################################
+# LIBVIRT TESTS
+################################################################################
+
+cd /home/pyoung/git/pwyoung/vagrant-libvirt-testing/cli-tests
+./test-virbr0.sh # WORKS
+
+
+################################################################################
+# Attempt to build LIBVIRT
+################################################################################
+
+# HE IS RIGHT
+#   https://jonaspfannschmidt.com/libvirt_session.html
+#   "Luckily there is now a way to use existing bridges with qemu:///session. The tool qemu-bridge-helper can configure a tap device which connects the guest to a bridge. Unfortunately it doesn't seem to be configured correctly out-of-the-box in Ubuntu."
+
+
+
+
+
+################################################################################
+# VIRTUALBOX
+################################################################################
+
+sudo apt-get install virtualbox
+sudo apt install virtualbox-ext-pack
+
+sudo apt remove virtualbox
+
+
+
+
+
+
+
+
+
+
+
+################################################################################
+# Virtualization
+################################################################################
+
+
+Notes:
+  LIBVIRT/KVM/QEMU-based:
+    virt-manager:
+      - Is deprecated
+        - RHEL-8 is pushing Cockpit (a web service) to replace it.
+    Cockpit
+      - Is meant to replace virt-manager
+        - Is in early dev (which is why RHEL-8 will still include virt-manager)
+    Gnome-Boxes:
+      - Easy to use
+      - Local boxes are QEMU (user) Session.
+        - Excellent for ensuring this works
+      - Not as full-featured as above tools
+        - Claims its just for testing out new VMs and connecting to remote ones
+  VirtualBox:
+    - Nice, but vagrant can only provision one of these boxes at a time
+    - Vagrant on Linux (Fedora anyway) has all sorts of ruby plugin conflicts
+    - Requires maintaining GuestAdditions (for NVME drives, and other features)
+    - So provisioning tends to be much slower but given the deprecation of virt-manager
+      the GUI in Virtualbox is better for many  users
+
+
+# Cockpit
+sudo apt-get install cockpit
+systemctl restart cockpit
+systemctl status cockpit
+
+Create a VM in virt-manager
+# This tool is great.
+ - Shows GUI and links to just the XML config for the options
+ - Too bad it's deprecated in RHEL-8...
+
+
+################################################################################
+# VIRTUALIZATION
+################################################################################
+
+virsh vol-list default
+error: failed to connect to the hypervisor
+error: Failed to connect socket to '/var/run/libvirt/libvirt-sock': Permission denied
+
+ls -l /var/run/libvirt/libvirt-sock
+srwxrwx--- 1 root libvirt 0 Dec  6 18:29 /var/run/libvirt/libvirt-sock
+
+cat /etc/libvirt/libvirtd.conf | grep unix_sock_ | egrep -v '^#'
+unix_sock_group = "libvirt"
+unix_sock_ro_perms = "0777"
+unix_sock_rw_perms = "0770"
+
+# https://wiki.libvirt.org/page/Failed_to_connect_to_the_hypervisor
+grep libvirt /etc/group /etc/passwd
+/etc/group:libvirt:x:130:pyoung
+/etc/group:libvirt-qemu:x:64055:libvirt-qemu
+/etc/group:libvirt-dnsmasq:x:131:
+/etc/passwd:libvirt-qemu:x:64055:108:Libvirt Qemu,,,:/var/lib/libvirt:/usr/sbin/nologin
+/etc/passwd:libvirt-dnsmasq:x:122:131:Libvirt Dnsmasq,,,:/var/lib/libvirt/dnsmasq:/usr/sbin/nologin
+
+sudo usermod -G libvirt -a $USER
+#sudo usermod -G libvirt-qemu -a $USER
+#sudo usermod -G libvirtdnsmasq -a $USER
+
+# Timeshift Snapshot: Added user to libvirt group
+
+reboot
+
+Works
+
+sudo apt autoremove
+
+sudo apt-get install vagrant-libvirt | tee ~/vagrant-libvirt.log
+
+# Timeshift Snapshot: Added vagrant-libvirt
+
+
+
+
+
+mkdir -p ~/git/pwyoung; cd $_
+
+Background Image:
+  - https://wallpapercave.com/tardis-desktop-background
+
+
+
+################################################################################
+
+GNOME Shell Extensions:
+  todo:
+    - 427: Workspaces to Dock
+
+
+
+################################################################################
+Call to virDomainCreateWithFlags failed: Cannot access storage file '/var/lib/libvirt/images/test-module-vagrant_node-2.img' (as uid:64055, gid:108): No such file or directory
+
+cat /etc/passwd | grep 64055
+libvirt-qemu:x:64055:108:Libvirt Qemu,,,:/var/lib/libvirt:/usr/sbin/nologin
+
+root@pop-os:/etc/polkit-1/localauthority.conf.d# cat /etc/group | grep 108
+kvm:x:108:
+
+
+
+
+################################################################################
+# ADD BOXES
+################################################################################
+
+# Installed gnome-boxes
+# Added a box
+# Turned off the box
+# Added another NIC (bridge "br0")
+
+sudo su -
+mkdir /etc/qemu
+echo 'allow all' > /etc/qemu/bridge.conf
+chmod u+s /usr/lib/qemu/qemu-bridge-helper
+
+################################################################################
+# (RE)SET permissions on /var/lib/libvirt/images
+################################################################################
+
+
+sudo chown libvirt-qemu /var/lib/libvirt/images
+sudo chgrp kvm /var/lib/libvirt/images
+sudo chmod 775 /var/lib/libvirt/images
+sudo chmod g+s /var/lib/libvirt/images
+sudo chmod u+s /var/lib/libvirt/images
+ls -ld /var/lib/libvirt/images
+drwsrwsr-x 2 libvirt-qemu kvm 4096 Dec 10 16:18 /var/lib/libvirt/images
+
+# Error.
+#
+Call to virDomainCreateWithFlags failed: internal error: process exited while connecting to monitor: 2019-12-10T21:21:26.900613Z qemu-system-x86_64: -drive file=/var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_1.qcow2,if=none,id=drv1: Could not open '/var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_1.qcow2': Permission denied
+#
+ls -ld /var/lib/libvirt/images/*
+-rw-rw-r-- 1 pyoung       kvm      198216 Dec 10 16:21 /var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_1.qcow2
+-rw-rw-r-- 1 pyoung       kvm      198216 Dec 10 16:21 /var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_2.qcow2
+-rw------- 1 root         root     197120 Dec 10 16:21 /var/lib/libvirt/images/example-vagrant-qemu-system-nvme_node-1.img
+-rwxrw-r-- 1 libvirt-qemu kvm  1216439296 Dec  9 00:45 /var/lib/libvirt/images/generic-VAGRANTSLASH-ubuntu1804_vagrant_box_image_2.0.6.img
+
+# Attempt 2:
+sudo chown root /var/lib/libvirt/images
+sudo chgrp libvirt-qemu /var/lib/libvirt/images
+sudo chmod 775 /var/lib/libvirt/images
+sudo chmod g+s /var/lib/libvirt/images
+sudo chmod u-s /var/lib/libvirt/images
+ls -ld /var/lib/libvirt/images
+drwxrwsr-x 2 root libvirt-qemu 4096 Dec 10 16:21 /var/lib/libvirt/images
+
+# Error
+#
+Call to virDomainCreateWithFlags failed: internal error: process exited while connecting to monitor: 2019-12-10T21:27:38.332683Z qemu-system-x86_64: -drive file=/var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_1.qcow2,if=none,id=drv1: Could not open '/var/lib/libvirt/images/example_vagrant_qemu_system_nvme_node-1_1.qcow2': Permission denied
+#
+
+# This?
+https://bbs.archlinux.org/viewtopic.php?pid=1728381#p1728381
+
+################################################################################
+# MAYBE QEMU/SESSION WOULD BE EASIER... IT WORKED ON FEDORA
+################################################################################
+
+
+
+################################################################################
+# KVM NESTING
+################################################################################
+https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
+https://stafwag.github.io/blog/blog/2018/06/04/nested-virtualization-in-kvm/
+virt-host-validate
+
+
+kernelstub -a intel_iommu=on
+
+
