@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# See https://github.com/pwyoung/docker-dev-tooling
+
 L=/tmp/docker-dev-tools.sh.out
 
 H=$(hostname)

@@ -7,6 +7,12 @@
 # 2: Install a service which calls this script (so that it will invoke "run_command()")
 
 
+# Requirements
+# - Setup OneDrive
+#   sudo apt install -y onedrive
+#   mkdir -p ~/OneDrive
+
+
 LOG=/tmp/one-drive.sh.$USER.log
 
 THISSCRIPT=$0
