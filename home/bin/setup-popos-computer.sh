@@ -78,6 +78,8 @@ podman() {
 
 	echo "test"
 	podman run -it docker.io/library/busybox
+        docker run -it docker.io/library/busybox
+        docker-compose --version
     fi
 }
 
