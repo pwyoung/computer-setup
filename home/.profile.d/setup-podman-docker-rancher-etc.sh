@@ -22,19 +22,17 @@ setup_podman() {
 
 # Rancher automatically adds ~/.rd to PATH
 # So, move it off if we temporarily don't want to use it
-# This is easier than editing ~/.bash_profile and ~/.bashrc (constantly)
 avoid_rancher() {
     if [ -e ~/.rd ]; then
         mv ~/.rd ~/.rd.MOVED
     fi
 }
-
 restore_rancher() {
     if [ -e ~/.rd.MOVED ]; then
         mv ~/.rd.MOVED ~/.rd
     fi
 }
-
+# This is easier than editing ~/.bash_profile and ~/.bashrc (constantly)
 # avoid_rancher
 # restore_rancher
 
