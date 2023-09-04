@@ -43,7 +43,7 @@ elif command -v podman &>/dev/null; then
     setup_podman
 fi
 
-which docker &>1 >> $L
+which docker >> $L
 docker --version >> $L
-which docker-compose &>1 >> $L
+which docker-compose >> $L
 docker-compose --version >> $L
