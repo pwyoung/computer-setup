@@ -70,6 +70,12 @@ podman() {
 	echo "Per https://podman.io/docs/installation#debian"
 	sudo apt-get install -y podman
 
+        # https://www.redhat.com/sysadmin/podman-docker-compose
+        #   Emulate docker with podman
+        sudo apt-get install -y podman-docker
+        #   For Docker-Compose
+        sudo apt-get install -y docker-compose
+
 	echo "test"
 	podman run -it docker.io/library/busybox
     fi

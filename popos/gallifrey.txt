@@ -1,5 +1,20 @@
 
 Reinstall on 20230903
+setup steps are in ~/git/computer-setup/home/bin/setup-popos-computer.sh
+
+
+
+
+
+
+
+
+################################################################################
+TODO: not tested/done on latest setup...
+################################################################################
+
+
+
 
 
 
