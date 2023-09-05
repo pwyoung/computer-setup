@@ -20,6 +20,8 @@ PKGS+=" python3-pip vagrant "
 PKGS+=" xdg-utils"
 # For XFS
 PKGS+=" xfsprogs"
+# Python Dev
+PKGS+=" python-is-python3 python3-venv"
 
 install_packages() {
     sudo apt update
@@ -64,41 +66,33 @@ setup_symlinks() {
     chmod +x ~/.profile.d/*
 }
 
-podman() {
-    if ! which podman; then
-	echo "installing podman"
-	echo "Per https://podman.io/docs/installation#debian"
-	sudo apt-get install -y podman
 
-        # https://www.redhat.com/sysadmin/podman-docker-compose
-        #   Emulate docker with podman
-        sudo apt-get install -y podman-docker
-        #   For Docker-Compose
-        sudo apt-get install -y docker-compose
+# Call this before installing docker
+purge_all_docker() {
+    # From docker-ce: Uninstall docker
+    for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
 
-	echo "test"
-	podman run -it docker.io/library/busybox
-        docker run -it docker.io/library/busybox
-        docker-compose --version
-    fi
+    # added this
+    sudo apt uninstall docker* rancher* podman*
+
+    # Uninstall (rancher etc) never cleans this
+    rm -rf ~/.docker
+
+    echo "Review packages"
+    sudo apt list --installed | egrep -i 'docker|podman|rancher'
+
+    read -p "Press enter to continue"
 }
 
-# NOPE: It is not really meant to run on Ubuntu/PopOS -> due to RedHat/Canonical community mutual snubbing.
-# https://github.com/containers/podman/issues/11665
-# In a nutshell:
-# - podman devs have no interest in doing work to support Ubuntu (since they report but do not implement the manual solution)
-# - Ubuntu doesn't care to support podman (since it has no gvproxy package)
-#
-# NOTE:
-# - Rancher is probably a better tool, supported by a company that supports FOSS, and it just works everywhere.
 podman_desktop() {
     if ! flatpak info io.podman_desktop.PodmanDesktop &>/dev/null; then
 	echo "Install podman desktop"
 	echo "Per https://podman-desktop.io/docs/Installation/linux-install"
+
+        cat <<EOF
 	flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
 	flatpak install --user flathub io.podman_desktop.PodmanDesktop
 
-        cat <<EOF
         # Podman machine setup
         podman machine list
         # podman machine rm
@@ -114,11 +108,44 @@ rancher_desktop() {
     if ! which docker | grep '.rd/bin/docker'; then
 	    echo "Install Rancher Desktop"
 	    echo "Per https://docs.rancherdesktop.io/getting-started/installation/#linux"
-	    exit 1
+            echo "stop here"
+            exit 1
     fi
 }
 
-docs() {
+docker_ce() {
+    if ! docker --version | grep 'CHANGE'; then
+	    echo "Install Docker"
+	    echo "Per https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository"
+            echo "stop here"
+            exit 1
+    fi
+
+    sudo apt-get update
+    sudo apt-get install -y ca-certificates curl gnupg
+
+    if [ ! -e /etc/apt/keyrings/docker.gpg ]; then
+        sudo install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    fi
+
+    if [ ! -e /etc/apt/sources.list.d/docker.list ]; then
+        echo \
+            "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    fi
+
+    sudo apt-get update
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    sudo docker run hello-world
+
+
+}
+
+to_do() {
     cat <<EOF
   # SSH
   ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/id_ed25519
@@ -133,8 +160,66 @@ docs() {
 EOF
 }
 
-#install_packages
-setup_symlinks
-podman
-podman_desktop
-rancher_desktop
+setup_podman() {
+    if ! which podman; then
+        echo "Podman is not installed. Removing any old docker implementations first"
+        purge_all_docker
+
+	echo "installing podman"
+	echo "Per https://podman.io/docs/installation#debian"
+	sudo apt-get install -y podman
+
+    fi
+
+    # https://www.redhat.com/sysadmin/podman-docker-compose
+    #   Emulate docker with podman
+    sudo apt-get install -y podman-docker
+
+    #   For Docker-Compose
+    sudo apt-get install -y docker-compose
+
+
+    echo "test"
+    podman run -it docker.io/library/busybox hostname
+    docker run -it docker.io/library/busybox hostname
+    docker --version
+    docker-compose --version
+}
+
+install_some_docker() {
+
+    # No, uses VM, use this on Mac/Windows
+    #
+    # NOPE: It is not really meant to run on Ubuntu/PopOS -> due to RedHat/Canonical community mutual snubbing.
+    # https://github.com/containers/podman/issues/11665
+    # In a nutshell:
+    # - podman devs have no interest in doing work to support Ubuntu (since they report but do not implement the manual solution)
+    # - Ubuntu doesn't care to support podman (since it has no gvproxy package)
+    #
+    # NOTE:
+    # - Rancher is probably a better tool, supported by a company that supports FOSS, e.g. makes K3S, and things just work everywhere.
+    #podman_desktop
+
+    # No, uses VM, use this on Mac/Windows
+    #rancher_desktop
+
+    # Does not support CDI
+    #   https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#container-device-interface-cdi-support
+    #docker_ce
+
+    # Maybe risky since Nvidia doesn't officially support podman on Ubuntu
+    #   https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#container-runtimes
+    setup_podman
+}
+
+main() {
+    install_packages
+
+    setup_symlinks
+
+    install_some_docker
+
+    #to_do
+}
+
+main
