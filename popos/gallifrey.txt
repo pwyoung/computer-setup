@@ -3,9 +3,13 @@ Reinstall on 20230903
 setup steps are in ~/git/computer-setup/home/bin/setup-popos-computer.sh
 
 
+################################################################################
+Tiling Window Manager
+################################################################################
+Use super key to show workspaces
 
-
-
+Turn off animation when switching workspaces
+  gsettings set org.gnome.desktop.interface enable-animations false
 
 
 
@@ -87,5 +91,3 @@ sudo usermod -G libvirt-qemu -a $USER
 sudo usermod -G libvirt -a $USER
 sudo usermod -G kvm -a $USER
 reboot
-
-
