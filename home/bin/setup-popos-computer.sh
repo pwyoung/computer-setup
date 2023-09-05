@@ -337,12 +337,16 @@ setup_nvidia_for_docker_ce() {
     # configure docker daemon to recognize Nvidia runtime
     sudo nvidia-ctk runtime configure --runtime=docker
     sudo systemctl restart docker
+    # Check this
+    docker info | grep -i runtimes | grep -i nvidia
 
     echo "# Test"
     F1=/tmp/nvidia-smi.host
     F2=/tmp/nvidia-smi.container
     nvidia-smi | tee $F1
     sudo docker run --rm --runtime=nvidia --gpus all nvidia/cuda:11.6.2-base-ubuntu20.04 nvidia-smi | tee $F2
+    # docker run --rm --runtime=nvidia --gpus all nvidia/cuda nvidia-smi # fails, no latest version
+    # docker run --rm --runtime=nvidia --gpus all nvidia/cuda:11.6.2-base-ubuntu20.04 nvidia-smi # Works
     echo "Show nvidia-smi differences between host and container"
     diff $F1 $F2 || true
 
@@ -367,6 +371,14 @@ setup_nvidia_for_docker_ce() {
     #F=/etc/nvidia-container-runtime/config.toml
     #sudo sed -i 's/^#no-cgroups = false/no-cgroups = true/;' $F
 
+
+    # Test with Pytorch
+    # https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch
+    # https://docs.nvidia.com/deeplearning/frameworks/support-matrix/index.html
+    # docker run --gpus all -it --rm nvcr.io/nvidia/pytorch:23.08-py3 # Memory too low error
+    #
+    # stack=67108864=64MB
+    docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -it --rm nvcr.io/nvidia/pytorch:23.08-py3
 }
 
 main() {
