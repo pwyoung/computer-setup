@@ -7,7 +7,7 @@
 
 # Start with "dev-sshd"
 Host dev
-  HostName 192.168.3.2
+  HostName 127.0.0.1
   User dev
   Port 2222
   LogLevel FATAL
