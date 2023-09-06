@@ -240,6 +240,13 @@ purge_all_docker() {
 
 
 docker_ce() {
+    if ! groups | grep docker; then
+        echo "Adding $USER to docker group"
+        sudo usermod -aG docker $USER
+        echo "Exiting: Log in again"
+        exit 1
+    fi
+
     if command -v podman; then
         echo "Podman is installed. Removing any old docker implementations first"
         purge_all_docker
@@ -393,5 +400,5 @@ main() {
     #to_do
 }
 
-main
-
+#main
+install_some_docker
