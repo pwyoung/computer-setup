@@ -15,8 +15,8 @@ Host dev
   StrictHostKeyChecking no
   PasswordAuthentication no
 
-# a4:bb:6d:67:87:3c
-# ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIChqNzmJiuEUH0jI4WLfiRSpNYcOwi/xXNeCvfyWT6qK pyoung@gallifreypyoung@gallifrey
+# eth a4:bb:6d:67:87:3c 192.168.3.231
+# wifi bc:17:b8:64:28:b4 192.168.2.125
 Host gallifrey
   HostName 192.168.3.231
   User pyoung
