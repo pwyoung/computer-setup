@@ -2,8 +2,8 @@
 # Create an SSH key (using an elliptical key)
 # ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/id_ed25519
 
-# CLI-type settings
-# ssh  -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no"  ubuntu@18.205.214.96
+# CLI arg testing
+#   ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" dev@127.0.0.1 hostname
 
 # Start with "dev-sshd"
 Host dev
