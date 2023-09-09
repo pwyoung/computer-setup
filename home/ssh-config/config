@@ -35,7 +35,7 @@ Host gallifrey
 #   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFBGftdSCXNBhOQukPdbN6D9lVbsSKG0wka3K0l/K7tB pwyoung@tardis
 Host tardis
   HostName 192.168.3.3
-  User pyoung
+  User pwyoung
   Port 22
   LogLevel FATAL
   UserKnownHostsFile /dev/null
