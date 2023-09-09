@@ -1,0 +1,22 @@
+
+################################################################################
+# VSCODE
+################################################################################
+
+# Tips
+open https://linuxhint.com/install-visual-studio-code-pop-os/
+
+# VS-CODE in a (flatpak) sandbox:
+flatpak install flathub com.visualstudio.code
+flatpak run com.visualstudio.code
+# remove
+flatpak list | grep code
+
+# PopOS version
+sudo apt update && sudo apt upgrade -y
+sudo apt install code -y
+# USE THE APPLICATION GUI TO INSTALL (which only works after the apt pkg is installed)
+sudo dpkg -S /usr/share/code/code
+# To remove: sudo apt remove code -y
+
+################################################################################

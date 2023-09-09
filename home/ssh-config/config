@@ -1,4 +1,3 @@
-
 # Create an SSH key (using an elliptical key)
 # ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/id_ed25519
 
@@ -30,8 +29,18 @@ Host gallifrey
   PasswordAuthentication no
 
 
+
 # 00:ce:39:d1:21:be
 Host mele
+  HostName 192.168.3.6
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+# 00:ce:39:d1:21:be
+Host maas-server
   HostName 192.168.3.6
   User pyoung
   Port 22
@@ -42,16 +51,7 @@ Host mele
 
 # 48:21:0B:55:B4:5B
 Host nuc
-  HostName 192.168.3.5
-  User ubuntu
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-# VMs
-Host nuc-1
-  HostName 192.168.3.7
+  HostName 192.168.3.57 #nuc
   User ubuntu
   Port 22
   LogLevel FATAL
@@ -62,35 +62,13 @@ Host nuc-1
 
 # 80:fa:5b:74:f0:fc
 Host oryx
-  HostName 192.168.3.3
+  HostName oryx
   User ubuntu
   Port 22
   LogLevel FATAL
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
-# VMs
-Host oryx-1
-  HostName 192.168.3.8
-  User ubuntu
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-Host oryx-2
-  HostName 192.168.3.9
-  User ubuntu
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-
-
-
-# Gallifrey in Linux
-
 
 
 # Notes
@@ -112,10 +90,6 @@ Host oryx-2
   # Output should be something like this:
   #   debug1: Requesting X11 forwarding with authentication spoofing.
   #   DISPLAY=localhost:11.0
-
-# For SSH Tunneling
-
-
 # JumpBox settings
 Host jb
   HostName 52.54.72.108 # CHANGE ME
@@ -129,24 +103,4 @@ Host jb
   # Forward my SSH keys into the session so I can SSH to another host
   ForwardAgent yes
 
-#
-Host node-1
-	HostName 192.168.122.229
-	User vagrant
-	Port 22
-	IdentityFile /home/pwyoung/home_dev/git/philwyoungatinsight/ansible-playbook-ubuntu-nodeweaver/nomaj/build/vagrant/.vagrant/machines/node-1/libvirt/private_key
-	UserKnownHostsFile /dev/null
-	StrictHostKeyChecking no
-	PasswordAuthentication no
-	IdentitiesOnly yes
-	LogLevel FATAL
-Host node-2
-	HostName 192.168.122.176
-	User vagrant
-	Port 22
-	IdentityFile /home/pwyoung/home_dev/git/philwyoungatinsight/ansible-playbook-ubuntu-nodeweaver/nomaj/build/vagrant/.vagrant/machines/node-2/libvirt/private_key
-	UserKnownHostsFile /dev/null
-	StrictHostKeyChecking no
-	PasswordAuthentication no
-	IdentitiesOnly yes
-	LogLevel FATAL
+# Add more here
