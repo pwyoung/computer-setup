@@ -388,6 +388,52 @@ setup_nvidia_for_docker_ce() {
     docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -it --rm nvcr.io/nvidia/pytorch:23.08-py3
 }
 
+# Support this user running "user sessions" with KVM/Qemu
+# See: https://mike42.me/blog/2019-08-how-to-use-the-qemu-bridge-helper-on-debian-10
+configure_qemu_helper() {
+    if ! ls -l /usr/lib/qemu/qemu-bridge-helper | grep '\-rwsr-xr-x 1 root root'; then
+        cat <<EOF
+        # Allow default bridge to be used by non-root users
+        echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
+        sudo chown root:root /etc/qemu/bridge.conf
+        sudo chmod 0640 /etc/qemu/bridge.conf
+        sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
+        #
+        sudo chgrp $USER /etc/qemu/bridge.conf
+EOF
+        exit 1
+
+    fi
+
+    if ! systemctl status libvirtd.service | grep 'active (running)'; then
+        cat <<EOF
+        # Setup libvirt daemon
+        systemctl enable libvirtd.service
+        systemctl start libvirtd.service
+EOF
+        exit 1
+    fi
+
+    if ! ip addr show virbr0 | grep '192.168.122.1'; then
+        cat <<EOF
+        # Create "virbr0" as the default bridge for Libvirt/KVM/Qemu
+        sudo virsh net-autostart --network default
+        sudo virsh net-start --network default
+EOF
+        exit 1
+    fi
+
+}
+
+setup_ansible() {
+    sudo apt install software-properties-common -y
+    sudo apt-add-repository ppa:ansible/ansible
+    sudo apt update -y
+    sudo apt install ansible -y
+    ansible --version
+    ansible-galaxy --version
+}
+
 main() {
     install_packages
 
@@ -397,8 +443,12 @@ main() {
 
     setup_nvidia_for_docker_ce
 
+    configure_qemu_helper
+
+    setup_ansible
     #to_do
 }
 
-#main
-install_some_docker
+main
+
+
