@@ -1,5 +1,5 @@
 [credential]
-	helper = 
+	helper =
 	helper = /usr/local/share/gcm-core/git-credential-manager
 	# OSX
 	#helper = osxkeychain
