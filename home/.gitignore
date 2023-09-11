@@ -76,3 +76,7 @@ target
 #
 # debug output
 **/terragrunt-debug.tfvars.json
+
+
+# DOTNET
+**/obj/*

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+BRANCH="$1"
+if [ "$BRANCH" == "main" ]; then
+    echo "ERROR: this will not annihilate branch $BRANCH"
+    exit 1
+fi
+
+echo "Deleting a local branch"
+git branch --delete "$BRANCH" -f
+
+REMOTES=$(git remote -v | awk '{print $1}' | sort -u)
+
+for i in $REMOTES; do
+    echo "Delete Branch $BRANCH from remote $i"
+
+    echo "Deleting a remote branch"
+    git push $i --delete $BRANCH -f
+
+    echo "Deleting a local remote-tracking branch"
+    git branch --delete --remotes $i/$BRANCH -f
+
+    #echo "Delete multiple obsolete remote-tracking branches"
+    #git fetch $i --prune
+done

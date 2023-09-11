@@ -1,0 +1,10 @@
+echo "Use -r to delete remote branches."
+
+cat <<EOF
+# Fails
+# git push pwyoung --delete pwy-merging-bedrock
+#
+# Succeeds, because it specifies "remote" with "-r"
+# git branch -D -r pwyoung/pwy-merging-bedrock
+# git branch --delete -r pwyoung/pwy-merging-bedrock
+EOF

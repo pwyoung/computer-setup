@@ -1,0 +1,1 @@
+ps eaux | grep -v grep | grep ssh | grep -v sshfs | grep -v sftp | grep -v ssh-agent
