@@ -1,15 +1,18 @@
 #!/bin/bash
 
+# Kill all stopped containers
+sudo docker ps -a | grep Exit | cut -d ' ' -f 1 | xargs sudo docker rm
 
-    cat <<EOF
+# Remove dangling images
+docker images -q --filter dangling=true | xargs docker rmi
+
+
 # Useful commands to know:
-#
 # docker system prune
-#
+
 # docker ps -a
 # docker images -a
-#
+
 # systemctl status docker
 # sudo systemctl restart docker
-EOF
 
