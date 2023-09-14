@@ -31,21 +31,12 @@ PKGS+=" python-is-python3 python3-venv"
 # START: NOT-USED
 ################################################################################
 
-to_do() {
-    cat <<EOF
-  # SSH
-  ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/id_ed25519
 
-  # Timeshift
-  sudo apt-add-repository -y ppa:teejee2008/ppa
-  sudo apt-get update
-  sudo apt-get install timeshift
-
-  # KVM/QEMU
-  https://www.linuxtechi.com/how-to-install-kvm-on-ubuntu-22-04/
-EOF
-}
-
+# Podman-Desktop and Rancher-Desktop use VMs.
+# This is not ideal on Linux bare-metal because:
+# - The goal is to connect to the GPU directly (and pass-through is hard-enough already)
+# - No need to dedicate and limit resources in a VM (and starve the Host OS).
+#   That's part of the problem containers solve.
 
 # ***Give up on Podman on PopOS/Ubuntu (neither is officially supported w/podman)
 # This did not work. Details below.
@@ -142,7 +133,6 @@ setup_podman() {
     docker-compose --version
 }
 
-# This uses a VM. Not ideal on Linux when we need to access/debug connection to GPU
 podman_desktop() {
     if ! flatpak info io.podman_desktop.PodmanDesktop &>/dev/null; then
 	echo "Install podman desktop"
@@ -225,17 +215,7 @@ setup_symlinks() {
 purge_all_docker() {
     read -p "Press enter to NUKE/PURGE ALL DOCKER IMPLEMENTATIONS!"
 
-    # From docker-ce: Uninstall docker
-    for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get -y remove $pkg || true; done
-
-    # added this
-    sudo apt remove -y docker* rancher* podman*
-
-    # Uninstall (rancher etc) never cleans this
-    rm -rf ~/.docker
-
-    echo "Review packages"
-    sudo apt list --installed | egrep -i 'docker|podman|rancher'
+    ~/bin/purge-docker.sh
 }
 
 
@@ -279,8 +259,6 @@ docker_ce() {
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-    sudo docker run hello-world
-
 }
 
 install_some_docker() {
@@ -313,6 +291,10 @@ install_some_docker() {
     # But this seems to be supported in general
     #   https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#setting-up-docker
     docker_ce
+
+    # Test it
+    # sudo docker run hello-world
+    docker run hello-world
 }
 
 
@@ -385,11 +367,13 @@ setup_nvidia_for_docker_ce() {
     # docker run --gpus all -it --rm nvcr.io/nvidia/pytorch:23.08-py3 # Memory too low error
     #
     # stack=67108864=64MB
-    docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -it --rm nvcr.io/nvidia/pytorch:23.08-py3
+    docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -it --rm nvcr.io/nvidia/pytorch:23.08-py3 hostname
 }
 
 # Support this user running "user sessions" with KVM/Qemu
 # See: https://mike42.me/blog/2019-08-how-to-use-the-qemu-bridge-helper-on-debian-10
+#
+# See: https://www.linuxtechi.com/how-to-install-kvm-on-ubuntu-22-04/
 configure_qemu_helper() {
     if ! ls -l /usr/lib/qemu/qemu-bridge-helper | grep '\-rwsr-xr-x 1 root root'; then
         cat <<EOF
@@ -426,13 +410,31 @@ EOF
 }
 
 setup_ansible() {
-    sudo apt install software-properties-common -y
-    sudo apt-add-repository ppa:ansible/ansible
-    sudo apt update -y
-    sudo apt install ansible -y
-    ansible --version
-    ansible-galaxy --version
+    if ! ansible-galaxy --version; then
+        sudo apt install software-properties-common -y
+        sudo apt-add-repository ppa:ansible/ansible
+        sudo apt update -y
+        sudo apt install ansible -y
+        ansible --version
+        ansible-galaxy --version
+    fi
 }
+
+misc() {
+    # SSH
+    if [ ! -e ~/.ssh/id_ed25519 ]; then
+        echo "Make ed25519 SSH key"
+        ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/id_ed25519
+    fi
+
+    # Timeshift
+    if ! command -v timeshift-gtk; then
+        sudo apt-add-repository -y ppa:teejee2008/ppa
+        sudo apt-get update
+        sudo apt-get install timeshift
+    fi
+}
+
 
 main() {
     install_packages
@@ -446,9 +448,8 @@ main() {
     configure_qemu_helper
 
     setup_ansible
-    #to_do
+
+    misc
 }
 
 main
-
-

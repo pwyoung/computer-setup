@@ -56,6 +56,7 @@ cleanup() {
      sudo apt autoremove -y
 }
 
+# read -p "Press enter to NUKE/PURGE ALL DOCKER IMPLEMENTATIONS!"
 
 clean_slate
 nuke_docker
