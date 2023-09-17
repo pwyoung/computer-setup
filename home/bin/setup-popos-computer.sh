@@ -433,6 +433,15 @@ misc() {
         sudo apt-get update
         sudo apt-get install timeshift
     fi
+
+    # VSCODE
+    if ! command -v code; then
+        echo "Get VSCODE from https://code.visualstudio.com/Download"
+        echo "Check extensions here: https://marketplace.visualstudio.com/vscode"
+        google-chrome https://code.visualstudio.com/Download#
+        exit 1
+    fi
+
 }
 
 

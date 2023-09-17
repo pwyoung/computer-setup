@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+docs() {
+    cat <<EOF
+# https://github.com/aws/deep-learning-containers/blob/master/available_images.md
+# us-east-1
+#   763104351884.dkr.ecr.us-east-1.amazonaws.com/<repository-name>:<image-tag>
+
+# example of version pinning
+763104351884.dkr.ecr.us-east-1.amazonaws.com/tensorflow-training:2.4.1-cpu-py37-ubuntu18.04-v1.0
+
+# ec2, ecs, eks
+https://github.com/aws/deep-learning-containers/blob/master/available_images.md#ec2-framework-containers-tested-on-ec2-ecs-and-eks-only
+
+# Sagemaker containers
+https://github.com/aws/deep-learning-containers/blob/master/available_images.md#sagemaker-framework-containers-sm-support-only
+PyTorch 2.0.1	inference	No	CPU	3.10 (py310)	763104351884.dkr.ecr.us-east-1.amazonaws.com/pytorch-inference:2.0.1-cpu-py310-ubuntu20.04-sagemaker
+
+# Triton inference containers
+https://github.com/aws/deep-learning-containers/blob/master/available_images.md#nvidia-triton-inference-containers-sm-support-only
+Notes:
+The following versions of the 23.<XY> container are supported: 23.01, 23.02, 23.03, 23.05, 23.06.
+SageMaker Triton Inference Container does not support Tensorflow1 as of version 23.05 onwards, as upstream Triton container does not support Tensorflow(v1) native backend from version 23.04 onwards.
+SageMaker Triton Inference Container does not ship with the FasterTransformer(FT) backend from version 23.06 onwards since the upstream FT library is undergoing re-structuring. It was previously available from versions v22.12 - v23.05, experimentally. This note will be updated after the restructuring is complete.
+
+
+007439368137.dkr.ecr.us-east-2.amazonaws.com/sagemaker-tritonserver:23.<XY>-py3
+# v=23.05
+007439368137.dkr.ecr.us-east-2.amazonaws.com/sagemaker-tritonserver:23.05-py3
+
+# DLC
+https://docs.aws.amazon.com/sagemaker/latest/dg/large-model-inference-dlc.html#large-model-inference-dlc-instance
+
+
+EOF
+
+
+
+}
+
+
+# docs
