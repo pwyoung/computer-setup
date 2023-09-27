@@ -16,6 +16,8 @@ start_vms() {
         echo "Started VMs"
     else
         echo "Failed to start VMs"
+        echo "Maybe you need to create the cluster with:"
+        echo "  cd ~/git/nomaj/examples/k8s-via-kubespray && make"
         exit 1
     fi
 
