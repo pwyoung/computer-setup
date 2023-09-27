@@ -78,3 +78,4 @@
 ;; --------------------------------------------------------------------------------
 (setq-default indent-tabs-mode nil)
 (put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)

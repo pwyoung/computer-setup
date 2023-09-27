@@ -1,5 +1,16 @@
 #!/bin/bash
 
+################################################################################
+# Add to PATH (so that subsequent stuff can use this)
+################################################################################
+
+if [ -e ~/bin ]; then
+    PATH=~/bin:$PATH
+fi
+
+if [ -e ~/bin-local ]; then
+    PATH=~/bin-local:$PATH
+fi
 
 ################################################################################
 # Public stuff (from the public 'computer setup' git repo)
@@ -27,16 +38,6 @@ if [ -e ~/.private.d ]; then
 fi
 
 ################################################################################
-
-# Add to PATH
-if [ -e ~/bin ]; then
-    PATH=~/bin:$PATH
-fi
-
-# Add to PATH
-if [ -e ~/bin-local ]; then
-    PATH=~/bin-local:$PATH
-fi
 
 # prepend bin dirs to PATH
 DEDUPLICATED_ORDER_PRESERVED_PATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PATH}))')"

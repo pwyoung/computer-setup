@@ -16,7 +16,7 @@ report() {
 	echo "${BLUE}${MSG}${NC}"
     else
 	echo "${SEP}\n${MSG}\n${SEP}"
-    fi    
+    fi
 }
 
 run() {
@@ -31,7 +31,7 @@ get_resource_stats() {
     run "kubectl get services"
     run "kubectl get replicationcontroller"
     run "kubectl get deployment"
-    run "kubectl get replicaset"    
+    run "kubectl get replicaset"
 }
 
 show_cluster_events() {
@@ -79,7 +79,7 @@ docker_info(){
 }
 
 check_virtualbox() {
-    if [ -f /Applications/VirtualBox.app/Contents/MacOS/VBoxManage ]; then	
+    if [ -f /Applications/VirtualBox.app/Contents/MacOS/VBoxManage ]; then
 	N=$(/Applications/VirtualBox.app/Contents/MacOS/VBoxManage list runningvms | grep minikube | wc -l)
 	if [ $N -gt 0 ]; then
 	    echo "Looks like you are running a Virtualbox VM for Minikube."
@@ -87,7 +87,7 @@ check_virtualbox() {
 	fi
     fi
 }
-    
+
 
 get_resource_stats
 show_logs_for_pods_that_are_not_running
