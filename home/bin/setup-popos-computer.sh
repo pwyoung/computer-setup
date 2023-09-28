@@ -27,6 +27,7 @@ PKGS+=" xfsprogs"
 # Python Dev
 PKGS+=" python-is-python3 python3-venv"
 
+
 ################################################################################
 # START: NOT-USED
 ################################################################################
@@ -450,8 +451,11 @@ main() {
 
     setup_symlinks
 
-    install_some_docker
-
+    # Nvidia has only been successfully run with Docker-CE
+    # Specifically, podman on Ubuntu failed (is a semi-supported nightmare)
+    #install_some_docker
+    docker_ce
+    docker run hello-world
     setup_nvidia_for_docker_ce
 
     configure_qemu_helper
