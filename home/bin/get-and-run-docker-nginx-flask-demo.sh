@@ -105,3 +105,4 @@ tell_host_to_trust_cert
 show_cert
 run_docker_compose
 test_it
+cleanup
