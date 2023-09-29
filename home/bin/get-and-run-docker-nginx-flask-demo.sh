@@ -8,7 +8,11 @@
 #   This shows how to
 #     create a self-signed cert
 #     tell the Ubuntu host how to trust that cert
-#     configure nginx to use certs
+#     make a simple flask app
+#     configure nginx to
+#       use certs
+#       proxy requests (to the host running flask)
+
 
 PROJECT="pwytest"
 
