@@ -91,10 +91,18 @@ test_it() {
     curl https://${HOST_IP}
 }
 
+show_cert() {
+    echo "Show the cert(s) for our host ip (${HOST_IP})"
+    awk -v cmd='openssl x509 -noout -subject' '    /BEGIN/{close(cmd)};{print | cmd}' < /etc/ssl/certs/ca-certificates.crt \
+        | grep "${HOST_IP}"
+}
+
 use_git_repo
 cleanup
 make_cert
 build_docker_image
 tell_host_to_trust_cert
+show_cert
 run_docker_compose
 test_it
+
