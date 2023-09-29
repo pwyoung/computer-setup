@@ -5,9 +5,10 @@
 #     https://github.com/alros/docker-nginx-flask-demo
 #
 # LESSONS:
-#   This shows how to create a self-signed cert
-#   This shows how to tell the Ubuntu host how to trust that cert
-#   This shows how to configure nginx
+#   This shows how to
+#     create a self-signed cert
+#     tell the Ubuntu host how to trust that cert
+#     configure nginx to use certs
 
 PROJECT="pwytest"
 
@@ -25,11 +26,10 @@ REPO="https://github.com/pwyoung/docker-nginx-flask-demo"
 use_git_repo() {
     if [ -e ./docker-nginx-flask-demo ]; then
         echo "repo exists"
-        cd ./docker-nginx-flask-demo
     else
         git clone $REPO
-        cd ./docker-nginx-flask-demo
     fi
+    cd ./docker-nginx-flask-demo
 
     if ! git remote -v | grep "docker-nginx-flask-demo"; then
         echo "Error: we are not in the git repo dir"
@@ -105,4 +105,3 @@ tell_host_to_trust_cert
 show_cert
 run_docker_compose
 test_it
-
