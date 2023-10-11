@@ -11,15 +11,32 @@
 
 # https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 
+LOG=/tmp/kubernetes.sh.out
+
+echo "Start: `date`" | tee $LOG
+
 if command -v kubectl; then
-    source <(kubectl completion bash)
+    echo "Setup kubectl cfg" | tee -a $LOG
 
-    alias kl="KUBECONFIG=~/.kube/config.local /home/pyoung/bin-local/kubectl"
-    alias hl="KUBECONFIG=~/.kube/config.local /usr/local/bin/helm"
-    complete -F __start_kubectl kl
+    if echo $PATH | tr ':' "\n" | egrep '/bin-local'; then
+        echo '"bin-local" seems to be in PATH' | tee -a $LOG
+    else
+        echo '"bin-local" seems to not be in PATH' | tee -a $LOG
+    fi
+    mkdir -p ~/bin-local
 
+    KCTL="KUBECONFIG=~/.kube/config.local $HOME/bin-local/kubectl"
+    HLM="KUBECONFIG=~/.kube/config.local /usr/local/bin/helm"
 
-    alias k=kubectl
-    complete -F __start_kubectl k
+    F=~/bin-local/h
+    #echo "source <(kubectl completion bash)" > $F
+    echo "$HLM \$@" > $F
+    chmod 0700 $F
+
+    F=~/bin-local/k
+    echo "$KCTL \$@" > $F
+    #complete -F __start_kubectl k
+    chmod 0700 $F
 fi
 
+echo "End: `date`" | tee -a $LOG
