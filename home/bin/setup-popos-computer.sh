@@ -234,34 +234,17 @@ setup_nvidia_for_docker_ce() {
     docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -it --rm nvcr.io/nvidia/pytorch:23.08-py3 hostname
 }
 
-# Show steps that need to be made
-show_changes_to_make_to_qemu_helper() {
-       cat <<EOF
-        # Allow default bridge to be used by non-root users
-        echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
-        sudo chown root /etc/qemu/bridge.conf
-        sudo chmod 0640 /etc/qemu/bridge.conf
-        sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
-        #
-        sudo chgrp $USER /etc/qemu/bridge.conf
-EOF
-        exit 1
-}
-
 # Support this user running "user sessions" with KVM/Qemu
 # See: https://mike42.me/blog/2019-08-how-to-use-the-qemu-bridge-helper-on-debian-10
 #
 # See: https://www.linuxtechi.com/how-to-install-kvm-on-ubuntu-22-04/
 configure_qemu_helper() {
-    PERMS=$(stat -c "%A" /etc/qemu/bridge.conf)
-    if [ "$PERMS" != "-rw-r-----" ]; then
-        show_changes_to_make_to_qemu_helper
-    fi
-
-    USER=$(stat -c "%U" /etc/qemu/bridge.conf)
-    if [ "$USER" != "root" ]; then
-        show_changes_to_make_to_qemu_helper
-    fi
+    echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
+    sudo chown root /etc/qemu/bridge.conf
+    sudo chmod 0640 /etc/qemu/bridge.conf
+    sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
+    #
+    sudo chgrp $USER /etc/qemu/bridge.conf
 
     if ! systemctl status libvirtd.service | grep 'active (running)'; then
         cat <<EOF
