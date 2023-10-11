@@ -27,146 +27,9 @@ PKGS+=" xfsprogs"
 # Python Dev
 PKGS+=" python-is-python3 python3-venv"
 
-
-################################################################################
-# START: NOT-USED
-################################################################################
-
-
-# Podman-Desktop and Rancher-Desktop use VMs.
-# This is not ideal on Linux bare-metal because:
-# - The goal is to connect to the GPU directly (and pass-through is hard-enough already)
-# - No need to dedicate and limit resources in a VM (and starve the Host OS).
-#   That's part of the problem containers solve.
-
-# ***Give up on Podman on PopOS/Ubuntu (neither is officially supported w/podman)
-# This did not work. Details below.
-setup_nvidia_for_podman() {
-    # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#step-1-install-nvidia-container-toolkit
-    sudo apt-get update \
-        && sudo apt-get install -y nvidia-container-toolkit-base
-
-    nvidia-ctk --version
-
-    if [ ! -e /etc/cdi/nvidia.yaml ]; then
-        sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
-    fi
-    grep "  name:" /etc/cdi/nvidia.yaml
-
-
-    # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#id9
-
-    # Specify Ubuntu (even though this is popos)
-    curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | sudo apt-key add - \
-        && curl -s -L https://nvidia.github.io/libnvidia-container/ubuntu22.04/libnvidia-container.list | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-
-    sudo apt-get update
-    sudo apt-get install -y nvidia-container-toolkit
-    sudo apt list --installed *nvidia*
-    if [ -e /usr/share/containers/oci/hooks.d/oci-nvidia-hook.json ]; then
-        echo "This should not exist, per https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#step-3-using-the-cdi-specification"
-        exit 1
-    fi
-
-    # Run containers as non-root. Do NOT use this for containers running as root (as they will fail)
-    #F=/etc/cdi/nvidia.yaml # Docs
-    #
-    # Found this file
-    # rm /tmp/x; for i in $(sudo apt list --installed 2>/dev/null| grep nvidia | grep jammy | cut -d'/' -f 1); do echo $i; dpkg -L $i |tee -a /tmp/x; done && emacs /tmp/x
-    F=/etc/nvidia-container-runtime/config.toml
-    sudo sed -i 's/^#no-cgroups = false/no-cgroups = true/;' $F
-
-
-    # Test
-    F1=/tmp/nvidia-smi.host
-    F2=/tmp/nvidia-smi.container
-    nvidia-smi | tee $F1
-    #
-    cat <<EOF
-    NEXT CMD FAILS. The device is not recognized
-    podman run --rm --device nvidia.com/gpu=all ubuntu nvidia-smi -L | tee $F2
-    ***Give up on Podman on PopOS/Ubuntu (neither is officially supported w/podman)
-
-
-    # REMOVE NCT
-    #   sudo apt remove nvidia-container-toolkit nvidia-container-toolkit-base
-    #   sudo rm /etc/apt/sources.list.d/nvidia-container-toolkit.list
-    #   sudo rm -rf /etc/nvidia-container-runtime
-    #   sudo ls -ltr /usr/share/containers
-EOF
-    podman run --rm --device nvidia.com/gpu=all ubuntu nvidia-smi -L | tee $F2
-    #
-    diff $F1 $F2 # Fail/exit on difference
-
-    # Specify/request for a specific GPU
-    # podman run --rm --device nvidia.com/gpu=gpu0 --device nvidia.com/gpu=mig1:0 ubuntu nvidia-smi -L
-
-    # Test
-    podman run --rm --security-opt=label=disable \
-     --hooks-dir=/usr/share/containers/oci/hooks.d/ \
-     --cap-add SYS_ADMIN nvidia/samples:dcgmproftester-2.0.10-cuda11.0-ubuntu18.04 \
-     --no-dcgm-validation -t 1004 -d 30
-}
-
-setup_podman() {
-    if ! which podman; then
-        echo "Podman is not installed. Removing any old docker implementations first"
-        purge_all_docker
-
-	echo "installing podman"
-	echo "Per https://podman.io/docs/installation#debian"
-	sudo apt-get install -y podman
-
-    fi
-
-    # https://www.redhat.com/sysadmin/podman-docker-compose
-    #   Emulate docker with podman
-    sudo apt-get install -y podman-docker
-
-    #   For Docker-Compose
-    sudo apt-get install -y docker-compose
-
-
-    echo "test"
-    podman run -it docker.io/library/busybox hostname
-    docker run -it docker.io/library/busybox hostname
-    docker --version
-    docker-compose --version
-}
-
-podman_desktop() {
-    if ! flatpak info io.podman_desktop.PodmanDesktop &>/dev/null; then
-	echo "Install podman desktop"
-	echo "Per https://podman-desktop.io/docs/Installation/linux-install"
-
-        cat <<EOF
-	flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
-	flatpak install --user flathub io.podman_desktop.PodmanDesktop
-
-        # Podman machine setup
-        podman machine list
-        # podman machine rm
-        podman machine init
-        podman machine start
-EOF
-        echo "stop here"
-        exit 1
-    fi
-}
-
-# This uses a VM. Not ideal on Linux when we need to access/debug connection to GPU
-rancher_desktop() {
-    if ! which docker | grep '.rd/bin/docker'; then
-	    echo "Install Rancher Desktop"
-	    echo "Per https://docs.rancherdesktop.io/getting-started/installation/#linux"
-            echo "stop here"
-            exit 1
-    fi
-}
-
-################################################################################
-# END: NOT-USED
-################################################################################
+# For local certs, esp on K8S
+# https://github.com/cloudflare/cfssl
+PKGS+="  golang-cfssl"
 
 install_packages() {
     sudo apt update
@@ -371,23 +234,33 @@ setup_nvidia_for_docker_ce() {
     docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -it --rm nvcr.io/nvidia/pytorch:23.08-py3 hostname
 }
 
-# Support this user running "user sessions" with KVM/Qemu
-# See: https://mike42.me/blog/2019-08-how-to-use-the-qemu-bridge-helper-on-debian-10
-#
-# See: https://www.linuxtechi.com/how-to-install-kvm-on-ubuntu-22-04/
-configure_qemu_helper() {
-    if ! ls -l /usr/lib/qemu/qemu-bridge-helper | grep '\-rwsr-xr-x 1 root root'; then
-        cat <<EOF
+# Show steps that need to be made
+show_changes_to_make_to_qemu_helper() {
+       cat <<EOF
         # Allow default bridge to be used by non-root users
         echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
-        sudo chown root:root /etc/qemu/bridge.conf
+        sudo chown root /etc/qemu/bridge.conf
         sudo chmod 0640 /etc/qemu/bridge.conf
         sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
         #
         sudo chgrp $USER /etc/qemu/bridge.conf
 EOF
         exit 1
+}
 
+# Support this user running "user sessions" with KVM/Qemu
+# See: https://mike42.me/blog/2019-08-how-to-use-the-qemu-bridge-helper-on-debian-10
+#
+# See: https://www.linuxtechi.com/how-to-install-kvm-on-ubuntu-22-04/
+configure_qemu_helper() {
+    PERMS=$(stat -c "%A" /etc/qemu/bridge.conf)
+    if [ "$PERMS" != "-rw-r-----" ]; then
+        show_changes_to_make_to_qemu_helper
+    fi
+
+    USER=$(stat -c "%U" /etc/qemu/bridge.conf)
+    if [ "$USER" != "root" ]; then
+        show_changes_to_make_to_qemu_helper
     fi
 
     if ! systemctl status libvirtd.service | grep 'active (running)'; then
@@ -465,4 +338,5 @@ main() {
     misc
 }
 
-main
+#main
+configure_qemu_helper
