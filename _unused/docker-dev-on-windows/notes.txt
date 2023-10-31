@@ -7,14 +7,14 @@ IMAGE='ubuntu:18.04'
 COMMAND='/bin/bash'
 NAME='dev2'
 MOUNTS='-v C:\:/c'
-OPTS="$MOUNTS --privileged --name $NAME -it" 
-# Create the container and connect to it 
+OPTS="$MOUNTS --privileged --name $NAME -it"
+# Create the container and connect to it
 docker run $OPTS $IMAGE $COMMAND
 
 # Set up the container
 # Conveniences
 ln -s '/c/Users/youngp/OneDrive - ACI Worldwide Corp' /root/OneDrive
-ln -s /root/OneDrive/data /root/data 
+ln -s /root/OneDrive/data /root/data
 ln -s '/c/Users/youngp/Downloads' /root/Downloads
 # Useful apps
 apt-get install emacs-nox wget curl htop tree iputils-ping ssh git rsync
@@ -22,8 +22,8 @@ apt-get install emacs-nox wget curl htop tree iputils-ping ssh git rsync
 # AWS CLI
 apt-get install awscli
 
-exit # To Cygwin shell 
-# Note: I still use that as my Terminal, e.g. in VSCode and elsewhere. 
+exit # To Cygwin shell
+# Note: I still use that as my Terminal, e.g. in VSCode and elsewhere.
 #       'docker' works from there and calls the windows program transparently
 
 # Confirm the container is stopped
@@ -33,7 +33,7 @@ docker ps # shows only running containers
 docker start -i $NAME # 'dev2'
 
 # connect to a running container from a second shell
-docker exec -it dev2 /bin/bash 
+docker exec -it dev2 /bin/bash
 
 
 
@@ -41,7 +41,7 @@ docker exec -it dev2 /bin/bash
 
 
 --- Query #1: This is ideal for Druid
-SELECT `clientdateyyyy-mm-dd`, columns 
+SELECT `clientdateyyyy-mm-dd`, columns
 FROM druid_table
 WHERE `clientdateyyyy-mm-dd` BETWEEEN ‘2019-01-01’ and ‘2019-12-12’
 GROUP BY `clientdateyyyy-mm-dd`, columns
@@ -51,14 +51,14 @@ SELECT `clientdateyyyy`
 
 
 --- Query #3
-SELECT `clientdateyyyy-mm-dd`, clientdateyyymmdd, columns 
+SELECT `clientdateyyyy-mm-dd`, clientdateyyymmdd, columns
 FROM druid_table
 WHERE `clientdateyyyy-mm-dd` BETWEEEN ‘2019-01-01’ and ‘2019-12-12’
  AND clientdateyyyymmdd BETWEEN 20190101 and 20191212
 GROUP BY `clientdateyyyy-mm-dd`, clientdateyyymmdd, columns
 
 -- Query 4: has ORC partition column, but the GROUP BY does not need to change if ORC has thew new column
-SELECT `clientdateyyyy-mm-dd`, columns 
+SELECT `clientdateyyyy-mm-dd`, columns
 FROM druid_table
 WHERE `clientdateyyyy-mm-dd` BETWEEEN ‘2019-01-01’ and ‘2019-12-12’
  AND clientdateyyyymmdd BETWEEN 20190101 and 20191212
@@ -83,22 +83,21 @@ GROUP BY `clientdateyyyy-mm-dd`, dim1, metric
 
 
 --
--- 
 --
-select CAST(... INT) clientdateyyymmdd, 
+--
+select CAST(... INT) clientdateyyymmdd,
   dim1, metric -- "columns"
 from (
-SELECT `clientdateyyyymmdd`, 
+SELECT `clientdateyyyymmdd`,
   dim1, metric -- "columns"
 FROM druid_table
 WHERE `clientdateyyyymmdd` BETWEEEN '2019-01-01' and '2019-12-12'
   AND clientdateyyyymmdd BETWEEN 20190101 and 20191212
 GROUP BY `clientdateyyyymmdd`, dim1, metric
-) 
+)
 
 
 Does IBI have a "view"?
 
 data for a time range:
 - how many trans, etc.
-
