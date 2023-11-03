@@ -1,5 +1,6 @@
 rm -f ./*~ #&>/dev/null
 rm -f ./*# #&>/dev/null
+find ./ -name "*~" | xargs rm
 
 clear
 
