@@ -2,6 +2,8 @@
 
 # GOAL: Set up a Windows Machine with an Nvidia GPU for development
 
+# REQUIREMENTS: Run this on WSL2
+
 set -e
 
 # Path to where we installed https://github.com/pwyoung/computer-setup
@@ -333,8 +335,4 @@ main() {
     test_nvidia_docker_support
 }
 
-#main
-install_nvidia_cuda_toolkit
-configure_nvidia_cuda_toolkit_for_docker_ce
-test_nvidia_docker_support
-
+main
