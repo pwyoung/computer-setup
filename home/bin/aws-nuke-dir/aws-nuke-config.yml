@@ -1,0 +1,46 @@
+regions:
+- global
+- us-east-1
+
+# Do not delete these accounts
+account-blocklist:
+- "999999999999" 
+
+# Delete resources in these accounts
+accounts:
+  "792566780889":
+    # Exclude these specific resources
+    filters:
+      IAMUser:
+      - "pwyinsightadmin"
+      IAMUserPolicyAttachment:
+      - "pwyinsightadmin -> AdministratorAccess"
+      IAMUserAccessKey:
+      - "pwyinsightadmin -> AKIA3RCFJKPMS5OJI3FA"
+
+
+resource-types:
+# Option A: List resource types to be deleted
+#  targets:
+#   - EC2Instance
+#   - EC2SecurityGroup
+#   - EC2SpotFleetRequest
+#   - EC2Volume
+#   - IAMUser
+#   - IAMUserAccessKey
+#   - IAMGroup
+#   - IAMPolicy
+#   - IAMRole
+#
+# Option B: List resource types to NOT DELETE
+#   Every resources will be deleted except excluded ones
+#
+  excludes:
+    - Route53ResourceRecordSet
+    - Route53HostedZone
+    - Route53ResolverRule
+    - OSPackage
+    - AppStreamImage
+    - KMSAlias
+    - ElasticacheCacheParameterGroup
+    - IAMVirtualMFADevice

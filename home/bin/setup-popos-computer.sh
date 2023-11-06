@@ -29,7 +29,7 @@ PKGS+=" python-is-python3 python3-venv"
 
 # For local certs, esp on K8S
 # https://github.com/cloudflare/cfssl
-PKGS+="  golang-cfssl"
+PKGS+=" golang-cfssl"
 
 install_packages() {
     sudo apt update
@@ -84,13 +84,6 @@ purge_all_docker() {
 
 
 docker_ce() {
-    if ! groups | grep docker; then
-        echo "Adding $USER to docker group"
-        sudo usermod -aG docker $USER
-        echo "Exiting: Log in again"
-        exit 1
-    fi
-
     if command -v podman; then
         echo "Podman is installed. Removing any old docker implementations first"
         purge_all_docker
@@ -122,6 +115,13 @@ docker_ce() {
 
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    if ! groups | grep docker; then
+        echo "Adding $USER to docker group"
+        sudo usermod -aG docker $USER
+        echo "Exiting: Log in again"
+        exit 1
+    fi
 
 }
 
@@ -239,9 +239,15 @@ setup_nvidia_for_docker_ce() {
 #
 # See: https://www.linuxtechi.com/how-to-install-kvm-on-ubuntu-22-04/
 configure_qemu_helper() {
+    # This didn't exist
+    sudo mkdir -p /etc/qemu
+    sudo chown root /etc/qemu
+    sudo chmod 0755 /etc/qemu
+
     echo 'allow virbr0' | sudo tee /etc/qemu/bridge.conf
-    sudo chown root /etc/qemu/bridge.conf
-    sudo chmod 0640 /etc/qemu/bridge.conf
+    sudo chown root.$USER /etc/qemu/bridge.conf
+    sudo chmod 0664 /etc/qemu/bridge.conf
+    #
     sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
     #
     sudo chgrp $USER /etc/qemu/bridge.conf
@@ -299,8 +305,24 @@ misc() {
         exit 1
     fi
 
+    # SSH
+    sudo apt-get install -y openssh-server
+    sudo systemctl enable ssh --now
+
+    # For Nvidia/Nemo
+    # https://medium.com/analytics-vidhya/installing-any-version-of-cuda-on-ubuntu-and-using-tensorflow-and-torch-on-gpu-b1a954500786
+    sudo apt-get install -y nvidia-cuda-toolkit
+    sudo apt list -a cuda=12.1.0.1
+    sudo apt list -a cuda=12.3.0.1
+
 }
 
+
+preferences() {
+    # Speed up animations
+    gsettings set org.gnome.desktop.interface enable-animations false
+
+}
 
 main() {
     install_packages
@@ -321,5 +343,5 @@ main() {
     misc
 }
 
-#main
-configure_qemu_helper
+main
+#configure_qemu_helper
