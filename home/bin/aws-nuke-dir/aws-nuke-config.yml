@@ -4,7 +4,7 @@ regions:
 
 # Do not delete these accounts
 account-blocklist:
-- "999999999999" 
+- "999999999999"
 
 # Delete resources in these accounts
 accounts:
@@ -17,6 +17,10 @@ accounts:
       - "pwyinsightadmin -> AdministratorAccess"
       IAMUserAccessKey:
       - "pwyinsightadmin -> AKIA3RCFJKPMS5OJI3FA"
+      EC2KeyPair:
+      - "ec2-prv-default-keypair"
+      - "ec2-pub-default-keypair"
+
 
 
 resource-types:
@@ -36,6 +40,7 @@ resource-types:
 #   Every resources will be deleted except excluded ones
 #
   excludes:
+    - EC2KeyPair
     - Route53ResourceRecordSet
     - Route53HostedZone
     - Route53ResolverRule

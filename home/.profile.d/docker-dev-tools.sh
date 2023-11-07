@@ -17,11 +17,5 @@ else
         PATH=$D:$PATH
     fi
 
-    D2=~/git/docker-dev-tooling/bin/subcommands
-    if [ -e $D2 ]; then
-        echo "Adding $D2 to PATH" >> $L
-        PATH=$D2:$PATH
-    fi
-
     export $PATH
 fi
