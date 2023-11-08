@@ -80,3 +80,6 @@ target
 
 # DOTNET
 **/obj/*
+
+# Cooler setup
+**/*.csm_setup*

@@ -324,6 +324,27 @@ preferences() {
 
 }
 
+setup_cooler() {
+    read -p "Hit 'y' and 'enter' to set up fan/temp/RGP manager tool. Enter to skip this." X
+    echo "$X"
+    if [ "$X" != "y" ]; then
+        echo "ok, skipping cooler setup"
+        return
+    fi
+
+    # https://gitlab.com/coolercontrol/coolercontrol#debian
+    sudo apt install -y libusb-1.0-0 curl python3-virtualenv python3.10-venv python3.10-dev build-essential libgl1-mesa-dev
+    sudo apt install -y apt-transport-https
+    if [ "$XDG_SESSION_TYPE" == "x11" ]; then
+        sudo apt install -y libxcb-cursor0
+    fi
+    curl -1sLf 'https://dl.cloudsmith.io/public/coolercontrol/coolercontrol/setup.deb.sh' | sudo -E bash
+    sudo apt update
+    sudo apt install coolercontrol
+    sudo systemctl enable coolercontrold
+    sudo systemctl start coolercontrold
+}
+
 main() {
     install_packages
 
@@ -340,8 +361,9 @@ main() {
 
     setup_ansible
 
+    setup_cooler
+
     misc
 }
-
-main
-#configure_qemu_helper
+setup_cooler
+#main
