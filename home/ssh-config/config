@@ -4,7 +4,69 @@
 # CLI arg testing
 #   ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" dev@127.0.0.1 hostname
 
-# Start with "dev-sshd"
+#   ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" ubuntu@34.207.172.61
+
+
+# Amazon jump box
+#
+# Test (keys, connectivity, etc)
+#   ssh -i ~/.ssh/id_ed25519-devops ubuntu@34.229.247.14 hostname
+#
+# Test (and debug) using this file
+#   ssh -vv jb hostname
+#
+# Notes
+#   For X11 connection forwarding
+#   On the server side
+#     grep X11Forwarding /etc/ssh/sshd_config # must be yes
+#     xauth -V # app must be there
+#F  orwardX11 yes
+#   Test X11 forwarding with:
+#     ssh -v pi 'echo DISPLAY=$DISPLAY' &> /tmp/x
+#     cat /tmp/x | egrep 'X11|^DISPLAY'
+#   Output should be something like this:
+#     debug1: Requesting X11 forwarding with authentication spoofing.
+#     DISPLAY=localhost:11.0
+Host jb
+  HostName 34.229.247.14
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile /home/dev/.ssh/id_ed25519-devops
+  # Forward my SSH keys into the session so I can SSH to another host
+  ForwardAgent yes
+#
+# SSH-agent vs SSH-ProxyCommand
+#   https://news.ycombinator.com/item?id=9429580
+#
+# SSH-agent 
+#   eval $(ssh-agent)
+#   # Remember PID
+#   ssh-add ~/.ssh/id_ed25519-devops
+#   ssh jb 'ssh 10.0.1.26 hostname'
+#   # kill -15 <PID>
+#
+# SSH-ProxyCommand
+#   Jump through "jb" to this machine
+#   This uses SSH ProxyCommand to allow the ssh cli
+#   to appear as though its a direct connection.
+# Test with: "ssh jt hostname"
+Host jt
+  HostName 10.0.1.26
+  IdentityFile /home/dev/.ssh/id_ed25519-devops 
+  IdentitiesOnly yes
+  Port 22
+  User ubuntu
+  ProxyCommand ssh -q -W %h:%p jb
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+
 Host dev
   HostName 127.0.0.1
   User dev
@@ -84,37 +146,6 @@ Host oryx
   PasswordAuthentication no
 
 
-# Notes
-  #IdentitiesOnly yes # Caused failure on ec2 but not vagrant
-  # Forward my SSH keys into the session so I can SSH to another host
-  #ForwardAgent yes
-  #
-  # This is too slow. Don't bother with X11 (Wayland is gradualy replacing it)
-  # Use SPICE instead.
-  #
-  # For X11 connection forwarding
-  # On the server side
-  #   grep X11Forwarding /etc/ssh/sshd_config # must be yes
-  #   xauth -V # app must be there
-  #ForwardX11 yes
-  # Test X11 forwarding with:
-  #   ssh -v pi 'echo DISPLAY=$DISPLAY' &> /tmp/x
-  #   cat /tmp/x | egrep 'X11|^DISPLAY'
-  # Output should be something like this:
-  #   debug1: Requesting X11 forwarding with authentication spoofing.
-  #   DISPLAY=localhost:11.0
-# JumpBox settings
-Host jb
-  HostName 52.54.72.108 # CHANGE ME
-  User root
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-  #IdentitiesOnly yes # Caused failure on ec2 but not vagrant
-  # Forward my SSH keys into the session so I can SSH to another host
-  ForwardAgent yes
 
 # IL
 # ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEN/VMVG248BVSjcZYjMgLiqdUSeFYJuX1pKt6//Nz0H pyoung@C02GG0FQMD6R
