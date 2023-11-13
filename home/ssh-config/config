@@ -1,25 +1,7 @@
+#UserKnownHostsFile /dev/null
+#StrictHostKeyChecking no
 
-
-# Amazon jump box
-#
-# Test (keys, connectivity, etc)
-#   ssh -i ~/.ssh/id_ed25519-devops ubuntu@34.229.247.14 hostname
-#
-# Test (and debug) using this file
-#   ssh -vv jb hostname
-#
-# Notes
-#   For X11 connection forwarding
-#   On the server side
-#     grep X11Forwarding /etc/ssh/sshd_config # must be yes
-#     xauth -V # app must be there
-#F  orwardX11 yes
-#   Test X11 forwarding with:
-#     ssh -v pi 'echo DISPLAY=$DISPLAY' &> /tmp/x
-#     cat /tmp/x | egrep 'X11|^DISPLAY'
-#   Output should be something like this:
-#     debug1: Requesting X11 forwarding with authentication spoofing.
-#     DISPLAY=localhost:11.0
+# "SSH Jump-Box"
 Host jb
   HostName 34.229.247.14
   User ubuntu
@@ -29,28 +11,18 @@ Host jb
   StrictHostKeyChecking no
   PasswordAuthentication no
   IdentitiesOnly yes
-  IdentityFile /home/dev/.ssh/id_ed25519-devops
+  IdentityFile ~/.ssh/id_ed25519-devops
   # Forward my SSH keys into the session so I can SSH to another host
   ForwardAgent yes
 #
-# SSH-agent vs SSH-ProxyCommand
-#   https://news.ycombinator.com/item?id=9429580
-#
-# SSH-agent
-#   eval $(ssh-agent)
-#   # Remember PID
-#   ssh-add ~/.ssh/id_ed25519-devops
-#   ssh jb 'ssh 10.0.1.26 hostname'
-#   # kill -15 <PID>
-#
 # SSH-ProxyCommand
-#   Jump through "jb" to this machine
+#   Jump through the "SSH Jump-Box" to this machine
 #   This uses SSH ProxyCommand to allow the ssh cli
 #   to appear as though its a direct connection.
 # Test with: "ssh jt hostname"
 Host jt
   HostName 10.0.1.26
-  IdentityFile /home/dev/.ssh/id_ed25519-devops
+  IdentityFile ~/.ssh/id_ed25519-devops
   IdentitiesOnly yes
   Port 22
   User ubuntu
@@ -59,7 +31,24 @@ Host jt
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
+#
+# TL/DR: Do not use ssh-agent if/when possible
+#        Use SSH with ProxyCommand instead wherever possible.
+# SSH-AGENT issues:
+#   - The ssh-agent socket name is available (without work)
+#     only in the current shell.
+#   - The agent does not go away on its own.
+#     In fact it likes to become a zombie.
+# When to use SSH-agent vs SSH-ProxyCommand
+#   - https://news.ycombinator.com/item?id=9429580
+# Commands:
+#   eval $(ssh-agent)
+#   # Remember PID
+#   ssh-add ~/.ssh/id_ed25519-devops
+#   ssh jb 'ssh 10.0.1.26 hostname'
+#   # kill -15 <PID>
 
+# Local dev-container
 Host dev
   HostName 127.0.0.1
   User dev
@@ -75,66 +64,33 @@ Host dev
 # ~/.ssh/id_ed25519.pub
 #   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0flXp4pOONJfYpCRgQIMkrxpjNzfHT494myvwVXiaG pyoung@gallifrey
 Host gallifrey
-  HostName 192.168.3.231
+  HostName 192.168.3.115
   User pyoung
   Port 22
   LogLevel FATAL
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
-
-# ip a s
-#   eth 192.168.3.3/24 fc:34:97:4d:48:dd
-#   wifi 192.168.2.182 48:e7:da:58:40:c3
-# ~/.ssh/id_ed25519.pub
-#   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFBGftdSCXNBhOQukPdbN6D9lVbsSKG0wka3K0l/K7tB pwyoung@tardis
-Host tardis
-  HostName 192.168.3.3
-  User pwyoung
-  Port 22
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+  # Forward my SSH-agent-connection so I can SSH to another host from this one (not via ProxyCommand)
+  #ForwardAgent yes
+#
+# Manual connection to "Dev" container on gallifrey:
+#   ssh -i ~/.ssh/id_ed25519    -A -J pyoung@gallifrey dev@127.0.0.1 -p 2222 "hostname&&time"
+#
+# Adding "ProxyCommand" below allows the above command to alows the above to be:
+#   ssh gallifrey-dev "hostname&&time"
+#
+# dev-container on gallifrey
+Host gallifrey-dev
+  HostName 127.0.0.1
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+  Port 2222
+  User dev
+  ProxyCommand ssh -q -W %h:%p gallifrey
   LogLevel FATAL
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
-
-
-# 00:ce:39:d1:21:be
-Host mele
-  HostName 192.168.3.6
-  User pyoung
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-# 00:ce:39:d1:21:be
-Host maas-server
-  HostName 192.168.3.6
-  User pyoung
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-
-# 48:21:0B:55:B4:5B
-Host nuc
-  HostName 192.168.3.57 #nuc
-  User ubuntu
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-
-
-# 80:fa:5b:74:f0:fc
-Host oryx
-  HostName oryx
-  User ubuntu
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-
