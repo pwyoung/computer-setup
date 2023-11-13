@@ -1,10 +1,3 @@
-# Create an SSH key (using an elliptical key)
-# ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/id_ed25519
-
-# CLI arg testing
-#   ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" dev@127.0.0.1 hostname
-
-#   ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" ubuntu@34.207.172.61
 
 
 # Amazon jump box
@@ -43,7 +36,7 @@ Host jb
 # SSH-agent vs SSH-ProxyCommand
 #   https://news.ycombinator.com/item?id=9429580
 #
-# SSH-agent 
+# SSH-agent
 #   eval $(ssh-agent)
 #   # Remember PID
 #   ssh-add ~/.ssh/id_ed25519-devops
@@ -57,7 +50,7 @@ Host jb
 # Test with: "ssh jt hostname"
 Host jt
   HostName 10.0.1.26
-  IdentityFile /home/dev/.ssh/id_ed25519-devops 
+  IdentityFile /home/dev/.ssh/id_ed25519-devops
   IdentitiesOnly yes
   Port 22
   User ubuntu
@@ -144,11 +137,4 @@ Host oryx
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
-
-
-
-# IL
-# ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEN/VMVG248BVSjcZYjMgLiqdUSeFYJuX1pKt6//Nz0H pyoung@C02GG0FQMD6R
-
-# Add more here
 
