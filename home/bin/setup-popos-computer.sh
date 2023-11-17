@@ -294,6 +294,7 @@ EOF
     # sudo systemctl restart libvirtd.service
     # systemctl status libvirtd.service
 
+    # e ~/.profile.d/kvm.sh
 
 
 }
@@ -340,6 +341,16 @@ misc() {
     sudo apt-get install -y nvidia-cuda-toolkit
     sudo apt list -a cuda=12.1.0.1
     sudo apt list -a cuda=12.3.0.1
+
+    # KUBECTL
+    mkdir -p ~/bin-local
+    cd ~/bin-local
+    if [ ! -e ./kubectl ]; then
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    fi
+    if [ ! -e ./helm ]; then
+        wget https://get.helm.sh/helm-v3.13.2-linux-amd64.tar.gz
+    fi
 
 }
 
