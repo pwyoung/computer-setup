@@ -1,7 +1,36 @@
-#UserKnownHostsFile /dev/null
-#StrictHostKeyChecking no
+# Create an SSH key (using an elliptical key)
+# ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/id_ed25519
 
-# "SSH Jump-Box"
+# CLI arg testing
+#   ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" dev@127.0.0.1 hostname
+
+#   ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" ubuntu@34.207.172.61
+
+
+# Amazon jump box
+# Test command
+#   ssh -i ~/.ssh/id_ed25519-devops ubuntu@34.229.247.14 hostname
+#
+# Notes
+  #IdentitiesOnly yes # Caused failure on ec2 but not vagrant
+  # Forward my SSH keys into the session so I can SSH to another host
+  #ForwardAgent yes
+  #
+  # This is too slow. Don't bother with X11 (Wayland is gradualy replacing it)
+  # Use SPICE instead.
+  #
+  # For X11 connection forwarding
+  # On the server side
+  #   grep X11Forwarding /etc/ssh/sshd_config # must be yes
+  #   xauth -V # app must be there
+  #ForwardX11 yes
+  # Test X11 forwarding with:
+  #   ssh -v pi 'echo DISPLAY=$DISPLAY' &> /tmp/x
+  #   cat /tmp/x | egrep 'X11|^DISPLAY'
+  # Output should be something like this:
+  #   debug1: Requesting X11 forwarding with authentication spoofing.
+  #   DISPLAY=localhost:11.0
+# JumpBox settings
 Host jb
   HostName 34.229.247.14
   User ubuntu
@@ -9,46 +38,12 @@ Host jb
   LogLevel FATAL
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
-  PasswordAuthentication no
-  IdentitiesOnly yes
-  IdentityFile ~/.ssh/id_ed25519-devops
+  #PasswordAuthentication no
+  #IdentitiesOnly yes # Caused failure on ec2 but not vagrant
   # Forward my SSH keys into the session so I can SSH to another host
-  ForwardAgent yes
-#
-# SSH-ProxyCommand
-#   Jump through the "SSH Jump-Box" to this machine
-#   This uses SSH ProxyCommand to allow the ssh cli
-#   to appear as though its a direct connection.
-# Test with: "ssh jt hostname"
-Host jt
-  HostName 10.0.1.26
   IdentityFile ~/.ssh/id_ed25519-devops
-  IdentitiesOnly yes
-  Port 22
-  User ubuntu
-  ProxyCommand ssh -q -W %h:%p jb
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-#
-# TL/DR: Do not use ssh-agent if/when possible
-#        Use SSH with ProxyCommand instead wherever possible.
-# SSH-AGENT issues:
-#   - The ssh-agent socket name is available (without work)
-#     only in the current shell.
-#   - The agent does not go away on its own.
-#     In fact it likes to become a zombie.
-# When to use SSH-agent vs SSH-ProxyCommand
-#   - https://news.ycombinator.com/item?id=9429580
-# Commands:
-#   eval $(ssh-agent)
-#   # Remember PID
-#   ssh-add ~/.ssh/id_ed25519-devops
-#   ssh jb 'ssh 10.0.1.26 hostname'
-#   # kill -15 <PID>
+  ForwardAgent yes
 
-# Local dev-container
 Host dev
   HostName 127.0.0.1
   User dev
@@ -64,33 +59,132 @@ Host dev
 # ~/.ssh/id_ed25519.pub
 #   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0flXp4pOONJfYpCRgQIMkrxpjNzfHT494myvwVXiaG pyoung@gallifrey
 Host gallifrey
-  HostName 192.168.3.115
+  HostName 192.168.3.231
   User pyoung
   Port 22
   LogLevel FATAL
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
-  IdentitiesOnly yes
-  IdentityFile ~/.ssh/id_ed25519
-  # Forward my SSH-agent-connection so I can SSH to another host from this one (not via ProxyCommand)
-  #ForwardAgent yes
-#
-# Manual connection to "Dev" container on gallifrey:
-#   ssh -i ~/.ssh/id_ed25519    -A -J pyoung@gallifrey dev@127.0.0.1 -p 2222 "hostname&&time"
-#
-# Adding "ProxyCommand" below allows the above command to alows the above to be:
-#   ssh gallifrey-dev "hostname&&time"
-#
-# dev-container on gallifrey
-Host gallifrey-dev
-  HostName 127.0.0.1
-  IdentityFile ~/.ssh/id_ed25519
-  IdentitiesOnly yes
-  Port 2222
-  User dev
-  ProxyCommand ssh -q -W %h:%p gallifrey
+
+# ip a s
+#   eth 192.168.3.3/24 fc:34:97:4d:48:dd
+#   wifi 192.168.2.182 48:e7:da:58:40:c3
+# ~/.ssh/id_ed25519.pub
+#   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFBGftdSCXNBhOQukPdbN6D9lVbsSKG0wka3K0l/K7tB pwyoung@tardis
+Host tardis
+  HostName 192.168.3.3
+  User pwyoung
+  Port 22
   LogLevel FATAL
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
+
+
+# 00:ce:39:d1:21:be
+Host mele
+  HostName 192.168.3.6
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+# 00:ce:39:d1:21:be
+Host maas-server
+  HostName 192.168.3.6
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+
+# 48:21:0B:55:B4:5B
+Host nuc
+  HostName 192.168.3.57 #nuc
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+
+
+# 80:fa:5b:74:f0:fc
+Host oryx
+  HostName oryx
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+
+
+# Create the SSH tunnel to K8S using:
+#   Run ssh k-1-tunnel
+Host k-1-tunnel
+	HostName 192.168.122.131
+	User vagrant
+	Port 22
+	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-1/libvirt/private_key
+	UserKnownHostsFile /dev/null
+	StrictHostKeyChecking no
+	PasswordAuthentication no
+	IdentitiesOnly yes
+	LogLevel FATAL
+        # Make the SSH tunnel to the K8S cluster
+        LocalForward 6443 localhost:6443
+
+Host k-1
+	HostName 192.168.122.131
+	User vagrant
+	Port 22
+	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-1/libvirt/private_key
+	UserKnownHostsFile /dev/null
+	StrictHostKeyChecking no
+	PasswordAuthentication no
+	IdentitiesOnly yes
+	LogLevel FATAL
+Host k-2
+	HostName 192.168.122.11
+	User vagrant
+	Port 22
+	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-2/libvirt/private_key
+	UserKnownHostsFile /dev/null
+	StrictHostKeyChecking no
+	PasswordAuthentication no
+	IdentitiesOnly yes
+	LogLevel FATAL
+Host k-3
+	HostName 192.168.122.222
+	User vagrant
+	Port 22
+	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-3/libvirt/private_key
+	UserKnownHostsFile /dev/null
+	StrictHostKeyChecking no
+	PasswordAuthentication no
+	IdentitiesOnly yes
+	LogLevel FATAL
+Host k-4
+	HostName 192.168.122.40
+	User vagrant
+	Port 22
+	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-4/libvirt/private_key
+	UserKnownHostsFile /dev/null
+	StrictHostKeyChecking no
+	PasswordAuthentication no
+	IdentitiesOnly yes
+	LogLevel FATAL
+Host k-5
+	HostName 192.168.122.101
+	User vagrant
+	Port 22
+	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-5/libvirt/private_key
+	UserKnownHostsFile /dev/null
+	StrictHostKeyChecking no
+	PasswordAuthentication no
+	IdentitiesOnly yes
+	LogLevel FATAL
