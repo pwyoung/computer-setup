@@ -8,8 +8,8 @@ check_az_login() {
 }
 
 get_user_conf() {
-    echo "WARNING: This will delete ALL azure subscriptions ..."
-    echo "and resource groups in this AZ mgmt group"
+    echo "WARNING: This will delete ALL azure resource groups (and their resources)"
+    echo "for ALL SUBSCRIPTIONS for the current Tenant"
     read -p "Type YES and hit enter to continue: " X
 
     if [ ! "$X" == "YES" ]; then
