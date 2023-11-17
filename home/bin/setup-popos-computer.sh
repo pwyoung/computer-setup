@@ -156,6 +156,15 @@ install_some_docker() {
     #   https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#setting-up-docker
     docker_ce
 
+    # WIP: stopped for now (since Nvidia container toolkit didn't seem to work with it)
+    # Trying with Rancher-Desktop (and its embedded k3s)
+    #if which docker | grep '/.rd/'; then
+    #    echo "Rancher Desktop was found in PATH"
+    #else
+    #    echo "Rancher Desktop was not found in PATH"
+    #    exit 1
+    #fi
+
     # Test it
     # sudo docker run hello-world
     docker run hello-world
@@ -382,6 +391,19 @@ setup_cooler() {
     sudo systemctl start coolercontrold
 }
 
+# https://www.linuxtechi.com/how-to-install-rancher-on-ubuntu/
+setup_rancher() {
+    # Rancher
+    # https://docs.rancherdesktop.io/getting-started/installation/#linux
+
+    # Rancher installs (among other things), these in ~/.rd/bin
+    #docker
+    #helm
+    #kubectl
+
+
+}
+
 main() {
     install_packages
 
@@ -398,9 +420,13 @@ main() {
 
     setup_ansible
 
-    setup_cooler
+    # Not great...
+    #setup_cooler
+
+    setup_rancher
 
     misc
 }
-setup_cooler
-#main
+
+setup_rancher
+# main
