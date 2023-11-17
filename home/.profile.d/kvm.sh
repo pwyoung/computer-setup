@@ -25,3 +25,21 @@ EOF
     fi
 
 fi
+
+# To cleanup
+#   Domains
+#     virsh -c qemu:///system list --all
+#     virsh -c qemu:///session list --all
+#   Pools
+#     virsh pool-list
+#   Volumes
+#     virsh vol-list default
+#     virsh vol-delete --pool default test-module-makenode-1.img
+
+#
+# Default to "session" connection (user connection)
+if command -v virsh >/dev/null; then
+    # instead of "-c qemu:///session"
+    export LIBVIRT_DEFAULT_URI="qemu:///session"
+    #virsh list --all
+fi

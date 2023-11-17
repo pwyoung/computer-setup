@@ -270,6 +270,32 @@ EOF
         exit 1
     fi
 
+
+    # instead of "-c qemu:///session"
+    export LIBVIRT_DEFAULT_URI="qemu:///session"
+    virsh list --all
+
+    # ls -l /var/run/libvirt/libvirt-sock
+    # srwxrwx--- 1 root libvirt 0 Dec  7 20:40 /var/run/libvirt/libvirt-sock
+    #
+    # sudo usermod -G libvirt-qemu -a $USER
+    # sudo usermod -G libvirt -a $USER
+    # sudo usermod -G kvm -a $USER
+    # reboot
+
+    #
+    # Setup libvirtd to run as non-root
+    #   https://computingforgeeks.com/use-virt-manager-as-non-root-user/
+    #
+    # sudo emacs /etc/libvirt/libvirtd.conf
+    # unix_sock_group = "libvirt"
+    # unix_sock_rw_perms = "0770"
+    #
+    # sudo systemctl restart libvirtd.service
+    # systemctl status libvirtd.service
+
+
+
 }
 
 setup_ansible() {

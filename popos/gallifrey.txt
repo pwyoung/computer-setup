@@ -81,6 +81,20 @@ sudo apt list --installed 2>/dev/null | egrep -i 'libvirt|kvm|qemu|virtual|vagra
 # TEST VAGRANT-LIBVIRT
 ################################################################################
 
+# Setup libvirtd to run as non-root
+#   https://computingforgeeks.com/use-virt-manager-as-non-root-user/
+
+sudo emacs /etc/libvirt/libvirtd.conf
+# PWY
+unix_sock_group = "libvirt"
+# PWY
+unix_sock_rw_perms = "0770"
+#
+sudo systemctl restart libvirtd.service
+systemctl status libvirtd.service
+
+
+
 # ERROR
 #   Call to virConnectOpen failed: Failed to connect socket to '/var/run/libvirt/libvirt-sock': Permission denied
 #
@@ -91,3 +105,21 @@ sudo usermod -G libvirt-qemu -a $USER
 sudo usermod -G libvirt -a $USER
 sudo usermod -G kvm -a $USER
 reboot
+
+
+
+
+#
+virsh list
+virsh pool-list
+virsh vol-list default
+
+
+virsh -c qemu:///session list --all
+
+virsh -c qemu:///session destroy test-module-makenode-2
+
+
+# instead of "-c qemu:///session"
+export LIBVIRT_DEFAULT_URI="qemu:///session"
+
