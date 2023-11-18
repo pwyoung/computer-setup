@@ -5,18 +5,15 @@
 # RESOURCES
 #   https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
-USE_COLOR='Y'
 
-NC='\033[0m' # No Color
-BLUE='\033[0;34m'
-SEP='--------------------------------------------------------------------------------'
 report() {
+    NC='\033[0m' # No Color
+    BLUE='\033[0;34m'
+    SEP='--------------------------------------------------------------------------------'
+
     MSG="$1"
-    if [ "$USE_COLOR" == "Y" ]; then
-	echo "${BLUE}${MSG}${NC}"
-    else
-	echo "${SEP}\n${MSG}\n${SEP}"
-    fi
+    echo "${BLUE}${MSG}${NC}"
+    #echo "${SEP}\n${MSG}\n${SEP}"
 }
 
 run() {
@@ -55,22 +52,13 @@ show_k8s_capacity() {
 
 show_k8s_components() {
     report "K8S Cluster Components"
-    kubectl cluster-info  dump | jq .Items[0].name  2>&1 | grep -v 'error' | grep -v null
 
-    run 'kubectl get componentstatus'
+    kubectl get --raw='/readyz?verbose'
 }
 
 show_k8s_engine_info() {
     CONTEXT=$(cat ~/.kube/config | grep current-context | cut -d' ' -f 2)
     report "Current kubectl context: $CONTEXT"
-    if [ "$CONTEXT" == "minikube" ]; then
-	if minikube status >/dev/null; then
-	    report "Minikube routing"
-	    netstat -nr | grep $(minikube ip)
-	else
-	    report "Minikube is the current context, but seems to be down !!!"
-	fi
-    fi
 }
 
 docker_info(){

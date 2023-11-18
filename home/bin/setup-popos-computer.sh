@@ -198,6 +198,8 @@ setup_nvidia_for_docker_ce() {
     sudo apt-get install -y nvidia-container-toolkit
     # configure docker daemon to recognize Nvidia runtime
     sudo nvidia-ctk runtime configure --runtime=docker
+    CHECK=$(cat /etc/docker/daemon.json | jq -r .runtimes.nvidia.path)
+    echo "Checked runtime should include: $CHECK"
     sudo systemctl restart docker
     # Check this
     docker info | grep -i runtimes | grep -i nvidia
@@ -348,8 +350,8 @@ misc() {
     # For Nvidia/Nemo
     # https://medium.com/analytics-vidhya/installing-any-version-of-cuda-on-ubuntu-and-using-tensorflow-and-torch-on-gpu-b1a954500786
     sudo apt-get install -y nvidia-cuda-toolkit
-    sudo apt list -a cuda=12.1.0.1
-    sudo apt list -a cuda=12.3.0.1
+    #sudo apt list -a cuda=12.1.0.1
+    #sudo apt list -a cuda=12.3.0.1
 
     # KUBECTL
     mkdir -p ~/bin-local
@@ -393,6 +395,7 @@ setup_cooler() {
 
 # https://www.linuxtechi.com/how-to-install-rancher-on-ubuntu/
 setup_rancher() {
+    echo "Skipping this for now, as Nvidia container runtime doesn't seem to work with it"
     # Rancher
     # https://docs.rancherdesktop.io/getting-started/installation/#linux
 
@@ -401,7 +404,39 @@ setup_rancher() {
     #helm
     #kubectl
 
+    # Uninstall
+    #   Stop services.
+    #     In preferences, set services to stop when GUI shuts down; stop it.
+    #   sudo apt purge rancher-desktop
+    #   sudo rm /etc/apt/sources.list.d/isv-rancher-stable.list
+    #   rm -rf ~/.rd
+}
 
+setup_k3s() {
+    echo "Set up K3s"
+
+    echo "Install K3S"
+    if ! which k3s; then
+        sudo mkdir -p /usr/local/bin
+        sudo chmod 755 /usr/local/bin
+        curl -sfL https://get.k3s.io | sh –
+    fi
+
+    echo "Run K3S"
+    if ! sudo systemctl status k3s --no-pager; then
+        sudo systemctl start k3s
+    fi
+    sudo systemctl status k3s --no-pager
+
+    # Configure K3S
+    if [ ! -e ~/.kube/config.k3s ]; then
+        mkdir -p ~/.kube
+        sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config.k3s
+        sudo chown $USER ~/.kube/config.k3s
+        sudo chmod 600 ~/.kube/config.k3s
+    fi
+
+    # Add a dashboard, or use a tool like VsCode for that.
 }
 
 main() {
@@ -423,10 +458,22 @@ main() {
     # Not great...
     #setup_cooler
 
-    setup_rancher
+    # Doesn't seem to work with
+    # Nvidia container toolkit
+    #setup_rancher
 
     misc
+
+    setup_k3s
 }
 
-setup_rancher
-# main
+#main
+#setup_k3s
+
+# sudo emacs /boot/refind_linux.conf
+#   cat /boot/refind_linux.conf  | grep IOMMU
+#   "Boot with IOMMU options"  "root=UUID=c2e2a95c-aae3-4611-aad6-117558550e00 ro quiet loglevel=0 systemd.show_status=false splash intel_iommu=on iommu=pt"
+# reboot
+echo "Check IOMMU"
+sudo dmesg | grep -i -e DMAR -e IOMMU
+
