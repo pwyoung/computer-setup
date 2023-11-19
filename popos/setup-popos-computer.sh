@@ -464,16 +464,7 @@ main() {
 
     misc
 
-    setup_k3s
+    #setup_k3s
 }
 
-#main
-#setup_k3s
-
-# sudo emacs /boot/refind_linux.conf
-#   cat /boot/refind_linux.conf  | grep IOMMU
-#   "Boot with IOMMU options"  "root=UUID=c2e2a95c-aae3-4611-aad6-117558550e00 ro quiet loglevel=0 systemd.show_status=false splash intel_iommu=on iommu=pt"
-# reboot
-echo "Check IOMMU"
-sudo dmesg | grep -i -e DMAR -e IOMMU
-
+main
