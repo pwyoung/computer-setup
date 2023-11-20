@@ -1,0 +1,5 @@
+# Stop/Halt the VMs comprising the K8S cluster.
+# This assumes that the VMs were created and configured with K8S.
+cd ~/git/nomaj/examples/k8s-via-kubespray/build/vagrant && vagrant halt
+
+vagrant global-status
