@@ -96,13 +96,19 @@ misc() {
     echo "TODO: https://flatpak.org/setup/Ubuntu"
 }
 
+allow_passwordless_ssh() {
+    F=/etc/sudoers.d/$USER
+    echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee $F
+    sudo chmod 0400 $F
+}
+
 
 main() {
+    allow_passwordless_ssh
     install_packages
-
     setup_symlinks
-
     misc
 }
 
 main
+

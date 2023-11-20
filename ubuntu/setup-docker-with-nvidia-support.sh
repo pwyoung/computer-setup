@@ -167,9 +167,7 @@ test_gpu() {
     # docker run --gpus all -it --rm nvcr.io/nvidia/pytorch:23.08-py3 # Memory too low error
     # stack=67108864=64MB
     docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -it --rm nvcr.io/nvidia/pytorch:23.08-py3 hostname
-
 }
-
 
 main() {
     docker_ce
