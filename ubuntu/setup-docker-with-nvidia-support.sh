@@ -144,7 +144,9 @@ setup_nvidia_for_docker_ce() {
         sudo cp /etc/apt/trusted.gpg /etc/apt/trusted.gpg.d
         sudo apt update
     fi
+}
 
+test_gpu() {
     # Docker-CE does not support CDI (K8S does not love Docker-CE in general...)
     #
     # Run containers as non-root. Do NOT use this for containers running as root (as they will fail)
@@ -172,6 +174,7 @@ setup_nvidia_for_docker_ce() {
 main() {
     docker_ce
     setup_nvidia_for_docker_ce
+    test_gpu
 }
 
 main
