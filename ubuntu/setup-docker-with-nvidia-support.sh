@@ -87,6 +87,11 @@ docker_ce() {
     docker run hello-world
 }
 
+bail() {
+    echo "BAILING"
+    exit 1
+}
+
 # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#step-1-install-nvidia-container-toolkit
 setup_nvidia_for_docker_ce() {
 
@@ -101,7 +106,6 @@ setup_nvidia_for_docker_ce() {
         sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
     fi
     grep "  name:" /etc/cdi/nvidia.yaml
-
 
     echo "step 3"
     curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | sudo apt-key add -
@@ -151,22 +155,23 @@ setup_nvidia_for_docker_ce() {
     #F=/etc/nvidia-container-runtime/config.toml
     #sudo sed -i 's/^#no-cgroups = false/no-cgroups = true/;' $F
 
+    # Test with CUDA
+    IMG='nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda10.2'
+    docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -it --rm $IMG
 
     # Test with Pytorch
     # https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch
     # https://docs.nvidia.com/deeplearning/frameworks/support-matrix/index.html
     # docker run --gpus all -it --rm nvcr.io/nvidia/pytorch:23.08-py3 # Memory too low error
-    #
     # stack=67108864=64MB
     docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -it --rm nvcr.io/nvidia/pytorch:23.08-py3 hostname
+
 }
 
 
 main() {
     docker_ce
-
-    # TODO: re-do this carefully
-    #setup_nvidia_for_docker_ce
+    setup_nvidia_for_docker_ce
 }
 
 main
