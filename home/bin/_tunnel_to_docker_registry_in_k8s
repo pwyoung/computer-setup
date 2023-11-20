@@ -1,8 +1,0 @@
-#!/bin/bash
-
-HOST_PORT=5000
-POD_NAME=$(kubectl get pods --namespace container-registry -l "app=docker-registry,release=docker-registry" -o jsonpath="{.items[0].metadata.name}")
-
-echo "Create tunnel via kubectl: $POD_NAME ${HOST_PORT}:5000"
-
-export TAG='KUBECTL_PORT_FORWARD' && nohup kubectl -n container-registry port-forward $POD_NAME ${HOST_PORT}:5000 &>/tmp/kubectl-forward.out &

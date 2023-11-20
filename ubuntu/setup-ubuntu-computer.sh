@@ -91,6 +91,9 @@ misc() {
 
     # Speed up animations
     gsettings set org.gnome.desktop.interface enable-animations false
+
+    # Flatpak
+    echo "TODO: https://flatpak.org/setup/Ubuntu"
 }
 
 

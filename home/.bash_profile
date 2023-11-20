@@ -12,6 +12,8 @@ if [ -e ~/bin-local ]; then
     PATH=~/bin-local:$PATH
 fi
 
+echo "`date`" > /tmp/date.txt
+
 ################################################################################
 # Public stuff (from the public 'computer setup' git repo)
 ################################################################################
