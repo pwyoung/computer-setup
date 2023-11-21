@@ -59,7 +59,7 @@ Host dev
 # ~/.ssh/id_ed25519.pub
 #   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0flXp4pOONJfYpCRgQIMkrxpjNzfHT494myvwVXiaG pyoung@gallifrey
 Host gallifrey
-  HostName 192.168.3.231
+  HostName 192.168.3.115
   User pyoung
   Port 22
   LogLevel FATAL
