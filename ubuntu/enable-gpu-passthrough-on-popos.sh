@@ -46,6 +46,9 @@ show_status() {
     D=/sys/kernel/iommu_groups/
     echo "Listing $D"
     ls -1d $D/*
+
+    echo "Show cmdline"
+    cat /proc/cmdline  | grep iommu | grep intel
 }
 
 todo() {
