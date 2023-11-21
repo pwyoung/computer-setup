@@ -36,14 +36,16 @@ update_kernel_boot_options() {
 }
 
 show_status() {
+    nvidia-smi
+
     BUS=$(nvidia-smi --query-gpu=pci.bus_id --format=csv | tail -1)
-    echo "BUS=$BUS"
+    echo "NVIDIA PCI BUS=$BUS"
 
     sudo dmesg | grep -i -e DMAR -e IOMMU
 
     D=/sys/kernel/iommu_groups/
     echo "Listing $D"
-    ls -ltrd $D/*
+    ls -1d $D/*
 }
 
 todo() {
@@ -51,6 +53,6 @@ todo() {
     query='I want you to create scripts that will build an ubuntu 22.04 vm using vagrant. The vagrantfile should specify that the vm uses libvirt. The vagrantfile should enable gpu passthrough of a video card with a pci bus id of "00000000:01:00.0". In addition, create a bash script that can run on an ubuntu 22.04 host to enable gpu passthrough. Comment all files.'
 }
 
-support_text_mode_via_refind
-update_kernel_boot_options
+#support_text_mode_via_refind
+#update_kernel_boot_options
 show_status
