@@ -2,9 +2,9 @@
 
 set -e
 
-# Automate
-# https://pve.proxmox.com/wiki/PCI_Passthrough
-
+# Document how to pass a GPU to a VM
+#   https://pve.proxmox.com/wiki/PCI_Passthrough
+#   https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
 # Run this on the proxmox server (as root)
 
 update_kernel_args() {
@@ -20,6 +20,13 @@ EOF
     cat <<EOF >/dev/null
     GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt"
 EOF
+
+    # From https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
+    # IMPORTANT ADDITIONAL COMMANDS
+    # GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off"
+    # For more information on what these commands do and how they help:
+    #   A. Disabling the Framebuffer: video=vesafb:off,efifb:off
+    #   B. ACS Override for IOMMU groups: pcie_acs_override=downstream,multifunction
 
 }
 
@@ -54,8 +61,14 @@ check_pci_groups() {
     # The GPU is in group 16.
     # There is only one other thing in that group.
     pvesh get /nodes/pve/hardware/pci --pci-class-blacklist ""  | grep -i nvidia | awk '{print $6, $8}'
+
+    # First slot (nearest the CPU)
     0000:01:00.0 16
     0000:01:00.1 16
+
+    # Second slot
+    0000:08:00.0 21
+    0000:08:00.1 21
 EOF
 }
 
@@ -63,10 +76,16 @@ blacklist_drivers() {
     if ! grep nouveau /etc/modprobe.d/blacklist.conf; then
         echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
         echo "blacklist nvidia*" >> /etc/modprobe.d/blacklist.conf
+        echo "blacklist radeon" >> /etc/modprobe.d/blacklist.conf
         reboot
     fi
 }
 
+
+# This failed
+# This comes from:
+#   URL: https://pve.proxmox.com/wiki/PCI_Passthrough
+#   Section: How to know if a graphics card is UEFI (OVMF) compatible
 check_uefi_ovmf_compatability() {
 
     cd ~/
@@ -78,18 +97,67 @@ check_uefi_ovmf_compatability() {
 
     mkdir -p ~/tmp
 
-    cd /sys/bus/pci/devices/0000:01:00.0/
+    # PCI BUS ID
+    # pvesh get /nodes/pve/hardware/pci --pci-class-blacklist ""  | grep -i nvidia | awk '{print $6, $8}' | head -1
+    ID='0000:08:00.0'
+
+    cd /sys/bus/pci/devices/$ID/
     echo 1 > rom
     cat rom > ~/tmp/image.rom
     echo 0 > rom
 
-    cd ~/rom-parser
-    ./rom-parser ~/tmp/image.rom
+    ~/rom-parser/rom-parser ~/tmp/image.rom
 
+}
+
+# This comes from:
+#   URL: https://pve.proxmox.com/wiki/PCI_Passthrough
+#   Section: The 'romfile' option
+romfile_option() {
+    mkdir -p ~/tmp
+
+    # PCI BUS ID
+    # pvesh get /nodes/pve/hardware/pci --pci-class-blacklist ""  | grep -i nvidia | awk '{print $6, $8}' | head -1
+    ID='0000:08:00.0'
+
+    # Did not exist (originally)
+    # ls -l /usr/share/kvm/vbios.bin
+
+    cd /sys/bus/pci/devices/$ID/
+    echo 1 > rom
+    cat rom > /usr/share/kvm/vbios.bin
+    echo 0 > rom
+
+    # Then you can pass the vbios file (must be located in /usr/share/kvm/) with:
+    # ARG="hostpci0: 01:00,x-vga=on,romfile=vbios.bin"
+    #ARG="hostpci0: 08:00,x-vga=on,romfile=vbios.bin"
+    G=$(echo $ID | perl -pe 's/....:(..:..)../$1/')
+    ARG="hostpci0: $G,x-vga=on,romfile=vbios.bin"
+
+}
+
+# Step 3: IOMMU interrupt remapping
+iommu_interrupt_remapping() {
+    # These Files didn't exist
+
+    # WOOHOO
+    # - steps above ( check_uefi_ovmf_compatability )
+    #   show my IOMMU *IS* TYPE 1
+    # - Docs below show vfio supports iommo type 1
+    #   https://github.com/torvalds/linux/blob/master/drivers/vfio/vfio_iommu_type1.c
+    #   https://docs.kernel.org/driver-api/vfio.html#iommufd-and-vfio-iommu-type1
+    echo "options vfio_iommu_type1 allow_unsafe_interrupts=1" > /etc/modprobe.d/iommu_unsafe_interrupts.conf
+
+    # This should help on Windows VMs
+    #   https://wiki.archlinux.org/title/QEMU
+    #   https://www.reddit.com/r/Proxmox/comments/gvylgj/how_unstable_are_unsafe_interrupts/
+    echo "options kvm ignore_msrs=1" > /etc/modprobe.d/kvm.conf
 }
 
 #update_kernel_args
 #check_iommu_setup
 #check_pci_groups
 #blacklist_drivers
-check_uefi_ovmf_compatability
+## failed ## check_uefi_ovmf_compatability
+## Didn't update any config file ## romfile_option
+iommu_interrupt_remapping
