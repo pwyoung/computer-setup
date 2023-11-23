@@ -2,12 +2,21 @@
 
 set -e
 
+# Best doc
+#   https://nopresearcher.github.io/Proxmox-GPU-Passthrough-Ubuntu/
+#
 # Document how to pass a GPU to a VM
 #   https://pve.proxmox.com/wiki/PCI_Passthrough
 #   https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
 # Run this on the proxmox server (as root)
 
 update_kernel_args() {
+
+    # Use this
+    # https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
+    # IMPORTANT ADDITIONAL COMMANDS
+    # emacs /etc/default/grub
+    #   GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off"
 
     cat /proc/cmdline  | grep 'intel_iommu=on' | grep 'iommu=pt'
     # Remember
@@ -77,8 +86,15 @@ blacklist_drivers() {
         echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
         echo "blacklist nvidia*" >> /etc/modprobe.d/blacklist.conf
         echo "blacklist radeon" >> /etc/modprobe.d/blacklist.conf
+
+        # Sound card
+        echo "blacklist snd_hda_intel" >> /etc/modprobe.d/blacklist.conf
         reboot
     fi
+
+    # lspci -v | egrep -i 'nouveau|nvidia|snd_hda_intel'
+    lspci -v
+
 }
 
 
@@ -114,6 +130,10 @@ check_uefi_ovmf_compatability() {
 #   URL: https://pve.proxmox.com/wiki/PCI_Passthrough
 #   Section: The 'romfile' option
 romfile_option() {
+    echo "Did not do this. The how-to shows how to use type-1 iommu"
+    sleep 5
+    exit 1
+
     mkdir -p ~/tmp
 
     # PCI BUS ID
@@ -133,13 +153,31 @@ romfile_option() {
     #ARG="hostpci0: 08:00,x-vga=on,romfile=vbios.bin"
     G=$(echo $ID | perl -pe 's/....:(..:..)../$1/')
     ARG="hostpci0: $G,x-vga=on,romfile=vbios.bin"
+    # NOTE: the above would be put in /etc/pve/qemu-server/<VM-ID>.conf
 
 }
 
-# Step 3: IOMMU interrupt remapping
-iommu_interrupt_remapping() {
-    # These Files didn't exist
 
+################################################################################
+# https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
+################################################################################
+
+guide_steps() {
+    # Step 1: Configuring the Grub
+    #update_kernel_args
+    #check_iommu_setup
+
+    # Step 2: VFIO Modules
+    cat <<EOF > /etc/modules
+vfio
+vfio_iommu_type1
+vfio_pci
+vfio_virqfd
+EOF
+
+    # Step 3: IOMMU interrupt remapping
+    #
+    # These Files didn't exist
     # WOOHOO
     # - steps above ( check_uefi_ovmf_compatability )
     #   show my IOMMU *IS* TYPE 1
@@ -147,11 +185,60 @@ iommu_interrupt_remapping() {
     #   https://github.com/torvalds/linux/blob/master/drivers/vfio/vfio_iommu_type1.c
     #   https://docs.kernel.org/driver-api/vfio.html#iommufd-and-vfio-iommu-type1
     echo "options vfio_iommu_type1 allow_unsafe_interrupts=1" > /etc/modprobe.d/iommu_unsafe_interrupts.conf
-
+    #
     # This should help on Windows VMs
     #   https://wiki.archlinux.org/title/QEMU
     #   https://www.reddit.com/r/Proxmox/comments/gvylgj/how_unstable_are_unsafe_interrupts/
     echo "options kvm ignore_msrs=1" > /etc/modprobe.d/kvm.conf
+
+    # Step 4: Blacklisting Drivers
+    # blacklist_drivers
+
+    # Step 5: Adding GPU to VFIO
+    lspci -v
+    # PCI BUS ID
+    # pvesh get /nodes/pve/hardware/pci --pci-class-blacklist ""  | grep -i nvidia | awk '{print $6, $8}' | head -1
+    ID='0000:01:00.0'
+    G=$(echo $ID | perl -pe 's/....:(..:..)../$1/') # 01:00
+    lspci -n -s $G
+    #lspci -n -s 01:00
+    #  01:00.0 0300: 10de:2684 (rev a1)
+    #  01:00.1 0403: 10de:22ba (rev a1)
+    # Vendor IDs
+    echo "options vfio-pci ids=10de:2684,10de:22ba disable_vga=1"> /etc/modprobe.d/vfio.conf
+    reset
+    reboot
+
+    # Check that the "vfio" driver is in use
+    lspci -v
+    # Both the "VGA Controller" and "Audio Controller" show:
+    # Kernel driver in use: vfio-pci
+
+
+    # Linux Guest VM
+    #   https://nopresearcher.github.io/Proxmox-GPU-Passthrough-Ubuntu/
+    # Setup SSH to VM
+    #   sudo apt update
+    #   sudo apt install openssh-server
+    #   sudo systemctl enable ssh
+    #   sudo systemctl status ssh
+    #   #
+    #   ssh-copy-id pyoung@192.168.3.114
+    #   ssh pyoung@192.168.3.114
+    #
+    # On Proxmox-VE
+    #   ProxmoxGUI->VM->Hardware->Display->None
+    #   Tell VM to use PCI group
+    #   cat /etc/pve/qemu-server/104.conf  | grep hostpci
+    #   hostpci0: 01:00
+    #   Adding this caused it to not boot ",x-vga=on"
+    #
+    #
+    # On VM
+    # cat /etc/default/grub | grep nomodeset
+    # GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off"
+
+
 }
 
 #update_kernel_args
@@ -160,4 +247,6 @@ iommu_interrupt_remapping() {
 #blacklist_drivers
 ## failed ## check_uefi_ovmf_compatability
 ## Didn't update any config file ## romfile_option
-iommu_interrupt_remapping
+
+
+guide_steps
