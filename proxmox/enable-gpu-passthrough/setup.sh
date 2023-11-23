@@ -225,6 +225,8 @@ EOF
     #   #
     #   ssh-copy-id pyoung@192.168.3.114
     #   ssh pyoung@192.168.3.114
+    #   #
+    #   sudo shutdown -h now
     #
     # On Proxmox-VE
     #   ProxmoxGUI->VM->Hardware->Display->None
@@ -235,10 +237,27 @@ EOF
     #
     #
     # On VM
-    # cat /etc/default/grub | grep nomodeset
-    # GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off"
+    #   cat /etc/default/grub | grep nomodeset
+    #   GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off"
+    #   sudo emacs /etc/default/grub
+    #   sudo update-grub
+    #
+    #   sudo bash -c "echo blacklist nouveau > /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
+    #   sudo bash -c "echo options nouveau modeset=0 >> /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
+    #   sudo update-initramfs -u
+    #
+    #   sudo apt-get install nvidia-driver-545
+    #
+    # sudo apt-get install -y htop wget curl make gcc emacs-nox
+    #
+    # sudo /sbin/modprobe nvidia
+    # lsmod
+    # sudo emacs /etc/rc.local
+    # reboot
 
 
+
+    # lsblk -ao NAME,FSTYPE,FSSIZE,FSUSED,FSUSE%,SIZE,MOUNTPOINT
 }
 
 #update_kernel_args
