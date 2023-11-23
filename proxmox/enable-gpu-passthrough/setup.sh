@@ -103,6 +103,11 @@ blacklist_drivers() {
 #   URL: https://pve.proxmox.com/wiki/PCI_Passthrough
 #   Section: How to know if a graphics card is UEFI (OVMF) compatible
 check_uefi_ovmf_compatability() {
+    echo "Do not do this. It's a waste of time"
+    echo "This checks for Type-3 IOMMO."
+    echo "BUT... guide_steps() shows how to make it work with a Type-1 iommu"
+    sleep 5
+    exit 1
 
     cd ~/
     if [ ! -e rom-parser ]; then
