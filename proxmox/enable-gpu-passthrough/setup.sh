@@ -78,7 +78,7 @@ GRUB_CMDLINE_LINUX=""
 EOF
 
     scp $T $SSH_ALIAS:/etc/default/grub
-    ssh $SSH_ALIAS proxmox-boot-tool refresh
+    ssh $SSH_ALIAS 'proxmox-boot-tool refresh || update-grub'
 }
 
 update_systemd() {
@@ -88,7 +88,7 @@ intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodese
 EOF
     scp $T $SSH_ALIAS:/tmp/tmp-1
     ssh $SSH_ALIAS 'cat /tmp/tmp-1 >> /etc/kernel/cmdline'
-    ssh $SSH_ALIAS proxmox-boot-tool refresh
+    ssh $SSH_ALIAS 'proxmox-boot-tool refresh || reinstall-kernels'
 }
 
 update_kernel_args() {
@@ -133,6 +133,7 @@ blacklist radeon
 blacklist snd_hda_intel
 EOF
         scp $T $SSH_ALIAS:/etc/modprobe.d/blacklist.conf
+        ssh $SSH_ALIAS 'update-initramfs -u'
         reboot_it
     fi
 
@@ -211,26 +212,8 @@ EOF
 
 }
 
-################################################################################
-# https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
-################################################################################
-
-guide_steps() {
-    # Step 1: Configuring the Grub
-    update_kernel_args
-    check_iommu_setup
-
-    # Step 2: VFIO Modules
-    update_vfio_modules
-
-    # Step 3: IOMMU interrupt remapping
-    iommu_interrupt_remapping
-
-    # Step 4: Blacklisting Drivers
-    blacklist_drivers
-
-    # Step 5: Adding GPU to VFIO
-    add_gpu_to_vfio
+setup_guest_vms() {
+    cat <<EOF >/dev/null
 
     # Linux Guest VM
     #   https://nopresearcher.github.io/Proxmox-GPU-Passthrough-Ubuntu/
@@ -250,7 +233,7 @@ guide_steps() {
     #   Tell VM to use PCI group
     #   cat /etc/pve/qemu-server/104.conf  | grep hostpci
     #   hostpci0: 01:00
-    #   Adding this caused it to not boot ",x-vga=on"
+    #   Adding ",x-vga=on" caused it to not boot (or seemed to)
     #
     #
     # On VM
@@ -279,6 +262,31 @@ guide_steps() {
     #
 
     # lsblk -ao NAME,FSTYPE,FSSIZE,FSUSED,FSUSE%,SIZE,MOUNTPOINT
+EOF
+}
+
+################################################################################
+# https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
+################################################################################
+
+guide_steps() {
+    # Step 1: Configuring the Grub
+    update_kernel_args
+    check_iommu_setup
+
+    # Step 2: VFIO Modules
+    update_vfio_modules
+
+    # Step 3: IOMMU interrupt remapping
+    iommu_interrupt_remapping
+
+    # Step 4: Blacklisting Drivers
+    blacklist_drivers
+
+    # Step 5: Adding GPU to VFIO
+    add_gpu_to_vfio
+
+    setup_guest_vms
 }
 
 
