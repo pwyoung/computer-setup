@@ -2,185 +2,157 @@
 
 set -e
 
-# Best doc
-#   https://nopresearcher.github.io/Proxmox-GPU-Passthrough-Ubuntu/
-#
-# Document how to pass a GPU to a VM
-#   https://pve.proxmox.com/wiki/PCI_Passthrough
-#   https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
-# Run this on the proxmox server (as root)
+SSH_ALIAS='proxmox'
+
+# Assumptions
+# - chip is intel
+# - gpu is nvidia
+# - passwordless SSH works to $SSH_ALIAS (as root user)
+
+# References
+# - https://nopresearcher.github.io/Proxmox-GPU-Passthrough-Ubuntu/
+# - https://pve.proxmox.com/wiki/PCI_Passthrough
+# - https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
+
+# Temp file
+T=/tmp/.mytempfile
+
+reboot_it() {
+    ssh $SSH_ALIAS reboot
+    sleep 10
+    for i in $(seq 1 60); do
+        echo "$i"
+        if ssh $SSH_ALIAS hostname; then
+            return
+        else
+            sleep 1
+        fi
+    done
+    echo "Is the host awake?"
+    exit 1
+}
+
+update_grub() {
+
+    cat <<EOF > $T
+# If you change this file, run 'update-grub' afterwards to update
+# /boot/grub/grub.cfg.
+# For full documentation of the options in this file, see:
+#   info -f grub -n 'Simple configuration'
+
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`
+#GRUB_CMDLINE_LINUX_DEFAULT="quiet"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off"
+GRUB_CMDLINE_LINUX=""
+
+# If your computer has multiple operating systems installed, then you
+# probably want to run os-prober. However, if your computer is a host
+# for guest OSes installed via LVM or raw disk devices, running
+# os-prober can cause damage to those guest OSes as it mounts
+# filesystems to look for things.
+#GRUB_DISABLE_OS_PROBER=false
+
+# Uncomment to enable BadRAM filtering, modify to suit your needs
+# This works with Linux (no patch required) and with any kernel that obtains
+# the memory map information from GRUB (GNU Mach, kernel of FreeBSD ...)
+#GRUB_BADRAM="0x01234567,0xfefefefe,0x89abcdef,0xefefefef"
+
+# Uncomment to disable graphical terminal
+#GRUB_TERMINAL=console
+
+# The resolution used on graphical terminal
+# note that you can use only modes which your graphic card supports via VBE
+# you can see them in real GRUB with the command `vbeinfo'
+#GRUB_GFXMODE=640x480
+
+# Uncomment if you don't want GRUB to pass "root=UUID=xxx" parameter to Linux
+#GRUB_DISABLE_LINUX_UUID=true
+
+# Uncomment to disable generation of recovery mode menu entries
+#GRUB_DISABLE_RECOVERY="true"
+
+# Uncomment to get a beep at grub start
+#GRUB_INIT_TUNE="480 440 1"
+EOF
+
+    scp $T $SSH_ALIAS:/etc/default/grub
+    ssh $SSH_ALIAS proxmox-boot-tool refresh
+}
+
+update_systemd() {
+    # NEW ARGS
+    cat <<EOF > $T
+intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off
+EOF
+    scp $T $SSH_ALIAS:/tmp/tmp-1
+    ssh $SSH_ALIAS 'cat /tmp/tmp-1 >> /etc/kernel/cmdline'
+    ssh $SSH_ALIAS proxmox-boot-tool refresh
+}
 
 update_kernel_args() {
-
-    # Use this
-    # https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
-    # IMPORTANT ADDITIONAL COMMANDS
-    # emacs /etc/default/grub
-    #   GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off"
-
-    cat /proc/cmdline  | grep 'intel_iommu=on' | grep 'iommu=pt'
-    # Remember
-    cat <<EOF >/dev/null
-    BOOT_IMAGE=/boot/vmlinuz-6.2.16-3-pve root=/dev/mapper/pve-root ro quiet intel_iommu=on iommu=pt
-EOF
-
-    cat /etc/default/grub | grep GRUB_CMDLINE_LINUX_DEFAULT | grep 'intel_iommu=on' | grep 'iommu=pt'
-    # Remember
-    cat <<EOF >/dev/null
-    GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt"
-EOF
-
-    # From https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
-    # IMPORTANT ADDITIONAL COMMANDS
-    # GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off"
-    # For more information on what these commands do and how they help:
-    #   A. Disabling the Framebuffer: video=vesafb:off,efifb:off
-    #   B. ACS Override for IOMMU groups: pcie_acs_override=downstream,multifunction
+    if ! ssh $SSH_ALIAS cat /proc/cmdline | grep 'intel_iommu=on'; then
+        X=$(ps --no-headers -o comm 1)
+        if [ "$X" == "systemd" ]; then
+            update_systemd
+        elif [ "$X" == "grub" ]; then
+            update_grub
+        else
+            echo "unknown system $X"
+            exit 1
+        fi
+        reboot_it
+    else
+        echo "IOMMU is on"
+    fi
 
 }
 
 check_iommu_setup() {
 
-    sudo dmesg | grep -e DMAR -e IOMMU | grep 'DMAR: IOMMU enabled'
+    if ! ssh $SSH_ALIAS dmesg | grep -e DMAR -e IOMMU | grep 'DMAR: IOMMU enabled'; then
+        echo "IOMMU check failed"
+        exit 1
+    fi
 
-    # Remember
-    cat <<EOF >/dev/null
-[    0.004587] ACPI: DMAR 0x000000007803E000 000050 (v01 INTEL  EDK2     00000002      01000013)
-[    0.004616] ACPI: Reserving DMAR table memory at [mem 0x7803e000-0x7803e04f]
-[    0.131068] DMAR: IOMMU enabled
-...
-EOF
-
-    sudo dmesg | grep 'remapping' | grep 'DMAR-IR: Enabled IRQ remapping in'
-
-    # Remember
-    cat <<EOF >/dev/null
-[    0.296629] DMAR-IR: Queued invalidation will be enabled to support x2apic and Intr-remapping.
-[    0.297395] DMAR-IR: Enabled IRQ remapping in x2apic mode
-EOF
+    if ! ssh $SSH_ALIAS dmesg | grep 'remapping' | grep 'DMAR-IR: Enabled IRQ remapping in'; then
+        echo "Remapping check failed"
+        exit 1
+    fi
 
 }
 
-check_pci_groups() {
-    NODE='pve'
-    pvesh get /nodes/$NODE/hardware/pci --pci-class-blacklist "" | grep -i nvidia
-
-    # Remember
-    cat <<EOF >/dev/null
-    # The GPU is in group 16.
-    # There is only one other thing in that group.
-    pvesh get /nodes/pve/hardware/pci --pci-class-blacklist ""  | grep -i nvidia | awk '{print $6, $8}'
-
-    # First slot (nearest the CPU)
-    0000:01:00.0 16
-    0000:01:00.1 16
-
-    # Second slot
-    0000:08:00.0 21
-    0000:08:00.1 21
-EOF
-}
 
 blacklist_drivers() {
-    if ! grep nouveau /etc/modprobe.d/blacklist.conf; then
-        echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
-        echo "blacklist nvidia*" >> /etc/modprobe.d/blacklist.conf
-        echo "blacklist radeon" >> /etc/modprobe.d/blacklist.conf
-
-        # Sound card
-        echo "blacklist snd_hda_intel" >> /etc/modprobe.d/blacklist.conf
-        reboot
+    if ! ssh $SSH_ALIAS 'grep nouveau /etc/modprobe.d/blacklist.conf'; then
+        cat <<EOF > $T
+blacklist nouveau
+blacklist nvidia*
+blacklist radeon
+blacklist snd_hda_intel
+EOF
+        scp $T $SSH_ALIAS:/etc/modprobe.d/blacklist.conf
+        reboot_it
     fi
 
-    # lspci -v | egrep -i 'nouveau|nvidia|snd_hda_intel'
-    lspci -v
-
 }
 
 
-# This failed
-# This comes from:
-#   URL: https://pve.proxmox.com/wiki/PCI_Passthrough
-#   Section: How to know if a graphics card is UEFI (OVMF) compatible
-check_uefi_ovmf_compatability() {
-    echo "Do not do this. It's a waste of time"
-    echo "This checks for Type-3 IOMMO."
-    echo "BUT... guide_steps() shows how to make it work with a Type-1 iommu"
-    sleep 5
-    exit 1
-
-    cd ~/
-    if [ ! -e rom-parser ]; then
-        git clone https://github.com/awilliam/rom-parser
-        cd rom-parser
-        make
-    fi
-
-    mkdir -p ~/tmp
-
-    # PCI BUS ID
-    # pvesh get /nodes/pve/hardware/pci --pci-class-blacklist ""  | grep -i nvidia | awk '{print $6, $8}' | head -1
-    ID='0000:08:00.0'
-
-    cd /sys/bus/pci/devices/$ID/
-    echo 1 > rom
-    cat rom > ~/tmp/image.rom
-    echo 0 > rom
-
-    ~/rom-parser/rom-parser ~/tmp/image.rom
-
-}
-
-# This comes from:
-#   URL: https://pve.proxmox.com/wiki/PCI_Passthrough
-#   Section: The 'romfile' option
-romfile_option() {
-    echo "Did not do this. The how-to shows how to use type-1 iommu"
-    sleep 5
-    exit 1
-
-    mkdir -p ~/tmp
-
-    # PCI BUS ID
-    # pvesh get /nodes/pve/hardware/pci --pci-class-blacklist ""  | grep -i nvidia | awk '{print $6, $8}' | head -1
-    ID='0000:08:00.0'
-
-    # Did not exist (originally)
-    # ls -l /usr/share/kvm/vbios.bin
-
-    cd /sys/bus/pci/devices/$ID/
-    echo 1 > rom
-    cat rom > /usr/share/kvm/vbios.bin
-    echo 0 > rom
-
-    # Then you can pass the vbios file (must be located in /usr/share/kvm/) with:
-    # ARG="hostpci0: 01:00,x-vga=on,romfile=vbios.bin"
-    #ARG="hostpci0: 08:00,x-vga=on,romfile=vbios.bin"
-    G=$(echo $ID | perl -pe 's/....:(..:..)../$1/')
-    ARG="hostpci0: $G,x-vga=on,romfile=vbios.bin"
-    # NOTE: the above would be put in /etc/pve/qemu-server/<VM-ID>.conf
-
-}
-
-
-################################################################################
-# https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
-################################################################################
-
-guide_steps() {
-    # Step 1: Configuring the Grub
-    #update_kernel_args
-    #check_iommu_setup
-
-    # Step 2: VFIO Modules
-    cat <<EOF > /etc/modules
+update_vfio_modules() {
+    if ! ssh $SSH_ALIAS 'grep vfio /etc/modules'; then
+        cat <<EOF > $T
 vfio
 vfio_iommu_type1
 vfio_pci
 vfio_virqfd
 EOF
+        scp $T $SSH_ALIAS:/etc/modules
+        reboot_it
+    fi
+}
 
-    # Step 3: IOMMU interrupt remapping
+iommu_interrupt_remapping() {
     #
     # These Files didn't exist
     # WOOHOO
@@ -189,36 +161,76 @@ EOF
     # - Docs below show vfio supports iommo type 1
     #   https://github.com/torvalds/linux/blob/master/drivers/vfio/vfio_iommu_type1.c
     #   https://docs.kernel.org/driver-api/vfio.html#iommufd-and-vfio-iommu-type1
-    echo "options vfio_iommu_type1 allow_unsafe_interrupts=1" > /etc/modprobe.d/iommu_unsafe_interrupts.conf
-    #
+    if ! ssh $SSH_ALIAS 'grep vfio_iommu_type1 /etc/modprobe.d/iommu_unsafe_interrupts.conf'; then
+        cat <<EOF > $T
+options vfio_iommu_type1 allow_unsafe_interrupts=1
+EOF
+        scp $T $SSH_ALIAS:/etc/modprobe.d/iommu_unsafe_interrupts.conf
+    fi
+
+
     # This should help on Windows VMs
     #   https://wiki.archlinux.org/title/QEMU
     #   https://www.reddit.com/r/Proxmox/comments/gvylgj/how_unstable_are_unsafe_interrupts/
-    echo "options kvm ignore_msrs=1" > /etc/modprobe.d/kvm.conf
+    if ! ssh $SSH_ALIAS 'grep ignore_msrs=1 /etc/modprobe.d/kvm.conf'; then
+        cat <<EOF > $T
+options kvm ignore_msrs=1
+EOF
+        scp $T $SSH_ALIAS:/etc/modprobe.d/kvm.conf
+    fi
+
+}
+
+add_gpu_to_vfio() {
+    if ! ssh $SSH_ALIAS 'pvesh get /nodes/pve/hardware/pci --pci-class-blacklist "" | grep -i nvidia'; then
+        echo "Nvidia card was not found by proxmox"
+        exit 1
+    fi
+
+    if ssh $SSH_ALIAS 'ls -1 /etc/modprobe.d/vfio.conf'; then
+        echo "/etc/modprobe.d/vfio.conf exists already"
+        return
+    fi
+
+    # '0000:01:00.0'
+    BUSID=$(ssh $SSH_ALIAS 'pvesh get /nodes/pve/hardware/pci --pci-class-blacklist "" | grep -i nvidia' | grep RTX | cut -d' ' -f 6)
+
+    # 01:00
+    G=$(echo $BUSID | perl -pe 's/....:(..:..)../$1/')
+
+    X=$(lspci -n -s $G | cut -d' ' -f 3 | tr "\n" ',')
+    # 10de:249c,10de:228b,
+    IDS=${X::-1}
+
+    cat <<EOF >$T
+options vfio-pci ids=$IDS disable_vga=1
+EOF
+    scp $T $SSH_ALIAS:/etc/modprobe.d/vfio.conf
+    #ssh $SSH_ALIAS 'reset'
+    reboot_it
+
+}
+
+################################################################################
+# https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
+################################################################################
+
+guide_steps() {
+    # Step 1: Configuring the Grub
+    update_kernel_args
+    check_iommu_setup
+
+    # Step 2: VFIO Modules
+    update_vfio_modules
+
+    # Step 3: IOMMU interrupt remapping
+    iommu_interrupt_remapping
 
     # Step 4: Blacklisting Drivers
-    # blacklist_drivers
+    blacklist_drivers
 
     # Step 5: Adding GPU to VFIO
-    lspci -v
-    # PCI BUS ID
-    # pvesh get /nodes/pve/hardware/pci --pci-class-blacklist ""  | grep -i nvidia | awk '{print $6, $8}' | head -1
-    ID='0000:01:00.0'
-    G=$(echo $ID | perl -pe 's/....:(..:..)../$1/') # 01:00
-    lspci -n -s $G
-    #lspci -n -s 01:00
-    #  01:00.0 0300: 10de:2684 (rev a1)
-    #  01:00.1 0403: 10de:22ba (rev a1)
-    # Vendor IDs
-    echo "options vfio-pci ids=10de:2684,10de:22ba disable_vga=1"> /etc/modprobe.d/vfio.conf
-    reset
-    reboot
-
-    # Check that the "vfio" driver is in use
-    lspci -v
-    # Both the "VGA Controller" and "Audio Controller" show:
-    # Kernel driver in use: vfio-pci
-
+    add_gpu_to_vfio
 
     # Linux Guest VM
     #   https://nopresearcher.github.io/Proxmox-GPU-Passthrough-Ubuntu/
@@ -242,6 +254,11 @@ EOF
     #
     #
     # On VM
+    #
+    # Check that the "vfio" driver is in use
+    # Both the "VGA Controller" and "Audio Controller" show:
+    # Kernel driver in use: vfio-pci
+    #
     #   cat /etc/default/grub | grep nomodeset
     #   GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off"
     #   sudo emacs /etc/default/grub
@@ -259,18 +276,11 @@ EOF
     # lsmod
     # sudo emacs /etc/rc.local
     # reboot
-
-
+    #
 
     # lsblk -ao NAME,FSTYPE,FSSIZE,FSUSED,FSUSE%,SIZE,MOUNTPOINT
 }
 
-#update_kernel_args
-#check_iommu_setup
-#check_pci_groups
-#blacklist_drivers
-## failed ## check_uefi_ovmf_compatability
-## Didn't update any config file ## romfile_option
-
 
 guide_steps
+echo "Done"
