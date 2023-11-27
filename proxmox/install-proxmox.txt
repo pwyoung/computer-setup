@@ -1,0 +1,102 @@
+
+# Oracle ZFS Guide
+#   https://docs.oracle.com/cd/E19253-01/819-5461/gaynp/index.html
+#   https://docs.oracle.com/cd/E18752_01/html/819-5461/gazsu.html
+
+Steps:
+- Had to edit Bios since 3rd or 4th NVME disk,
+  was conflicting with SATA port/config.
+  Appeared in Bios in m2_3.5
+- Chose ZFS raid-1 (mirroring)
+
+
+# zpool list
+NAME    SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP    HEALTH  ALTROOT
+rpool  3.62T  1.27G  3.62T        -         -     0%     0%  1.00x    ONLINE  -
+
+# zfs list
+NAME               USED  AVAIL     REFER  MOUNTPOINT
+rpool             1.27G  3.51T      104K  /rpool
+rpool/ROOT        1.27G  3.51T       96K  /rpool/ROOT
+rpool/ROOT/pve-1  1.27G  3.51T     1.27G  /
+rpool/data          96K  3.51T       96K  /rpool/data
+
+# zpool status -v
+  pool: rpool
+ state: ONLINE
+config:
+
+	NAME                                                 STATE     READ WRITE CKSUM
+	rpool                                                ONLINE       0     0     0
+	  mirror-0                                           ONLINE       0     0     0
+	    nvme-eui.e8238fa6bf530001001b448b4a724163-part3  ONLINE       0     0     0
+	    nvme-eui.e8238fa6bf530001001b448b4a0fc998-part3  ONLINE       0     0     0
+
+errors: No known data errors
+
+
+
+# lsblk
+NAME        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+nvme2n1     259:0    0  1.8T  0 disk
+nvme1n1     259:1    0  1.8T  0 disk
+nvme0n1     259:2    0  3.6T  0 disk
+├─nvme0n1p1 259:3    0 1007K  0 part
+├─nvme0n1p2 259:4    0    1G  0 part
+└─nvme0n1p3 259:5    0  3.6T  0 part
+nvme3n1     259:6    0  3.6T  0 disk
+├─nvme3n1p1 259:7    0 1007K  0 part
+├─nvme3n1p2 259:8    0    1G  0 part
+└─nvme3n1p3 259:9    0  3.6T  0 part
+
+
+# zpool history
+History for 'rpool':
+2023-11-27.10:26:33 zpool create -f -o cachefile=none -o ashift=12 rpool mirror /dev/disk/by-id/nvme-eui.e8238fa6bf530001001b448b4a724163-part3 /dev/disk/by-id/nvme-eui.e8238fa6bf530001001b448b4a0fc998-part3
+2023-11-27.10:26:33 zfs create rpool/ROOT
+2023-11-27.10:26:33 zfs create rpool/data
+2023-11-27.10:26:33 zfs create rpool/ROOT/pve-1
+2023-11-27.10:26:33 zfs set atime=on relatime=on rpool
+2023-11-27.10:26:33 zfs set compression=on rpool
+2023-11-27.10:26:33 zfs set sync=disabled rpool
+2023-11-27.10:27:08 zfs set sync=standard rpool
+2023-11-27.10:27:08 zfs set mountpoint=/ rpool/ROOT/pve-1
+2023-11-27.10:27:08 zpool set bootfs=rpool/ROOT/pve-1 rpool
+2023-11-27.10:27:08 zpool export rpool
+2023-11-27.10:27:50 zpool import -N rpool
+2023-11-27.12:14:36 zpool import -N rpool
+
+# zpool iostat
+              capacity     operations     bandwidth
+pool        alloc   free   read  write   read  write
+----------  -----  -----  -----  -----  -----  -----
+rpool       1.27G  3.62T      0     23  14.1K   164K
+
+
+
+# zpool iostat -v
+                                                       capacity     operations     bandwidth
+pool                                                 alloc   free   read  write   read  write
+---------------------------------------------------  -----  -----  -----  -----  -----  -----
+rpool                                                1.27G  3.62T      0     23  14.0K   164K
+  mirror-0                                           1.27G  3.62T      0     23  14.0K   164K
+    nvme-eui.e8238fa6bf530001001b448b4a724163-part3      -      -      0     12  6.82K  81.8K
+    nvme-eui.e8238fa6bf530001001b448b4a0fc998-part3      -      -      0     11  7.19K  81.8K
+---------------------------------------------------  -----  -----  -----  -----  -----  -----
+
+# zpool status -x
+all pools are healthy
+
+# zfs list -t filesystem -o name,used,avail,mountpoint
+NAME               USED  AVAIL  MOUNTPOINT
+rpool             1.27G  3.51T  /rpool
+rpool/ROOT        1.27G  3.51T  /rpool/ROOT
+rpool/ROOT/pve-1  1.27G  3.51T  /
+rpool/data          96K  3.51T  /rpool/data
+
+
+# https://docs.oracle.com/cd/E23823_01/html/819-5461/gazvb.html
+# zfs get quota /rpool/data
+NAME        PROPERTY  VALUE  SOURCE
+rpool/data  quota     none   default
+
