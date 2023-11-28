@@ -1,0 +1,14 @@
+# Set up user
+#   PVE linux host
+#     useradd -m -d /home/terraform -s /bin/bash terraform
+#     echo 'terraform' | passwd terraform
+# PVE-GUI
+#   datacenter->users
+#     https://192.168.3.115:8006/#v1:0:18:4::=contentBackup:::::14
+#
+virtual_environment_endpoint="https://192.168.3.115:8006"
+virtual_environment_password="terraform"
+virtual_environment_username="terraform"
+
+
+

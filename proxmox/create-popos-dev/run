@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+# Exit on error
+set -e
+
+# Location of this script
+MY_DIR=$(cd "$(dirname "$0")"; pwd -P)
+
+show_usage()
+{
+    printf "Usage: $0 <command>\n"
+    cat <<EOF
+    -c|--clean
+    -b|--build
+    -t|--test
+    -h|--help
+
+    Example:
+      $0 -C -b -t
+EOF
+    exit 0
+}
+
+if [[ $# -lt 1 ]]; then
+    show_usage "$@"
+fi
+
+clean() {
+    echo "Clean"
+}
+
+build() {
+    echo "Build"
+    cd $MY_DIR
+    terraform init
+
+}
+
+run_test() {
+    echo "Test"
+}
+
+
+################################################################################
+
+while [[ $# -gt 0 ]]; do
+  key="$1"
+
+  case $key in
+    -c|--clean)
+        shift
+        clean
+        ;;
+    -b|--build)
+        shift
+        build
+        ;;
+    -t|--test)
+        shift
+        run_test
+        ;;
+    -h|--help)
+        show_usage
+      ;;
+    *)    # unknown option
+      POSITIONAL+=("$1") # save it in an array for later
+      shift # past argument
+      ;;
+  esac
+done

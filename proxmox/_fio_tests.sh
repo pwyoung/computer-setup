@@ -3,17 +3,6 @@
 # https://fio.readthedocs.io/en/latest/fio_doc.html
 # https://docs.oracle.com/en-us/iaas/Content/Block/References/samplefiocommandslinux.htm
 
-echo "Random R/W, 4k, 1 thread"
-fio --name=random-rw --ioengine=posixaio --rw=randrw --bs=4k --numjobs=1 --size=4g --iodepth=1 --runtime=60 --time_based --end_fsync=1
-
-echo "Random W, 64k, 1 thread"
-fio --name=fiotest --filename=/test/test1 --size=16Gb --rw=randwrite --bs=64k --direct=1 --numjobs=1 --ioengine=libaio --iodepth=16 --group_reporting --runtime=60 --startdelay=1
-
-echo "Random R, 64k, 1 thread"
-fio --name=fiotest --filename=/test/test1 --size=16Gb --rw=randwrite --bs=64k --direct=1 --numjobs=1 --ioengine=libaio --iodepth=16 --group_reporting --runtime=60 --startdelay=1
-
-exit 0
-
 # --rw=
 # https://fio.readthedocs.io/en/latest/fio_doc.html#i-o-type
 
