@@ -126,6 +126,9 @@ check_iommu_setup() {
 
 
 blacklist_drivers() {
+    # The Proxmox host shouldn't have any drivers installed on it,
+    # But in general, this is what one does to ensure the device is free
+    # to be passed through from the host to the VMs.
     if ! ssh $SSH_ALIAS 'grep nouveau /etc/modprobe.d/blacklist.conf'; then
         cat <<EOF > $T
 blacklist nouveau
@@ -208,9 +211,8 @@ add_gpu_to_vfio() {
 options vfio-pci ids=$IDS disable_vga=1
 EOF
     scp $T $SSH_ALIAS:/etc/modprobe.d/vfio.conf
-    #ssh $SSH_ALIAS 'reset'
-    reboot_it
 
+    reboot_it
 }
 
 setup_guest_vms() {
@@ -305,11 +307,11 @@ EOF
 
 }
 
-################################################################################
-# https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
-################################################################################
-
 guide_steps() {
+    ################################################################################
+    # https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
+    ################################################################################
+
     # Step 1: Configuring the Grub
     update_kernel_args
     check_iommu_setup
