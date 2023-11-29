@@ -13,6 +13,7 @@ SSH_ALIAS='proxmox'
 # - https://nopresearcher.github.io/Proxmox-GPU-Passthrough-Ubuntu/
 # - https://pve.proxmox.com/wiki/PCI_Passthrough
 # - https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
+# - https://pve.proxmox.com/pve-docs/pve-admin-guide.html#qm_virtual_machines_settings
 
 # Temp file
 T=/tmp/.mytempfile
@@ -213,56 +214,95 @@ EOF
 }
 
 setup_guest_vms() {
+    # Guest VM setup steps
     cat <<EOF >/dev/null
+################################################################################
+# START: MANUAL STEPS
+################################################################################
+# Guest VM Setup
 
-    # Linux Guest VM
-    #   https://nopresearcher.github.io/Proxmox-GPU-Passthrough-Ubuntu/
-    # Setup SSH to VM
-    #   sudo apt update
-    #   sudo apt install openssh-server
-    #   sudo systemctl enable ssh
-    #   sudo systemctl status ssh
-    #   #
-    #   ssh-copy-id pyoung@192.168.3.114
-    #   ssh pyoung@192.168.3.114
-    #   #
-    #   sudo shutdown -h now
-    #
-    # On Proxmox-VE
-    #   ProxmoxGUI->VM->Hardware->Display->None
-    #   Tell VM to use PCI group
-    #   cat /etc/pve/qemu-server/104.conf  | grep hostpci
-    #   hostpci0: 01:00
-    #   Adding ",x-vga=on" caused it to not boot (or seemed to)
-    #
-    #
-    # On VM
-    #
-    # Check that the "vfio" driver is in use
-    # Both the "VGA Controller" and "Audio Controller" show:
-    # Kernel driver in use: vfio-pci
-    #
-    #   cat /etc/default/grub | grep nomodeset
-    #   GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off"
-    #   sudo emacs /etc/default/grub
-    #   sudo update-grub
-    #
-    #   sudo bash -c "echo blacklist nouveau > /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
-    #   sudo bash -c "echo options nouveau modeset=0 >> /etc/modprobe.d/blacklist-nvidia-nouveau.conf"
-    #   sudo update-initramfs -u
-    #
-    #   sudo apt-get install nvidia-driver-545
-    #
-    # sudo apt-get install -y htop wget curl make gcc emacs-nox
-    #
-    # sudo /sbin/modprobe nvidia
-    # lsmod
-    # sudo emacs /etc/rc.local
-    # reboot
-    #
+## SSH Setup
 
-    # lsblk -ao NAME,FSTYPE,FSSIZE,FSUSED,FSUSE%,SIZE,MOUNTPOINT
+### In VM
+  sudo apt update
+  sudo apt install openssh-server
+  sudo systemctl enable ssh
+  sudo systemctl status ssh
+
+### In dev machine
+  ssh-copy-id pyoung@192.168.3.114
+  ssh pyoung@192.168.3.114
+
+## Add Nvidia driver and some Conveniences
+
+### In VM
+  sudo apt-get install -y htop wget curl make gcc emacs-nox
+  sudo apt-get install nvidia-driver-545
+  # Prevent
+  sudo shutdown -h now
+
+## Configure "virtual hardware" for Pass-through
+
+### On Proxmox-VE
+  From the GUI, pass through the PCIe device:
+    PVE->hardware->add->PCI device->choose the Nvidia VGA device
+      Select: raw, all functions, ROM bar, PCI-Express
+      DeSelect: Primary GPU
+  Example of the effect of the above
+      cat /etc/pve/qemu-server/<VMID>.conf  | grep hostpci
+        hostpci0: 0000:01:00,pcie=1
+
+  Edit the VM's config file
+    Note - some args below were taken as-is from tutorials.
+           Some are documented here:
+           https://www.qemu.org/docs/master/system/i386/kvm-pv.html
+    emacs /etc/pve/qemu-server/<VMID>.conf  | grep hostpci
+      cpu: host,hidden=1,flags=+pcid
+      args: -cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'
+
+################################################################################
+# STOP: MANUAL STEPS
+################################################################################
 EOF
+
+    # This is to remember a working /etc/pve/qemu-server/<VMID>.conf
+    #
+    # I added these lines (to support GPU pass-through)
+    #   cpu: host,hidden=1,flags=+pcid
+    #   args: -cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'
+    #
+    # From the GUI, configured these lines (to support GPU pass-through):
+    #   hostpci0: 0000:01:00,pcie=1
+    #
+    # And for speed/convenience of the GUI, I use this display driver:
+    #   vga: virtio
+    cat <<EOF > /dev/null
+agent: 1
+args: -cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'
+balloon: 0
+bios: ovmf
+boot: order=scsi0;ide2;net0
+cores: 8
+cpu: host,hidden=1,flags=+pcid
+efidisk0: local-zfs:vm-103-disk-0,efitype=4m,size=1M
+hostpci0: 0000:01:00,pcie=1
+ide2: local:iso/pop-os_22.04_amd64_nvidia_33.iso,media=cdrom,size=3090528K
+machine: q35
+memory: 32768
+meta: creation-qemu=8.0.2,ctime=1701223075
+name: popos-dev
+net0: virtio=A2:AE:C7:3A:70:C4,bridge=vmbr0,firewall=1
+numa: 0
+ostype: l26
+parent: working
+scsi0: local-zfs:vm-103-disk-1,iothread=1,size=500G
+scsihw: virtio-scsi-single
+smbios1: uuid=0968faa3-35a5-4390-b158-bd70413b6462
+sockets: 1
+vga: virtio
+vmgenid: 0fe89475-2488-4b99-a064-2f5024d51299
+EOF
+
 }
 
 ################################################################################
@@ -290,8 +330,9 @@ guide_steps() {
 }
 
 
-#add_gpu_to_vfio
-#echo "bail" && exit 1
+# For dev:
+# add_gpu_to_vfio
+# echo "bail" && exit 1
 
 guide_steps
 echo "Done"
