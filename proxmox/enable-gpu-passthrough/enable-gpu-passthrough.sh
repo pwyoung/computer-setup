@@ -200,8 +200,8 @@ add_gpu_to_vfio() {
     G=$(echo $BUSID | perl -pe 's/....:(..:..)../$1/')
 
     X=$(lspci -n -s $G | cut -d' ' -f 3 | tr "\n" ',')
-    # 10de:249c,10de:228b,
     IDS=${X::-1}
+    # 10de:249c,10de:228b
 
     cat <<EOF >$T
 options vfio-pci ids=$IDS disable_vga=1
@@ -289,6 +289,9 @@ guide_steps() {
     setup_guest_vms
 }
 
+
+#add_gpu_to_vfio
+#echo "bail" && exit 1
 
 guide_steps
 echo "Done"
