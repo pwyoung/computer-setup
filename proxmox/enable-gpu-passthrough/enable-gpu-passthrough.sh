@@ -9,6 +9,7 @@ SSH_ALIAS='proxmox'
 
 # Assumptions
 # - CPU is Intel
+# - System supports IOMMU type-1
 # - GPU is Nvidia
 # - Passwordless SSH works to $SSH_ALIAS (as root user)
 
@@ -98,8 +99,6 @@ EOF
 update_systemd() {
     report "update_systemd()"
 
-    # In case we lose this, the default is:
-    #   root=ZFS=rpool/ROOT/pve-1 boot=zfs
     ARGS1=$(ssh $SSH_ALIAS 'cat /etc/kernel/cmdline')
 
     if echo $ARGS1 | grep "iommu"; then
@@ -189,11 +188,6 @@ EOF
 iommu_interrupt_remapping() {
     report "iommu_interrupt_remapping()"
 
-    #
-    # These Files didn't exist
-    # WOOHOO
-    # - steps above ( check_uefi_ovmf_compatability )
-    #   show my IOMMU *IS* TYPE 1
     # - Docs below show vfio supports iommo type 1
     #   https://github.com/torvalds/linux/blob/master/drivers/vfio/vfio_iommu_type1.c
     #   https://docs.kernel.org/driver-api/vfio.html#iommufd-and-vfio-iommu-type1
@@ -293,7 +287,8 @@ setup_guest_vms() {
     Note - some args below were taken as-is from tutorials.
            Some are documented here:
            https://www.qemu.org/docs/master/system/i386/kvm-pv.html
-    emacs /etc/pve/qemu-server/<VMID>.conf  | grep hostpci
+    emacs /etc/pve/qemu-server/<VMID>.conf
+      # Change/Add these parameters to match the following:
       cpu: host,hidden=1,flags=+pcid
       args: -cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'
 
@@ -350,29 +345,19 @@ vmgenid: 0fe89475-2488-4b99-a064-2f5024d51299
 EOF
 
     echo "Look at steps to setup a VM at $T"
-    # cat $T
-
 }
 
 guide_steps() {
-    ################################################################################
-    # https://www.reddit.com/r/homelab/comments/b5xpua/the_ultimate_beginners_guide_to_gpu_passthrough/
-    ################################################################################
-
-    # Step 1: Configuring the Grub
     update_kernel_args
+
     check_iommu_setup
 
-    # Step 2: VFIO Modules
     update_vfio_modules
 
-    # Step 3: IOMMU interrupt remapping
     iommu_interrupt_remapping
 
-    # Step 4: Blacklisting Drivers
     blacklist_drivers
 
-    # Step 5: Adding GPU to VFIO
     add_gpu_to_vfio
 
     setup_guest_vms
