@@ -1,21 +1,18 @@
-# https://registry.terraform.io/providers/Telmate/proxmox/latest/docs
-
 terraform {
   required_providers {
     proxmox = {
-      source  = "telmate/proxmox"
-      version = "2.6.8"
+      source  = "bpg/proxmox"
+      version = "0.38.1"
     }
   }
 }
 
 provider "proxmox" {
-  pm_api_url = var.virtual_environment_endpoint
-  pm_user = var.virtual_environment_username
-  pm_password = var.virtual_environment_password
-  pm_tls_insecure = true
-
-  #pm_debug = true
-  #pm_timeout = 800
-
+  endpoint  = var.virtual_environment_endpoint
+  api_token = var.virtual_environment_token
+  insecure  = true
+  ssh {
+    agent = true
+    username = "root"
+  }
 }

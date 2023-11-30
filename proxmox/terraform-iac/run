@@ -39,7 +39,8 @@ clean() {
 
     # "clean all"
     rm -rf ./.terraform* || true
-    rm -f ./terraform.tfstate || true
+    rm -rf ./.tfplan || true
+    rm -f ./terraform.tfstate* || true
 }
 
 build() {
@@ -50,15 +51,31 @@ build() {
     terraform version -json | jq .
 
     # Init (if it seems necessary)
-    if [ ! -e ./.terraform* ]; then
+    if ! ls -1d ./.terraform*; then
         terraform init -upgrade
     fi
 
+    # For some operations, the bpg provider needs SSH access
+    # to the PVE host (e.g. to convert files)
+    #
+    # Set up access to Proxmox and then run this in a shell
+    # where the agent is running
+    SSH_PRIVATE_KEY=~/.ssh/id_ed25519
+    if ! ls -1d $SSH_PRIVATE_KEY; then
+        echo "SSH key does not exist: $SSH_PRIVATE_KEY"
+        exit 1
+    fi
+    if ! env | grep SSH_AGENT_PID >/dev/null; then
+        echo "Running SSH agent"
+        eval `ssh-agent -s`
+        ssh-add $SSH_PRIVATE_KEY
+        ssh-add -L
+    fi
+    # At this point, the following should work (for some IP)
+    # PROXMOX_IP=192.168.3.115 && ssh root@$PROXMOX_IP whoami
+
     # Plan
     TF_LOG=trace terraform plan -lock=false -out ./.tfplan
-
-    # Wait
-    read -p "Hit enter to proceed"
 
     # Apply
     terraform apply ./.tfplan
