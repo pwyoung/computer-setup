@@ -1,26 +1,68 @@
+# https://registry.terraform.io/providers/bpg/proxmox/latest/docs
+
+# https://registry.terraform.io/providers/bpg/proxmox/latest/docs/resources/virtual_environment_vm
 resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   name      = "test-ubuntu"
+  #vm_id     = 4321
+
   node_name = "pve"
 
-  # datastore_id = "local-zfs" # invalid here
+  description = "Managed by Terraform"
+  tags        = ["terraform", "ubuntu"]
 
+  agent {
+    # read 'Qemu guest agent' section, change to true only when ready
+    enabled = false
+  }
 
-  initialization {
-    user_account {
-      # do not use this in production, configure your own ssh key instead!
-      username = "root"
-      password = "testpw"
-    }
+  startup {
+    order      = "3"
+    up_delay   = "60"
+    down_delay = "60"
   }
 
   disk {
-    datastore_id = "local-lvm" # created this manually (since using ZFS)
+    # The datastore MUST be called "local-lvm"
+    # Somewhere it is hard-coded and will use that value
+    # I created 'local-lvm' manually since my Proxmox is using ZFS
+    datastore_id = "local-lvm"
     file_id      = proxmox_virtual_environment_file.ubuntu_cloud_image.id
+
+    # interface    = "scsi0"
     interface    = "virtio0"
     iothread     = true
     discard      = "on"
-    size         = 20
+    size         = 55
+
   }
+
+  initialization {
+    ip_config {
+      ipv4 {
+        address = "dhcp"
+      }
+    }
+
+    user_account {
+      keys     = [trimspace(tls_private_key.ubuntu_vm_key.public_key_openssh)]
+      password = random_password.ubuntu_vm_password.result
+      username = "ubuntu"
+    }
+
+    # TODO: add a config
+    # user_data_file_id = proxmox_virtual_environment_file.cloud_config.id
+  }
+
+  network_device {
+    bridge = "vmbr0"
+  }
+
+  operating_system {
+    type = "l26"
+  }
+
+  serial_device {}
+
 }
 
 resource "proxmox_virtual_environment_file" "ubuntu_cloud_image" {
@@ -44,4 +86,34 @@ resource "proxmox_virtual_environment_file" "ubuntu_cloud_image" {
     path      = "/imgs/jammy-server-cloudimg-amd64.updated.img"
 
   }
+}
+
+
+################################################################################
+# CREDS
+################################################################################
+
+resource "random_password" "ubuntu_vm_password" {
+  length           = 16
+  override_special = "_%@"
+  special          = true
+}
+
+resource "tls_private_key" "ubuntu_vm_key" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
+output "ubuntu_vm_password" {
+  value     = random_password.ubuntu_vm_password.result
+  sensitive = true
+}
+
+output "ubuntu_vm_private_key" {
+  value     = tls_private_key.ubuntu_vm_key.private_key_pem
+  sensitive = true
+}
+
+output "ubuntu_vm_public_key" {
+  value = tls_private_key.ubuntu_vm_key.public_key_openssh
 }
