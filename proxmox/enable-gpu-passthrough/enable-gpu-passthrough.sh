@@ -2,12 +2,15 @@
 
 set -e
 
+# Show debug info
+#set -x
+
 SSH_ALIAS='proxmox'
 
 # Assumptions
-# - chip is intel
-# - gpu is nvidia
-# - passwordless SSH works to $SSH_ALIAS (as root user)
+# - CPU is Intel
+# - GPU is Nvidia
+# - Passwordless SSH works to $SSH_ALIAS (as root user)
 
 # References
 # - https://nopresearcher.github.io/Proxmox-GPU-Passthrough-Ubuntu/
@@ -18,7 +21,16 @@ SSH_ALIAS='proxmox'
 # Temp file
 T=/tmp/.mytempfile
 
+report() {
+    SEP="####################"
+    echo "$SEP"
+    echo "$SEP: $1"
+    echo "$SEP"
+}
+
 reboot_it() {
+    # read -p "Hit Enter to reboot $SSH_ALIAS"
+
     ssh $SSH_ALIAS reboot
     sleep 10
     for i in $(seq 1 60); do
@@ -34,6 +46,7 @@ reboot_it() {
 }
 
 update_grub() {
+    report "update_grub()"
 
     cat <<EOF > $T
 # If you change this file, run 'update-grub' afterwards to update
@@ -79,20 +92,31 @@ GRUB_CMDLINE_LINUX=""
 EOF
 
     scp $T $SSH_ALIAS:/etc/default/grub
-    ssh $SSH_ALIAS 'proxmox-boot-tool refresh || update-grub'
+    ssh $SSH_ALIAS 'proxmox-boot-tool refresh' # || update-grub
 }
 
 update_systemd() {
-    # NEW ARGS
-    cat <<EOF > $T
-intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off
-EOF
-    scp $T $SSH_ALIAS:/tmp/tmp-1
-    ssh $SSH_ALIAS 'cat /tmp/tmp-1 >> /etc/kernel/cmdline'
-    ssh $SSH_ALIAS 'proxmox-boot-tool refresh || reinstall-kernels'
+    report "update_systemd()"
+
+    # In case we lose this, the default is:
+    #   root=ZFS=rpool/ROOT/pve-1 boot=zfs
+    ARGS1=$(ssh $SSH_ALIAS 'cat /etc/kernel/cmdline')
+
+    if echo $ARGS1 | grep "iommu"; then
+        echo "It looks like IOMMU settings are already in /etc/kernel/cmdline"
+        echo "Not updating it"
+    else
+        ARGS2="intel_iommu=on iommu=pt pcie_acs_override=downstream,multifunction nofb nomodeset video=vesafb:off,efifb:off"
+
+        echo "$ARGS1 $ARGS2" | tee $T
+        scp $T $SSH_ALIAS:/etc/kernel/cmdline
+        ssh $SSH_ALIAS 'proxmox-boot-tool refresh' # || reinstall-kernels
+    fi
 }
 
 update_kernel_args() {
+    report "update_kernel_args()"
+
     if ! ssh $SSH_ALIAS cat /proc/cmdline | grep 'intel_iommu=on'; then
         X=$(ps --no-headers -o comm 1)
         if [ "$X" == "systemd" ]; then
@@ -111,6 +135,7 @@ update_kernel_args() {
 }
 
 check_iommu_setup() {
+    report "check_iommu_setup()"
 
     if ! ssh $SSH_ALIAS dmesg | grep -e DMAR -e IOMMU | grep 'DMAR: IOMMU enabled'; then
         echo "IOMMU check failed"
@@ -126,6 +151,8 @@ check_iommu_setup() {
 
 
 blacklist_drivers() {
+    report "blacklist_drivers()"
+
     # The Proxmox host shouldn't have any drivers installed on it,
     # But in general, this is what one does to ensure the device is free
     # to be passed through from the host to the VMs.
@@ -145,6 +172,8 @@ EOF
 
 
 update_vfio_modules() {
+    report "update_vfio_modules()"
+
     if ! ssh $SSH_ALIAS 'grep vfio /etc/modules'; then
         cat <<EOF > $T
 vfio
@@ -158,6 +187,8 @@ EOF
 }
 
 iommu_interrupt_remapping() {
+    report "iommu_interrupt_remapping()"
+
     #
     # These Files didn't exist
     # WOOHOO
@@ -187,6 +218,8 @@ EOF
 }
 
 add_gpu_to_vfio() {
+    report "add_gpu_to_vfio()"
+
     if ! ssh $SSH_ALIAS 'pvesh get /nodes/pve/hardware/pci --pci-class-blacklist "" | grep -i nvidia'; then
         echo "Nvidia card was not found by proxmox"
         exit 1
@@ -216,14 +249,16 @@ EOF
 }
 
 setup_guest_vms() {
+    report "setup_guest_vms()"
+
     # Guest VM setup steps
-    cat <<EOF >/dev/null
+    cat <<EOF > $T
 ################################################################################
 # START: MANUAL STEPS
 ################################################################################
 # Guest VM Setup
 
-## SSH Setup
+## Allow Connectivity to VM
 
 ### In VM
   sudo apt update
@@ -231,11 +266,11 @@ setup_guest_vms() {
   sudo systemctl enable ssh
   sudo systemctl status ssh
 
-### In dev machine
+### In another machine (e.g. the one running this script)
   ssh-copy-id pyoung@192.168.3.114
   ssh pyoung@192.168.3.114
 
-## Add Nvidia driver and some Conveniences
+## Add Nvidia driver and some Conveniences to VM
 
 ### In VM
   sudo apt-get install -y htop wget curl make gcc emacs-nox
@@ -243,7 +278,7 @@ setup_guest_vms() {
   # Prevent
   sudo shutdown -h now
 
-## Configure "virtual hardware" for Pass-through
+## Configure VM itself for Pass-through
 
 ### On Proxmox-VE
   From the GUI, pass through the PCIe device:
@@ -266,6 +301,9 @@ setup_guest_vms() {
 # STOP: MANUAL STEPS
 ################################################################################
 EOF
+
+    echo "Look at steps to setup a VM at $T"
+    # cat $T
 
     # This is to remember a working /etc/pve/qemu-server/<VMID>.conf
     #
@@ -330,11 +368,6 @@ guide_steps() {
 
     setup_guest_vms
 }
-
-
-# For dev:
-# add_gpu_to_vfio
-# echo "bail" && exit 1
 
 guide_steps
 echo "Done"
