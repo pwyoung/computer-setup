@@ -9,3 +9,6 @@ build: FORCE
 
 test: build
 	./run -t
+
+clean: FORCE
+	./run -c

@@ -1,0 +1,21 @@
+virtual_environment_endpoint="https://192.168.3.115:8006"
+
+# Set up Proxmox user for use by Terraform
+#
+# TFROLE="TerraformProv"
+# TFUSER="terraform-prov@pve"
+# TFPW="testpw"
+# pveum role add $TFROLE -privs "Datastore.AllocateSpace Datastore.Audit Pool.Allocate Sys.Audit Sys.Console Sys.Modify VM.Allocate VM.Audit VM.Clone VM.Config.CDROM VM.Config.Cloudinit VM.Config.CPU VM.Config.Disk VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options VM.Migrate VM.Monitor VM.PowerMgmt"
+# pveum user add $TFUSER --password "$TFPW"
+# pveum aclmod / -user $TFUSER -role $TFROLE
+#
+virtual_environment_password="testpw"
+virtual_environment_username="terraform-prov@pve"
+
+
+
+
+
+
+
+

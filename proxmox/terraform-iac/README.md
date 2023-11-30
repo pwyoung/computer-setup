@@ -1,8 +1,16 @@
 # Goal
-Automate creation of dev machine.
+- Automate creation of dev machine.
 
+# References
+- Terraform Providers
+  - https://registry.terraform.io/browse/providers
+- Specific Providers
+  - Proxmox
+    - BPG: https://registry.terraform.io/providers/bpg/proxmox/latest/docs
+    - Telmate: ...
+    
 # Boiler-Plate
-As always, everything should "just work" by running "make".
+- As always, everything should "just work" by running "make".
 
 # Details
 - Provision

@@ -3,8 +3,13 @@
 # Exit on error
 set -e
 
+# set -x
+
 # Location of this script
 MY_DIR=$(cd "$(dirname "$0")"; pwd -P)
+
+# Terraform files
+TF_DIR=$MY_DIR/tf
 
 show_usage()
 {
@@ -27,13 +32,36 @@ fi
 
 clean() {
     echo "Clean"
+
+    cd $TF_DIR
+
+    terraform apply -destroy || true
+
+    # "clean all"
+    rm -rf ./.terraform* || true
+    rm -f ./terraform.tfstate || true
 }
 
 build() {
     echo "Build"
-    cd $MY_DIR
-    terraform init
+    cd $TF_DIR
 
+    # Fail here if terraform is not installed
+    terraform version -json | jq .
+
+    # Init (if it seems necessary)
+    if [ ! -e ./.terraform* ]; then
+        terraform init -upgrade
+    fi
+
+    # Plan
+    TF_LOG=trace terraform plan -lock=false -out ./.tfplan
+
+    # Wait
+    read -p "Hit enter to proceed"
+
+    # Apply
+    terraform apply ./.tfplan
 }
 
 run_test() {
