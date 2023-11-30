@@ -300,23 +300,24 @@ setup_guest_vms() {
 ################################################################################
 # STOP: MANUAL STEPS
 ################################################################################
-EOF
 
-    echo "Look at steps to setup a VM at $T"
-    # cat $T
 
-    # This is to remember a working /etc/pve/qemu-server/<VMID>.conf
-    #
-    # I added these lines (to support GPU pass-through)
-    #   cpu: host,hidden=1,flags=+pcid
-    #   args: -cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'
-    #
-    # From the GUI, configured these lines (to support GPU pass-through):
-    #   hostpci0: 0000:01:00,pcie=1
-    #
-    # And for speed/convenience of the GUI, I use this display driver:
-    #   vga: virtio
-    cat <<EOF > /dev/null
+################################################################################
+# START: Example Proxmox VM config file
+################################################################################
+
+# This is to remember a working /etc/pve/qemu-server/<VMID>.conf
+#
+# I added these lines (to support GPU pass-through)
+#   cpu: host,hidden=1,flags=+pcid
+#   args: -cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'
+#
+# From the GUI, configured these lines (to support GPU pass-through):
+#   hostpci0: 0000:01:00,pcie=1
+#
+# And for speed/convenience of the GUI, I use this display driver:
+#   vga: virtio
+#
 agent: 1
 args: -cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'
 balloon: 0
@@ -341,7 +342,15 @@ smbios1: uuid=0968faa3-35a5-4390-b158-bd70413b6462
 sockets: 1
 vga: virtio
 vmgenid: 0fe89475-2488-4b99-a064-2f5024d51299
+
+################################################################################
+# STOP: Example Proxmox VM config file
+################################################################################
+
 EOF
+
+    echo "Look at steps to setup a VM at $T"
+    # cat $T
 
 }
 
