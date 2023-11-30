@@ -8,10 +8,15 @@ set -e
 SSH_ALIAS='proxmox'
 
 # Assumptions
-# - CPU is Intel
-# - System supports IOMMU type-1
-# - GPU is Nvidia
-# - Passwordless SSH works to $SSH_ALIAS (as root user)
+# - The target host $SSH_ALIAS is a Proxmox VE server
+# - Passwordless SSH works to $SSH_ALIAS (as root)
+# - PVE has CPU from Intel
+# - PVE supports IOMMU type-1
+# - PVE has one Nvidia GPU
+
+# Notes:
+# - This can easily be updated to support AMD CPUs.
+# - This can easily be updated to support other GPUs.
 
 # References
 # - https://nopresearcher.github.io/Proxmox-GPU-Passthrough-Ubuntu/
@@ -93,7 +98,11 @@ GRUB_CMDLINE_LINUX=""
 EOF
 
     scp $T $SSH_ALIAS:/etc/default/grub
-    ssh $SSH_ALIAS 'proxmox-boot-tool refresh' # || update-grub
+
+
+   ssh $SSH_ALIAS 'proxmox-boot-tool refresh'
+   #ssh $SSH_ALIAS 'update-grub'
+
 }
 
 update_systemd() {
@@ -109,7 +118,9 @@ update_systemd() {
 
         echo "$ARGS1 $ARGS2" | tee $T
         scp $T $SSH_ALIAS:/etc/kernel/cmdline
-        ssh $SSH_ALIAS 'proxmox-boot-tool refresh' # || reinstall-kernels
+
+        ssh $SSH_ALIAS 'proxmox-boot-tool refresh'
+        #ssh $SSH_ALIAS 'reinstall-kernels'
     fi
 }
 
@@ -152,9 +163,6 @@ check_iommu_setup() {
 blacklist_drivers() {
     report "blacklist_drivers()"
 
-    # The Proxmox host shouldn't have any drivers installed on it,
-    # But in general, this is what one does to ensure the device is free
-    # to be passed through from the host to the VMs.
     if ! ssh $SSH_ALIAS 'grep nouveau /etc/modprobe.d/blacklist.conf'; then
         cat <<EOF > $T
 blacklist nouveau
