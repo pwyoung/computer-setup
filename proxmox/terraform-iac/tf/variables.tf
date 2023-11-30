@@ -17,3 +17,8 @@ variable "virtual_environment_username" {
   type        = string
   description = "The username and realm for the Proxmox Virtual Environment API (example: root@pam)"
 }
+
+variable "boxes" {
+  type        = list 
+  description = "The virtual machines to build"
+}
