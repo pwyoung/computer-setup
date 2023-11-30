@@ -36,8 +36,15 @@ clean() {
     cd $TF_DIR
 
     terraform apply -destroy || true
+}
 
-    # "clean all"
+clean_all() {
+    clean
+
+    echo "Clean-All"
+
+    cd $TF_DIR
+
     rm -rf ./.terraform* || true
     rm -rf ./.tfplan || true
     rm -f ./terraform.tfstate* || true
@@ -95,6 +102,10 @@ while [[ $# -gt 0 ]]; do
     -c|--clean)
         shift
         clean
+        ;;
+    -C|--clean-all)
+        shift
+        clean_all
         ;;
     -b|--build)
         shift

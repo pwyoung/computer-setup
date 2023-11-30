@@ -12,3 +12,6 @@ test: build
 
 clean: FORCE
 	./run -c
+
+clean-all: clean
+	./run -C
