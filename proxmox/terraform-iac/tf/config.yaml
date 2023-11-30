@@ -1,0 +1,7 @@
+virtual_machines:
+- name: "vm-9901"
+  vm_id: 9901
+  mac_address: "00:00:00:00:99:01"
+- name: "vm-9902"
+  vm_id: 9902
+  mac_address: "00:00:00:00:99:02"

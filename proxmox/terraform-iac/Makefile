@@ -15,3 +15,7 @@ clean: FORCE
 
 clean-all: clean
 	./run -C
+
+plan: FORCE
+	./run -p
+

@@ -12,21 +12,24 @@
 #   sudo dhclient -v
 #   Or, tweak the template to do it...
 
-#locals {
-#  boxes = yamldecode(file("${path.module}/virtual-machines.yaml"))
-#}
+data "local_file" "config" {
+  filename = "config.yaml"
+}
+
+locals {
+  config = yamldecode(data.local_file.config.content)
+  virtual_machines = local.config.virtual_machines
+}
 
 # https://registry.terraform.io/providers/bpg/proxmox/latest/docs/resources/virtual_environment_vm
 resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
-  count = length(var.boxes)
+  count = length(local.virtual_machines)
 
   # VM Name (not hostname)
-  #name      = "vm-9901-ubuntu-test"
-  name  = var.boxes[count.index].name
+  name  = local.virtual_machines[count.index].name
 
   # Useful for advanced scripting and ordering in the GUI
-  #vm_id     = 9901
-  vm_id = var.boxes[count.index].vm_id
+  vm_id = local.virtual_machines[count.index].vm_id
 
   node_name = "pve"
 
@@ -44,8 +47,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   }
 
   network_device {
-    # mac_address = "00:00:00:00:99:01"
-    mac_address = var.boxes[count.index].mac_address
+    mac_address = local.virtual_machines[count.index].mac_address
   }
 
 }
