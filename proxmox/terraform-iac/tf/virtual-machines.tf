@@ -35,6 +35,10 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     retries = 2 # optional
   }
 
+  agent {
+    enabled = local.virtual_machine_globals.agent_enabled
+  }
+
   network_device {
     mac_address = local.virtual_machines[count.index].mac_address
   }
