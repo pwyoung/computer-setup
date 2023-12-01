@@ -39,8 +39,48 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     enabled = local.virtual_machine_globals.agent_enabled
   }
 
-  network_device {
-    mac_address = local.virtual_machines[count.index].mac_address
+  dynamic "network_device" {
+    for_each = local.virtual_machines[count.index].network_device_list
+    content {
+      mac_address = network_device.value["mac_address"]
+    }
   }
+
+  dynamic "operating_system" {
+    for_each = local.virtual_machines[count.index].operating_system
+    content {
+      type = operating_system.value["type"]
+    }
+  }
+
+  dynamic "vga" {
+    for_each = local.virtual_machines[count.index].vga
+    content {
+      enabled = vga.value["enabled"]
+      type = vga.value["type"]
+    }
+  }
+
+
+  dynamic "hostpci" {
+    for_each = local.virtual_machines[count.index].hostpci_list
+    content {
+      device = hostpci.value["device"]
+      id = hostpci.value["id"]
+      pcie = hostpci.value["pcie"]
+    }
+  }
+
+  dynamic "cpu" {
+    for_each = local.virtual_machines[count.index].cpu
+    content {
+      cores = cpu.value["cores"]
+      type = cpu.value["type"]
+      # hidden=1 # not supported via TF
+      flags = cpu.value["flags"]
+    }
+  }
+
+  #kvm_arguments
 
 }

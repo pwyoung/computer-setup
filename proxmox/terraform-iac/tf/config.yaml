@@ -11,7 +11,38 @@ virtual_machine_globals:
 virtual_machines:
 - name: "vm-9901"
   vm_id: 9901
-  mac_address: "00:00:00:00:99:01"
+  network_device_list:
+  - mac_address: "00:00:00:00:99:01"
+  operating_system:
+  - type: "l26"
+  # GPU Passthrough needs /etc/pve/qemu-server/<VM_ID>.conf to show:
+  #   machine: q35
+  #   bios: ovmf
+  #   hostpci0: 0000:01:00,pcie=1
+  #   cpu: host,hidden=1,flags=+pcid
+  #   <TODO> args: -cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'
+  vga:
+  - enabled: true
+    type: std
+  hostpci_list:
+  - device: "hostpci0"
+    id: "0000:01:00"
+    pcie: true
+  cpu:
+  - cores: 2
+    type: "host"
+    flags:
+    - "+pcid"
+  kvm_arguments: {} #- todo: "<TODO>"
 - name: "vm-9902"
   vm_id: 9902
-  mac_address: "00:00:00:00:99:02"
+  network_device_list:
+  - mac_address: "00:00:00:00:99:02"
+  operating_system:
+  - type: "l26"
+  vga:
+  - enabled: true
+    type: std
+  hostpci_list: {}
+  cpu: {}
+  kvm_arguments: {}
