@@ -1,17 +1,5 @@
 # https://registry.terraform.io/providers/bpg/proxmox/latest/docs
 
-# Notes:
-# - Commented blocks are meant to be inherited from the clone source
-# - The Initialization section is run once on creation (not cloning).
-# - So, the Mac Address is assigned (so that the DHCP server can be told to keep the IP constant)
-# - For convenience in the GUI, the VM_ID is ordered.
-# - To avoid Mac Address conflicts, the last 4 chars of the MAC are the VM_ID
-# - After cloning, we might have to update the DHCP lease or we might get an existing IP.
-#   sudo dhclient -v -r
-#   sudo hostnamectl hostname <new hostname>
-#   sudo dhclient -v
-#   Or, tweak the template to do it...
-
 data "local_file" "config" {
   filename = "config.yaml"
 }
@@ -19,6 +7,7 @@ data "local_file" "config" {
 locals {
   config = yamldecode(data.local_file.config.content)
   virtual_machines = local.config.virtual_machines
+  virtual_machine_globals = local.config.virtual_machine_globals
 }
 
 # https://registry.terraform.io/providers/bpg/proxmox/latest/docs/resources/virtual_environment_vm
@@ -28,13 +17,13 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   # VM Name (not hostname)
   name  = local.virtual_machines[count.index].name
 
-  # Useful for advanced scripting and ordering in the GUI
+  # Useful for scripting and ordering in the GUI
   vm_id = local.virtual_machines[count.index].vm_id
 
-  node_name = "pve"
+  node_name = local.virtual_machine_globals.node_name
 
-  description = "Managed by Terraform"
-  tags        = ["terraform", "ubuntu"]
+  description = local.virtual_machine_globals.description
+  tags        = local.virtual_machine_globals.tags
 
   # The defaults for these settings are not inherited from the clone source
   # These settings are for UEFI (which we need for GPU/PCIe pass-through)
@@ -42,7 +31,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   bios = "ovmf"
 
   clone {
-    vm_id = 100 # "ubuntu-2204-template"
+    vm_id = local.virtual_machine_globals.clone_vm_id
     retries = 2 # optional
   }
 

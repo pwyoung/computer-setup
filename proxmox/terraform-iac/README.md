@@ -8,7 +8,7 @@
   - Proxmox
     - BPG: https://registry.terraform.io/providers/bpg/proxmox/latest/docs
     - Telmate: ...
-    
+
 # Boiler-Plate
 - As always, everything should "just work" by running "make".
 
@@ -26,5 +26,3 @@
     Use git repos/scripts to configure
   - TODO:
     Use an Ansible job
-
-
