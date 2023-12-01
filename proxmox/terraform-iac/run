@@ -11,6 +11,9 @@ MY_DIR=$(cd "$(dirname "$0")"; pwd -P)
 # Terraform files
 TF_DIR=$MY_DIR/tf
 
+# Scripts dir
+SCRIPTS_DIR=$MY_DIR/scripts
+
 show_usage()
 {
     printf "Usage: $0 <command>\n"
@@ -86,6 +89,10 @@ tf_plan() {
 
 run_test() {
     echo "Test"
+
+    # Report the IPs of the running machines
+    cd $SCRIPTS_DIR
+    bash ./get_ips.sh
 }
 
 ################################################################################
