@@ -22,8 +22,9 @@ resource "proxmox_virtual_environment_vm" "vms" {
 
   node_name = local.virtual_machine_globals.node_name
 
-  description = local.virtual_machine_globals.description
-  tags        = local.virtual_machine_globals.tags
+  description = format("%s:%s", local.virtual_machine_globals.description, local.virtual_machines[count.index].description )
+
+  tags = concat( local.virtual_machine_globals.tags, local.virtual_machines[count.index].tags )
 
   # The defaults for these settings are not inherited from the clone source
   # These settings are for UEFI (which we need for GPU/PCIe pass-through)

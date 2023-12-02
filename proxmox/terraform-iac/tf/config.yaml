@@ -6,7 +6,6 @@ virtual_machine_globals:
   - "terraform"
   - "ubuntu"
 
-
 virtual_machines:
 - name: "vm-9901"
   vm_id: 9901
@@ -38,6 +37,9 @@ virtual_machines:
     flags:
     - "+pcid"
   kvm_arguments: "-cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'"
+  tags:
+  - "gpu-nvidia"
+  description: "node A"
 - name: "vm-9902"
   vm_id: 9902
   network_device_list:
@@ -54,3 +56,6 @@ virtual_machines:
   hostpci_list: {}
   cpu: {}
   kvm_arguments: ""
+  tags:
+  - "gpu-none"
+  description: "node B"
