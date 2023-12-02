@@ -11,7 +11,7 @@ locals {
 }
 
 # https://registry.terraform.io/providers/bpg/proxmox/latest/docs/resources/virtual_environment_vm
-resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
+resource "proxmox_virtual_environment_vm" "vms" {
   count = length(local.virtual_machines)
 
   # VM Name (not hostname)
@@ -30,15 +30,6 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   machine = "q35"
   bios = "ovmf"
 
-  clone {
-    vm_id = local.virtual_machine_globals.clone_vm_id
-    retries = 2 # optional
-  }
-
-  agent {
-    enabled = local.virtual_machine_globals.agent_enabled
-  }
-
   dynamic "network_device" {
     for_each = local.virtual_machines[count.index].network_device_list
     content {
@@ -46,10 +37,18 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     }
   }
 
-  dynamic "operating_system" {
-    for_each = local.virtual_machines[count.index].operating_system
+  dynamic "clone" {
+    for_each = local.virtual_machines[count.index].clone
     content {
-      type = operating_system.value["type"]
+      vm_id = clone.value["vm_id"]
+      retries = 2
+    }
+  }
+
+  dynamic "agent" {
+    for_each = local.virtual_machines[count.index].agent
+    content {
+      enabled = agent.value["enabled"]
     }
   }
 
@@ -61,6 +60,12 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     }
   }
 
+  dynamic "operating_system" {
+    for_each = local.virtual_machines[count.index].operating_system
+    content {
+      type = operating_system.value["type"]
+    }
+  }
 
   dynamic "hostpci" {
     for_each = local.virtual_machines[count.index].hostpci_list
@@ -81,6 +86,9 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
     }
   }
 
-  #kvm_arguments
+  kvm_arguments = local.virtual_machines[count.index].kvm_arguments
+}
 
+output "ip_list" {
+  value = ["${proxmox_virtual_environment_vm.vms.*.ipv4_addresses}"]
 }

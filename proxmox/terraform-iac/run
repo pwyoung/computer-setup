@@ -90,7 +90,11 @@ tf_plan() {
 run_test() {
     echo "Test"
 
-    # Report the IPs of the running machines
+    # Fetch the IPs from Terraform
+    cd $TF_DIR
+    terraform show -json | jq -r ".values.outputs.ip_list.value[][][][]" | egrep -v '^127.'
+
+    # Get the IP, MAC, and VM_ID of the running machines from the PVE node
     cd $SCRIPTS_DIR
     bash ./get_ips.sh
 }
