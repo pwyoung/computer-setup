@@ -1,7 +1,15 @@
 # Goal
+Create VMs suitable for hosting a K8S cluster that can
+support GPU-based (AI) workloads.
+
+# Specific requirements
+The result should be compatible with Kubespray
+and the Nvidia K8S GPU operator.
+
+# Details
 - Automate creation of VMs using Proxmox
 - Support PCIe passthough of the GPU
-- Export IPs for ease of use by subsequent Ansible jobs
+- Export IPs for ease of use by subsequent configuration (e.g. via Ansible)
 
 # Prequisites
 

@@ -97,6 +97,15 @@ resource "proxmox_virtual_environment_vm" "vms" {
     }
   }
 
+  # https://github.com/bpg/terraform-provider-proxmox/issues/634
+  dynamic "memory" {
+    for_each = local.virtual_machines[count.index].memory
+    content {
+      dedicated = memory.value["ballooning"]
+      floating = memory.value["ballooning"]
+    }
+  }
+
   kvm_arguments = local.virtual_machines[count.index].kvm_arguments
 }
 

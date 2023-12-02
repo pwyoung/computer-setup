@@ -50,12 +50,10 @@ clean_all() {
 
 tf_init() {
     # Be idempotent
-    # "init" should be run once
-    # "init -upgrade" is safe (and necessary for some code changes)
+    # "init" must be run initially
+    # "init -upgrade" is safe to run each time, but slow
     if ! ls -1d ./.terraform*; then
         terraform init
-    else
-        terraform init -upgrade
     fi
 }
 

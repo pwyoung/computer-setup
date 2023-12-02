@@ -7,7 +7,7 @@ virtual_machine_globals:
   - "ubuntu"
 
 virtual_machines:
-- description: "node A"
+- description: "GPU Node"
   tags:
   - "gpu-nvidia"
   name: "vm-9901"
@@ -43,6 +43,8 @@ virtual_machines:
     type: "host"
     flags:
     - "+pcid"
+  memory:
+  - ballooning: 32768
   kvm_arguments: "-cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'"
   ################################################################################
   # GPU PASS-THROUGH: END
@@ -64,7 +66,7 @@ virtual_machines:
     file_format: "raw"
     size: 12
     ssd: false
-- description: "node B"
+- description: "A normal node"
   tags:
   - "gpu-none"
   name: "vm-9902"
@@ -82,5 +84,7 @@ virtual_machines:
     type: std
   hostpci_list: {}
   cpu: {}
+  memory:
+  - ballooning: 12288
   kvm_arguments: ""
   disk_list: {}
