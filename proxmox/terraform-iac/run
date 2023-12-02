@@ -3,16 +3,11 @@
 # Exit on error
 set -e
 
-# set -x
-
 # Location of this script
 MY_DIR=$(cd "$(dirname "$0")"; pwd -P)
 
 # Terraform files
 TF_DIR=$MY_DIR/tf
-
-# Scripts dir
-SCRIPTS_DIR=$MY_DIR/scripts
 
 show_usage()
 {
@@ -54,8 +49,12 @@ clean_all() {
 }
 
 tf_init() {
-    # Init (if it seems necessary)
+    # Be idempotent
+    # "init" should be run once
+    # "init -upgrade" is safe (and necessary for some code changes)
     if ! ls -1d ./.terraform*; then
+        terraform init
+    else
         terraform init -upgrade
     fi
 }
@@ -93,10 +92,6 @@ run_test() {
     # Fetch the IPs from Terraform
     cd $TF_DIR
     terraform show -json | jq -r ".values.outputs.ip_list.value[][][][]" | egrep -v '^127.'
-
-    # Get the IP, MAC, and VM_ID of the running machines from the PVE node
-    cd $SCRIPTS_DIR
-    bash ./get_ips.sh
 }
 
 ################################################################################

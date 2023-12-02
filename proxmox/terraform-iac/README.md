@@ -1,23 +1,51 @@
 # Goal
-- Automate creation of VMs.
+- Automate creation of VMs using Proxmox
+- Support PCIe passthough of the GPU
+- Export IPs for ease of use by subsequent Ansible jobs
 
-# Boiler-Plate
-- As always, everything should "just work" by running "make".
+# Prequisites
 
-# Details
-- Provision
-  - Current:
-    This uses Terraform (with ProxMox) to create local VMs
-- Configure
-  - Current:
-    Use git repos/scripts to configure
+## Proxmox Virtualation Environment Server (PVE)
+- The PVE is running on a host with a supported Nvidia GPU (e.g. 4090)
+- The PVE is set up for passthrough.
+  See ./setup for a script that automates that.
+- The PVE has an exisintg template VM (ubuntu-2204) that can be cloned
 
-# TODO
-- Add support for other Terraform provisioned targets:
-  - Cloud (AWS/Azure)
-  - Bare-Metal (MaaS)
-  - Existing machine (Libvirt)
-- Use an Ansible job to configure the machines
-  - Make this a separate job, but allow the
-    inventory file to be created from this code.
+## On the machine where Terraform is run
+- The following tools are installed
+  - make
+  - terraform
+  - jq
+
+## Config
+
+Create variables.auto.tfvars with credentials for the Proxmox server
+```
+cd tf
+cp variables.auto.tfvars.EXAMPLE variables.auto.tfvars
+edit variables.auto.tfvars
+```
+
+Create config.yaml with the VMs configured for your system.
+```
+cd tf
+cp config.yaml.EXAMPLE config.yaml
+edit config.yaml
+```
+Notes:
+- make sure the GPU PCIe BUS ID is correct.
+- Add/remove machines and disks as needed
+- If the Proxmox server node name is not the default ("pve") change it here
+- Update the Clone source VM_ID as needed
+
+
+# Running this code
+
+## Creating VMs
+- Use "make" or directly call ./run to execute the Terraform code.
+- Running ```make``` alone should work, if the Prerequisites are in place.
+
+## Cleanup
+- Run ```make clean``` to run "terraform destroy"
+- Run ```make clean-all``` to also remove all local files terraform creates
 

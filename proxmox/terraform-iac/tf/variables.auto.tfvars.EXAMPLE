@@ -1,0 +1,6 @@
+virtual_environment_endpoint="https://192.168.3.115:8006"
+
+# https://github.com/bpg/terraform-provider-proxmox#disk-images-cannot-be-imported-by-non-pam-accounts
+virtual_environment_username="root@pam"
+virtual_environment_password="test123"
+# virtual_environment_token=""

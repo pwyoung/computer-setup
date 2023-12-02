@@ -1,0 +1,86 @@
+---
+virtual_machine_globals:
+  node_name: "pve"
+  description: "Managed by Terraform"
+  tags:
+  - "terraform"
+  - "ubuntu"
+
+virtual_machines:
+- description: "node A"
+  tags:
+  - "gpu-nvidia"
+  name: "vm-9901"
+  vm_id: 9901
+  network_device_list:
+  - mac_address: "00:00:00:00:99:01"
+  clone:
+  - vm_id: 101
+  agent:
+  - enabled: true
+  operating_system:
+  - type: "l26"
+  vga:
+  - enabled: true
+    type: std
+  ################################################################################
+  # GPU PASS-THROUGH: START
+  ################################################################################
+  # Document a working GPU pass-through config.
+  # When the Nvidia GPU has a PCIe BUS ID = "0000:01:00",
+  # etc/pve/qemu-server/<VM_ID>.conf contained:
+  #   machine: q35
+  #   bios: ovmf
+  #   hostpci0: 0000:01:00,pcie=1
+  #   cpu: host,hidden=1,flags=+pcid
+  #   args: -cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'
+  hostpci_list:
+  - device: "hostpci0"
+    id: "0000:01:00"
+    pcie: true
+  cpu:
+  - cores: 2
+    type: "host"
+    flags:
+    - "+pcid"
+  kvm_arguments: "-cpu 'host,+kvm_pv_unhalt,+kvm_pv_eoi,hv_vendor_id=NV43FIX,kvm=off'"
+  ################################################################################
+  # GPU PASS-THROUGH: END
+  ################################################################################
+  disk_list: # Skipping <disk-type>0 since the first disk is for the OS
+  - interface: "scsi1"
+    file_format: "raw"
+    size: 9
+    ssd: true
+  - interface: "scsi2"
+    file_format: "raw"
+    size: 10
+    ssd: false
+  - interface: "virtio1"
+    file_format: "raw"
+    size: 11
+    ssd: true
+  - interface: "virtio2"
+    file_format: "raw"
+    size: 12
+    ssd: false
+- description: "node B"
+  tags:
+  - "gpu-none"
+  name: "vm-9902"
+  vm_id: 9902
+  network_device_list:
+  - mac_address: "00:00:00:00:99:02"
+  clone:
+  - vm_id: 101
+  agent:
+  - enabled: true
+  operating_system:
+  - type: "l26"
+  vga:
+  - enabled: true
+    type: std
+  hostpci_list: {}
+  cpu: {}
+  kvm_arguments: ""
+  disk_list: {}
