@@ -38,6 +38,16 @@ resource "proxmox_virtual_environment_vm" "vms" {
     }
   }
 
+  dynamic "disk" {
+    for_each = local.virtual_machines[count.index].disk_list
+    content {
+      interface = disk.value["interface"]
+      size = disk.value["size"]
+      ssd = disk.value["ssd"]
+      file_format = disk.value["file_format"]
+    }
+  }
+
   dynamic "clone" {
     for_each = local.virtual_machines[count.index].clone
     content {
