@@ -57,5 +57,7 @@ todo() {
 }
 
 #support_text_mode_via_refind
-#update_kernel_boot_options
+
+update_kernel_boot_options
+
 show_status

@@ -51,6 +51,12 @@ docker_ce() {
 
     if docker --version; then
         echo "Docker is already installed"
+        if ! docker run hello-world; then
+            echo "If you just installed docker, then reboot"
+            echo "to make sure all processes know you're in the docker group"
+            sleep 3
+            exit 1
+        fi
         return
     fi
 
