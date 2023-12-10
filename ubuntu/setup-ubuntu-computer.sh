@@ -74,6 +74,16 @@ timeshift() {
         sudo apt-add-repository -y ppa:teejee2008/ppa
         sudo apt-get update
         sudo apt-get install timeshift
+        cat <<EOF
+        # Timeshift needs a btrfs witha root subvolume(@)
+        gdisk /dev/sdb # create /dev/sdb1 as linux filesystem, 8300
+        mkfs.btrfs /dev/sdb1 -f
+        mkdir /mnt/external-sdb1-btrfs
+        mount /dev/sdb1 /mnt/external-sdb1-btrfs/
+        btrfs sub create /mnt/external-sdb1-btrfs/@
+        umount /mnt/external-sdb1-btrfs/
+EOF
+        sleep 5
     fi
 }
 

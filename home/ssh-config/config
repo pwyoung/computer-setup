@@ -58,7 +58,7 @@ Host dev
 #   wifi bc:17:b8:64:28:b4 192.168.2.125
 # ~/.ssh/id_ed25519.pub
 #   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0flXp4pOONJfYpCRgQIMkrxpjNzfHT494myvwVXiaG pyoung@gallifrey
-Host proxmox
+Host pve
   HostName 192.168.3.115
   User root
   Port 22
@@ -112,10 +112,11 @@ Host nuc
   PasswordAuthentication no
 
 
-# 80:fa:5b:74:f0:fc
-Host oryx
-  HostName oryx
-  User ubuntu
+# https://login.tailscale.com/admin/machines
+# pop-os
+Host poposdev
+  HostName 100.115.32.81
+  User pyoung
   Port 22
   LogLevel FATAL
   UserKnownHostsFile /dev/null
