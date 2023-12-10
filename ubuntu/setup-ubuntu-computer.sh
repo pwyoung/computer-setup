@@ -63,13 +63,26 @@ setup_symlinks() {
     chmod +x ~/.profile.d/*
 }
 
-misc() {
+brave_browser() {
+    sudo apt purge brave-browser
+    sudo rm /etc/apt/sources.list.d/brave-browser-release.list
+}
+
+timeshift() {
     # Timeshift
     if ! command -v timeshift-gtk; then
         sudo apt-add-repository -y ppa:teejee2008/ppa
         sudo apt-get update
         sudo apt-get install timeshift
     fi
+}
+
+misc() {
+
+    # Fragile: doesn't work with non-ubuntu btrfs partitioning
+    # timeshift
+
+    brave_browser
 
     # VSCODE
     if ! command -v code; then
@@ -97,6 +110,8 @@ misc() {
 }
 
 allow_passwordless_ssh() {
+    sudo apt-get install -y openssh-server
+    
     F=/etc/sudoers.d/$USER
     echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee $F
     sudo chmod 0400 $F
@@ -111,4 +126,3 @@ main() {
 }
 
 main
-
