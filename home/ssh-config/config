@@ -7,6 +7,15 @@
 #   ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" ubuntu@34.207.172.61
 
 
+Host popos-dev
+  HostName 192.168.3.169
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+
 # Amazon jump box
 # Test command
 #   ssh -i ~/.ssh/id_ed25519-devops ubuntu@34.229.247.14 hostname

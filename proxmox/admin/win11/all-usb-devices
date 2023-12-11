@@ -1,0 +1,14 @@
+usb0: host=1e71:2011,usb3=1
+usb1: host=1e71:300c,usb3=1
+usb2: host=28de:2101,usb3=1
+usb3: host=28de:2101,usb3=1
+usb4: host=28de:2300,usb3=1
+usb5: host=2f9a:0235,usb3=1
+usb6: host=2f9a:0200,usb3=1
+usb7: host=2f9a:0210,usb3=1
+usb8: host=2f9a:0211,usb3=1
+usb9: host=1c4f:0034
+usb10: host=1c4f:0043
+usb11: host=0b05:19af
+usb12: host=0b05:1a97
+usb13: host=04b4:0007
