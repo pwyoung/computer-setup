@@ -17,7 +17,7 @@ COMPUTER_SETUP=~/git/computer-setup
 SYMLINKS=".bash_profile bin .dircolors .emacs .gitconfig .gitignore .profile.d .tmux .tmux.conf"
 
 # Convenient packages to have
-PKGS="emacs-nox tree glances htop dmidecode iotop"
+PKGS="emacs-nox tree glances htop dmidecode iotop openssh-server"
 
 install_packages() {
     sudo apt update
@@ -34,8 +34,8 @@ make_link() {
     SRC=$2
     report "INFO: Considering link to $TGT from $SRC"
     if [ -s $SRC ]; then
-	report "WARNING: Source $SRC already exists. Skipping"
-	return
+	report "WARNING: Source $SRC already exists"
+	mv -f $SRC $SRC.MOVED
     fi
     if [ ! -e $TGT ]; then
 	report "ERROR: Target $TGT does not exist."
@@ -63,44 +63,7 @@ setup_symlinks() {
     chmod +x ~/.profile.d/*
 }
 
-brave_browser() {
-    sudo apt purge brave-browser
-    sudo rm /etc/apt/sources.list.d/brave-browser-release.list
-}
-
-timeshift() {
-    # Timeshift
-    if ! command -v timeshift-gtk; then
-        sudo apt-add-repository -y ppa:teejee2008/ppa
-        sudo apt-get update
-        sudo apt-get install timeshift
-        cat <<EOF
-        # Timeshift needs a btrfs witha root subvolume(@)
-        gdisk /dev/sdb # create /dev/sdb1 as linux filesystem, 8300
-        mkfs.btrfs /dev/sdb1 -f
-        mkdir /mnt/external-sdb1-btrfs
-        mount /dev/sdb1 /mnt/external-sdb1-btrfs/
-        btrfs sub create /mnt/external-sdb1-btrfs/@
-        umount /mnt/external-sdb1-btrfs/
-EOF
-        sleep 5
-    fi
-}
-
 misc() {
-
-    # Fragile: doesn't work with non-ubuntu btrfs partitioning
-    # timeshift
-
-    brave_browser
-
-    # VSCODE
-    if ! command -v code; then
-        echo "Get VSCODE from https://code.visualstudio.com/Download"
-        echo "Check extensions here: https://marketplace.visualstudio.com/vscode"
-        google-chrome https://code.visualstudio.com/Download#
-        exit 1
-    fi
 
     # KUBECTL
     mkdir -p ~/bin-local
@@ -109,27 +72,40 @@ misc() {
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     fi
     if [ ! -e ./helm ]; then
-        wget https://get.helm.sh/helm-v3.13.2-linux-amd64.tar.gz
+        F=helm-v3.13.2-linux-amd64.tar.gz
+        wget https://get.helm.sh/$F
+        tar xvzf ./$F
+        mv ./linux-amd64/helm ./
     fi
 
     # Speed up animations
-    gsettings set org.gnome.desktop.interface enable-animations false
+    if command -v gsettings; then
+	gsettings set org.gnome.desktop.interface enable-animations false
+    fi
 
     # Flatpak
     echo "TODO: https://flatpak.org/setup/Ubuntu"
+
+    # VSCODE
+    if ! command -v code; then
+        echo "TODO: Get VSCODE from https://code.visualstudio.com/Download"
+        #google-chrome https://code.visualstudio.com/Download#
+        #exit 1
+    fi
 }
 
-allow_passwordless_ssh() {
-    sudo apt-get install -y openssh-server
-    
-    F=/etc/sudoers.d/$USER
-    echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee $F
-    sudo chmod 0400 $F
+allow_passwordless_sudo() {
+    read -p "Enter 'Y' to set up passwordless sudo for user $USER. Or enter to skip" X
+    if [ "$X" == "Y" ]; then
+	F=/etc/sudoers.d/$USER
+	echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee $F
+	sudo chmod 0400 $F
+    fi
 }
 
 
 main() {
-    allow_passwordless_ssh
+    allow_passwordless_sudo
     install_packages
     setup_symlinks
     misc
