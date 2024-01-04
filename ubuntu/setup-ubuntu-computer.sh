@@ -19,6 +19,10 @@ SYMLINKS=".bash_profile bin .dircolors .emacs .gitconfig .gitignore .profile.d .
 # Convenient packages to have
 PKGS="emacs-nox tree glances htop dmidecode iotop openssh-server"
 
+# Additional Packages
+# Track things installed over time
+PKGS="python3-venv"
+
 install_packages() {
     sudo apt update
     sudo apt install -y $PKGS

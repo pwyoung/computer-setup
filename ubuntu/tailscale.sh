@@ -1,7 +1,9 @@
 #!/bin/bash
 
-#resolvectl --no-pager | grep '100.100.100.100'
-resolvectl --no-pager | grep -i 'current' | grep -i 'dns'
+SEP='################################################################################'
 
-
+echo "$SEP"
+echo "Show DNS info per resolvectl"
+echo "$SEP"
+resolvectl --no-pager
 
