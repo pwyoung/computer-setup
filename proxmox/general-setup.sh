@@ -23,7 +23,6 @@ echo "Enable qemu guest-agent"
 sudo apt-get install qemu-guest-agent
 sudo systemctl start qemu-guest-agent
 sudo systemctl status qemu-guest-agent
-sudo systemctl enable qemu-guest-agent
 
 echo "Enable passwordless-sudo for ubuntu user"
 echo "ubuntu ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ubuntu
