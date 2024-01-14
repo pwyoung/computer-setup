@@ -12,23 +12,30 @@ Efficiency:
 - Disk: 500GB (soft provisioning)
 EOF
 
-# Convenience
+echo "Convenience"
 sudo apt-get update
 sudo apt-get install -y wget curl emacs-nox htop tree
 
-# Added and enabled SSH server
+echo "Add SSH server"
 sudo apt-get install -y openssh-server
 
-# Create local SSH keys and add my public ones
-ssh-keygen -t ed25519 # Follow prompts
-U='pwyoung' wget curl -L https://github.com/$U.keys >> ~/.ssh/authorized_keys
+echo "Enable qemu guest-agent"
+sudo apt-get install qemu-guest-agent
+sudo systemctl start qemu-guest-agent
+sudo systemctl status qemu-guest-agent
+sudo systemctl enable qemu-guest-agent
 
-# Enable passwordless-sudo for ubuntu user
-sudo su -
-echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu
+echo "Enable passwordless-sudo for ubuntu user"
+sudo su - -c 'echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ubuntu'
 
-#  Enable qemu guest-agent
-apt-get install qemu-guest-agent
-systemctl start qemu-guest-agent
-systemctl status qemu-guest-agent
-systemctl enable qemu-guest-agent
+echo "Create local SSH keys and add my public ones"
+if [ ! -e ~/.ssh ]; then
+    mkdir ~/.ssh
+    chmod 0700 ~/.ssh
+    #ssh-keygen -t ed25519 # Follow prompts
+fi
+echo "Adding SSH public keys from Github for user: $U"
+U='pwyoung'
+curl -L https://github.com/$U.keys >> ~/.ssh/authorized_keys
+
+
