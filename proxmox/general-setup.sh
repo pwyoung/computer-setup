@@ -26,7 +26,7 @@ sudo systemctl status qemu-guest-agent
 sudo systemctl enable qemu-guest-agent
 
 echo "Enable passwordless-sudo for ubuntu user"
-sudo echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ubuntu
+echo "ubuntu ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ubuntu
 
 echo "Create local SSH keys and add my public ones"
 if [ ! -e ~/.ssh ]; then
