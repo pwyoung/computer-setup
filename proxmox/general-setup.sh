@@ -26,7 +26,7 @@ sudo systemctl status qemu-guest-agent
 sudo systemctl enable qemu-guest-agent
 
 echo "Enable passwordless-sudo for ubuntu user"
-sudo su - -c 'echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ubuntu'
+sudo echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ubuntu
 
 echo "Create local SSH keys and add my public ones"
 if [ ! -e ~/.ssh ]; then
@@ -34,8 +34,8 @@ if [ ! -e ~/.ssh ]; then
     chmod 0700 ~/.ssh
     #ssh-keygen -t ed25519 # Follow prompts
 fi
-echo "Adding SSH public keys from Github for user: $U"
-U='pwyoung'
-curl -L https://github.com/$U.keys >> ~/.ssh/authorized_keys
+URL='https://github.com/pwyoung.keys'
+echo "Adding SSH public keys from $URL"
+curl -L $URL >> ~/.ssh/authorized_keys
 
 
