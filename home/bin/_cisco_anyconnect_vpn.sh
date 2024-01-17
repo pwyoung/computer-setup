@@ -1,6 +1,10 @@
 #!/bin/bash
 
+# Binary to run to establish the connection
 VPN=/opt/cisco/secureclient/bin/vpn
+
+# This exports parameters/secrets for the connection
+CREDS_FILE=~/.private.anyconnect.sh
 
 check_vpn_binary() {
     if [ ! -e $VPN ]; then
@@ -17,6 +21,16 @@ check_vpn_agent() {
     fi
 }
 
+check_state() {
+    N=$($VPN state | grep 'state: Connected' | wc -l)
+    if [ $N -gt 1 ]; then
+        echo "VPN seems to already be connected"
+        echo "Run '$VPN disconnect' to disconnect"
+        echo "Exiting"
+        exit 0
+    fi
+}
+
 # Set "AC_MFA"
 get_mfa() {
     # The MFA token is for 'Insight Hubs'
@@ -29,7 +43,6 @@ get_mfa() {
     fi
 }
 
-# TODO: use 'pass' instead
 read_secrets() {
     # Get parameters/creds
     #
@@ -37,7 +50,7 @@ read_secrets() {
     #export AC_USER=
     #export AC_PASSWORD=
     #
-    . ~/.private.anyconnect.sh
+    . $CREDS_FILE
 }
 
 connect_to_vpn() {
@@ -52,6 +65,7 @@ EOF
 
 check_vpn_binary
 check_vpn_agent
+check_state
 get_mfa
 read_secrets
 connect_to_vpn
