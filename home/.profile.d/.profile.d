@@ -1,0 +1,1 @@
+/home/pyoung/git/computer-setup/home/.profile.d
