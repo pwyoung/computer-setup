@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Binary to run to establish the connection
 VPN=/opt/cisco/secureclient/bin/vpn
 
@@ -14,9 +16,9 @@ check_vpn_binary() {
 }
 
 check_vpn_agent() {
-    # The vpn command requires that the vpn agent is running first.
     if ! ps eax | grep -v grep | grep -i vpnagentd; then
         echo "The VPN Agent does not seem to be running"
+        echo "$VPN will not work properly"
         exit 1
     fi
 }
@@ -31,26 +33,12 @@ check_state() {
     fi
 }
 
-# Set "AC_MFA"
-get_mfa() {
-    # The MFA token is for 'Insight Hubs'
-    if [ "$1" == "" ]; then
-        echo "Usage: $0 [MFA-value]"
-        exit 1
-    else
-        AC_MFA="$1"
-        echo "MFA: $AC_MFA"
-    fi
-}
-
 read_secrets() {
     # Get parameters/creds
-    #
-    #export AC_HOST=
-    #export AC_USER=
-    #export AC_PASSWORD=
-    #
     . $CREDS_FILE
+    echo "AC_HOST=$AC_HOST"
+    echo "AC_USER=$AC_USER"
+    echo "AC_PASSWORD length=${#AC_PASSWORD}"
 }
 
 connect_to_vpn() {
@@ -63,9 +51,16 @@ exit
 EOF
 }
 
+if [ "$1" == "" ]; then
+    echo "Usage: $0 <MFA-value>"
+    exit 1
+else
+    AC_MFA="$1"
+    echo "MFA: $AC_MFA"
+fi
+
 check_vpn_binary
 check_vpn_agent
 check_state
-get_mfa
 read_secrets
 connect_to_vpn
