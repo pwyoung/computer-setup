@@ -2,13 +2,17 @@
 
 set -e
 
-# Binary to run to establish the connection
-VPN=/opt/cisco/secureclient/bin/vpn
-
 # This exports parameters/secrets for the connection
 CREDS_FILE=~/.private.anyconnect.sh
 
-check_vpn_binary() {
+set_vpn_binary() {
+    # Binary to run to establish the connection
+    if uname -a | grep Darwin >/dev/null; then
+        VPN=/opt/cisco/anyconnect/bin/vpn
+    else
+        VPN=/opt/cisco/secureclient/bin/vpn
+    fi
+
     if [ ! -e $VPN ]; then
         echo "vpn binary [$VPN] does not exist"
         exit 1
@@ -59,7 +63,7 @@ else
     echo "MFA: $AC_MFA"
 fi
 
-check_vpn_binary
+set_vpn_binary
 check_vpn_agent
 check_state
 read_secrets
