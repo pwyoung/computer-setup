@@ -1,27 +1,19 @@
 #!/bin/bash
 
-# Tell the user if/when the setuid bit is turned off
-# for the helper program we need to run qemu user sessions
-# with bridged networking.
+# LOG file
+#L=$HOME/.kvm.sh.out
+L=/dev/null
 
 if command -v kvm >/dev/null; then
-
-    L=$HOME/.kvm.sh.out
+    echo "Checking group and perms on $F" >> $L
 
     F=/usr/lib/qemu/qemu-bridge-helper
-
-    if [ ! -u "$F" ]; then
-        D=$(date)
-        cat <<EOF | tee -a $L
-$D
-$F does not have setuid set
-Run the following to fix this:
-  sudo chmod +s $F
-
-NOTE:
-  The setuid bit must be turned on for the helper program
-  to support qemu user sessions with bridged networking.
-EOF
+    if ls -l $F | grep '\-rwsrwxr\-x' | grep "root $USER"; then
+        echo "No need to fix group and perms on $F" >> $L
+    else
+       echo "Fix group and perms on $F" >> $L
+       sudo chgrp $USER $F
+       sudo chmod 4775 $F
     fi
 
 fi

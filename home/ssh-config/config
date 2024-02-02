@@ -6,15 +6,18 @@
 
 #   ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" ubuntu@34.207.172.61
 
-
-Host popos-dev
-  HostName 192.168.3.169
+Host galileo
+  #HostName 192.168.3.200 # wired
+  HostName 192.168.3.198 # wired
+  #HostName 100.88.191.25 # tailscale
   User pyoung
+  IdentityFile ~/.ssh/id_ed25519
   Port 22
   LogLevel FATAL
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
+
 
 # Amazon jump box
 # Test command
@@ -90,7 +93,6 @@ Host tardis
   StrictHostKeyChecking no
   PasswordAuthentication no
 
-
 # 00:ce:39:d1:21:be
 Host mele
   HostName 192.168.3.6
@@ -122,79 +124,179 @@ Host nuc
 
 
 # https://login.tailscale.com/admin/machines
-# pop-os
-Host poposdev
-  HostName 100.115.32.81
+Host pve-popos-dev
+  HostName 192.168.3.234
   User pyoung
   Port 22
   LogLevel FATAL
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
+# Proxy through "pyoung@192.168.3.143" to 10.204.61.94
+#
+# These work (without pw after installing ssh key)
+#   ssh -J pve-popos-dev pyoung@10.204.61.94 hostname
+#   ssh -o ProxyCommand="ssh -W %h:%p pve-popos-dev" pyoung@10.204.61.94
+Host pyoung-dga100
+  HostName 10.204.61.94
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile ~/.ssh/id_ed25519
+  ProxyCommand ssh -W %h:%p pyoung@192.168.3.143
+# Short Host name for the above
+# Also, uses the Host defined here as the jumpbox
+Host ai
+  HostName 10.204.61.94
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile ~/.ssh/id_ed25519
+  ProxyCommand ssh -W %h:%p pve-popos-dev
+
+# https://login.tailscale.com/admin/machines
+Host pve-plex
+  HostName 192.168.3.202
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+
+################################################################################
+# Example of using SSH-Agent
+# This is used to support decrypting private SSH keys, once per shell/terminal
+# so that they are supplied when needed after that.
+#
+# This is basically built into OSX, and
+# Linux/Gnome (e.g https://wiki.gnome.org/Projects/GnomeKeyring/Ssh)
+#
+#   eval $(ssh-agent)
+#   ssh-add ~/.ssh/id_ed25519-devops
+#   ssh <target-host>
+################################################################################
+# Local dev-container
+Host dev
+  HostName 127.0.0.1
+  User dev
+  Port 2222
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+
+################################################################################
+# DGX2-Iy23!
+# Host nvadmin-dgx2
+#   HostName 10.204.61.15
+#   User nvadmin
+#   Port 22
+#   LogLevel FATAL
+#   UserKnownHostsFile /dev/null
+#   StrictHostKeyChecking no
+#   PasswordAuthentication no
+#   IdentitiesOnly yes
+#   #IdentityFile ~/.ssh/id_ed25519-devops
+#   # Forward my SSH keys into the session so I can SSH to another host
+#   # ForwardAgent yes
+
+# # DGX-2
+# #   pyoung@e4nvda0dgx2
+# #   ssh-copy-id -i /Users/pyoung/.ssh/id_ed25519.pub pyoung@10.204.61.15
+# #Host dgx2-pyoung
+# Host pyoung-dgx2
+#   HostName 10.204.61.15
+#   User pyoung
+#   Port 22
+#   LogLevel FATAL
+#   UserKnownHostsFile /dev/null
+#   StrictHostKeyChecking no
+#   PasswordAuthentication no
+#   IdentitiesOnly yes
+#   IdentityFile ~/.ssh/id_ed25519
+#   # Forward my SSH keys into the session so I can SSH to another host
+#   #ForwardAgent yes
+################################################################################
+# Host pve-popos-dev-vm
+#   HostName 192.168.3.143
+#   User pyoung
+#   Port 22
+#   LogLevel FATAL
+#   UserKnownHostsFile /dev/null
+#   StrictHostKeyChecking no
+#   PasswordAuthentication no
+#   IdentitiesOnly yes
+#   #ForwardAgent no # NOT needed for Proxy connections
+
+# # Proxy through "pve-popos-dev-vm" to the DGX2 as pyoung
+# Host pyoung-dgx2-via-popos
+#   HostName 10.204.61.15 # DGX2
+#   User pyoung
+#   Port 22
+#   LogLevel FATAL
+#   UserKnownHostsFile /dev/null
+#   StrictHostKeyChecking no
+#   PasswordAuthentication no
+#   IdentitiesOnly yes
+#   IdentityFile ~/.ssh/id_ed25519
+#   #
+#   ProxyCommand ssh -q -W %h:%p pve-popos-dev-vm
+
+################################################################################
+# DGXA100
+#   nvadmin@e4nvda0dgxa01
+# Host nvadmin-dgxa100
+#   HostName 10.204.61.94
+#   User nvadmin
+#   Port 22
+#   LogLevel FATAL
+#   UserKnownHostsFile /dev/null
+#   StrictHostKeyChecking no
+#   PasswordAuthentication no
+#   IdentitiesOnly yes
+#   # Forward my SSH keys into the session so I can SSH to another host
+#   # ForwardAgent yes
+
+# DGX-2
+#   ssh nvadmin@10.204.61.94
+#   sudo su -
+#   adduser pyoung
+#   echo "pyoung  ALL=(ALL) NOPASSWD: ALL" | tee /etc/sudoers.d/pyoung
+#   usermod -a -G docker pyoung
+#
+#   ssh-copy-id pyoung@10.204.61.94
+#   ssh pyoung-dgx-a100
+#   sudo ls /root
+Host pyoung-dgxa100
+  HostName 10.204.61.94
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+  # Forward my SSH keys into the session so I can SSH to another host
+  #ForwardAgent yes
 
 
-# Create the SSH tunnel to K8S using:
-#   Run ssh k-1-tunnel
-Host k-1-tunnel
-	HostName 192.168.122.131
-	User vagrant
-	Port 22
-	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-1/libvirt/private_key
-	UserKnownHostsFile /dev/null
-	StrictHostKeyChecking no
-	PasswordAuthentication no
-	IdentitiesOnly yes
-	LogLevel FATAL
-        # Make the SSH tunnel to the K8S cluster
-        LocalForward 6443 localhost:6443
+Host k9
+  HostName 10.200.9.33
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
 
-Host k-1
-	HostName 192.168.122.131
-	User vagrant
-	Port 22
-	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-1/libvirt/private_key
-	UserKnownHostsFile /dev/null
-	StrictHostKeyChecking no
-	PasswordAuthentication no
-	IdentitiesOnly yes
-	LogLevel FATAL
-Host k-2
-	HostName 192.168.122.11
-	User vagrant
-	Port 22
-	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-2/libvirt/private_key
-	UserKnownHostsFile /dev/null
-	StrictHostKeyChecking no
-	PasswordAuthentication no
-	IdentitiesOnly yes
-	LogLevel FATAL
-Host k-3
-	HostName 192.168.122.222
-	User vagrant
-	Port 22
-	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-3/libvirt/private_key
-	UserKnownHostsFile /dev/null
-	StrictHostKeyChecking no
-	PasswordAuthentication no
-	IdentitiesOnly yes
-	LogLevel FATAL
-Host k-4
-	HostName 192.168.122.40
-	User vagrant
-	Port 22
-	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-4/libvirt/private_key
-	UserKnownHostsFile /dev/null
-	StrictHostKeyChecking no
-	PasswordAuthentication no
-	IdentitiesOnly yes
-	LogLevel FATAL
-Host k-5
-	HostName 192.168.122.101
-	User vagrant
-	Port 22
-	IdentityFile /home/pyoung/home_dev/git/nomaj/examples/k8s-via-kubespray/build/vagrant/.vagrant/machines/k-5/libvirt/private_key
-	UserKnownHostsFile /dev/null
-	StrictHostKeyChecking no
-	PasswordAuthentication no
-	IdentitiesOnly yes
-	LogLevel FATAL
+
