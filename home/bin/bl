@@ -1,0 +1,4 @@
+# Jetbrains don't care to fix the terminal...
+# https://youtrack.jetbrains.com/issue/IDEA-185476/Terminal-is-not-a-Login-Session-Shell-Path-Options-do-not-take-effect
+/bin/bash -l $@
+
