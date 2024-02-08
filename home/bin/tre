@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ARGS="-I '.git|venv|*log'"
+echo "Running custom tree: $ARGS"
+tree $ARGS $@
+

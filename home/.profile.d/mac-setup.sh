@@ -5,6 +5,8 @@
 
 F=~/.custom-mouse-scaling.txt
 
+SCALE_FACTOR="16.0"
+
 # Maybe use "jenv", but skip that for now
 function notes() {
 
@@ -51,21 +53,37 @@ function setup_mac_openjdk() {
     #export PATH="$JAVA_HOME/bin:$PATH"
 }
 
-# If this is a mac, and $F does not exist, then set the mouse sensitivity
+function setup_mac_prompt() {
+    #  https://medium.com/macoclock/how-to-change-the-colour-of-your-bash-prompt-on-mac-b06032543353
+    #  oldprompt=$PS1 && echo $oldprompt
+    #           %n@%m %1~ %#
+    #
+    # Ubuntu colors
+    #export PS1="%B%F{208}% %n%f%b %F{158}%~:%f "
+    #
+    # https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
+    #export PS1="%B%F{33}% %n%f%b %F{153}%~#%f "
+    # Match Jetbrains Terminal
+    #export PS1="%B%F{28}% %n%f%b %F{33}%~#%f "
+    echo "no effect. Put this in ~/.zshrc" >/dev/null
+}
+
 if uname | grep Darwin >/dev/null; then
+
+    echo "$(date)" > $F
 
     # Set the mouse scaling. This can exceed the valyes the GUI supports.
     defaults write .GlobalPreferences com.apple.mouse.scaling -1
-    defaults write -g com.apple.mouse.scaling 16.0
-    defaults read -g com.apple.mouse.scaling > $F
+    defaults write -g com.apple.mouse.scaling $SCALE_FACTOR
+    # Store the values
+    defaults read -g com.apple.mouse.scaling >> $F
 
     # "open" does not work on html files properly
     alias browse='open -a "/Applications/Google Chrome.app"'
     alias o='open -a "/Applications/Google Chrome.app"'
 
-    #return
     setup_mac_openjdk
 
+    # Left for documentation purposes
+    setup_mac_prompt
 fi
-
-

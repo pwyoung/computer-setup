@@ -16,3 +16,16 @@ docker images -q --filter dangling=true | xargs docker rmi
 # systemctl status docker
 # sudo systemctl restart docker
 
+# Rancher Desktop
+#
+# https://github.com/rancher-sandbox/rancher-desktop/issues/2285
+#
+#ls -lh '/System/Volumes/Data/Users/pyoung/Library/Application Support/rancher-desktop/lima/0/diffdisk'
+#-rw-r--r--  1 pyoung  staff    96G Feb  8 13:01 /System/Volumes/Data/Users/pyoung/Library/Application Support/rancher-desktop/lima/0/diffdisk
+#
+# docker image prune -a
+# docker system prune
+#
+# Rancher Desktop: storage "reclaim space"
+#
+
