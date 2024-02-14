@@ -5,7 +5,9 @@
 
 F=~/.custom-mouse-scaling.txt
 
-SCALE_FACTOR="16.0"
+# This is needed for slow mice since the GUI won't let me speed
+# the mouse up beyond "3"
+SCALE_FACTOR="0.125"
 
 # Maybe use "jenv", but skip that for now
 function notes() {
@@ -53,6 +55,7 @@ function setup_mac_openjdk() {
     #export PATH="$JAVA_HOME/bin:$PATH"
 }
 
+# Left for documentation purposes
 function setup_mac_prompt() {
     #  https://medium.com/macoclock/how-to-change-the-colour-of-your-bash-prompt-on-mac-b06032543353
     #  oldprompt=$PS1 && echo $oldprompt
@@ -68,22 +71,28 @@ function setup_mac_prompt() {
     echo "no effect. Put this in ~/.zshrc" >/dev/null
 }
 
-if uname | grep Darwin >/dev/null; then
-
-    echo "$(date)" > $F
-
-    # Set the mouse scaling. This can exceed the valyes the GUI supports.
+function setup_mouse_scaling_speed() {
+    # Set the mouse scaling. This can exceed the values the GUI supports.
     defaults write .GlobalPreferences com.apple.mouse.scaling -1
     defaults write -g com.apple.mouse.scaling $SCALE_FACTOR
     # Store the values
     defaults read -g com.apple.mouse.scaling >> $F
+}
+
+if uname | grep Darwin >/dev/null; then
+
+    echo "$(date)" > $F
+
+    setup_mouse_scaling_speed
 
     # "open" does not work on html files properly
-    alias browse='open -a "/Applications/Google Chrome.app"'
     alias o='open -a "/Applications/Google Chrome.app"'
 
     setup_mac_openjdk
 
-    # Left for documentation purposes
     setup_mac_prompt
+
+    # snafu...
+    alias scp='noglob scp'
+
 fi
