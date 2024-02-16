@@ -7,7 +7,7 @@ F=~/.custom-mouse-scaling.txt
 
 # This is needed for slow mice since the GUI won't let me speed
 # the mouse up beyond "3"
-SCALE_FACTOR="0.125"
+SCALE_FACTOR="9.0" 
 
 # Maybe use "jenv", but skip that for now
 function notes() {
