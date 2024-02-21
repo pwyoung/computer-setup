@@ -56,21 +56,12 @@ EOF
 }
 
 get_mfa_val() {
-
-    if [ "$1" == "" ]; then
-        #echo "Usage: $0 <MFA-value>"
-        #exit 1
-
-        # Read the MFA val but don't show it
-        echo "Enter the MFA value"
-        tty_modes=`stty -g`
-        stty -echo
-        read AC_MFA
-        stty $tty_modes
-    else
-        AC_MFA="$1"
-        echo "MFA: $AC_MFA"
-    fi
+    # Read the MFA val but don't show it
+    echo "Enter the MFA value"
+    tty_modes=`stty -g`
+    stty -echo
+    read AC_MFA
+    stty $tty_modes
 }
 
 get_mfa_val
