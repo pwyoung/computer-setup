@@ -50,4 +50,4 @@ export PATH=$DEDUPLICATED_ORDER_PRESERVED_PATH
 #export PS1="%B%F{33}% %n%f%b %F{153}%~#%f "
 #
 # Match Jetbrains Terminal
-export PS1="%B%F{28}% %n%f%b %F{33}%~#%f "
+#export PS1="%B%F{28}% %n%f%b %F{33}%~#%f "
