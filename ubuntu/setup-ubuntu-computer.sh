@@ -17,7 +17,7 @@ COMPUTER_SETUP=~/git/computer-setup
 SYMLINKS=".bash_profile bin .dircolors .emacs .gitconfig .gitignore .profile.d .tmux .tmux.conf"
 
 # Convenient packages to have
-PKGS="emacs-nox tree glances htop dmidecode iotop openssh-server python3-pip"
+PKGS="emacs-nox tree glances htop dmidecode iotop openssh-server python3-pip jq"
 
 # Additional Packages
 # Track things installed over time

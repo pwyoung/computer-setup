@@ -98,30 +98,36 @@ bail() {
     exit 1
 }
 
-# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#step-1-install-nvidia-container-toolkit
-setup_nvidia_for_docker_ce() {
-
-    echo "step 1"
-    sudo apt-get update \
-        && sudo apt-get install -y nvidia-container-toolkit-base
-
-    nvidia-ctk --version
-
-    echo "step 2"
-    if [ ! -e /etc/cdi/nvidia.yaml ]; then
-        sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+install_nvidia_ctk() {
+    # Install container tookit
+    if ! nvidia-ctk --version; then
+        curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+            && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+                sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+                sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+        sudo apt-get update
+        sudo apt-get install -y nvidia-container-toolkit
+        nvidia-ctk --version
     fi
-    grep "  name:" /etc/cdi/nvidia.yaml
+}
 
-    echo "step 3"
-    curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | sudo apt-key add -
-    distro=$(. /etc/os-release;echo $ID$VERSION_ID)
-    # PopOS is compatible with Ubuntu (packages etc)
-    distro=$(echo $distro | perl -pe 's/pop/ubuntu/')
-    curl -s -L https://nvidia.github.io/libnvidia-container/$distro/libnvidia-container.list | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 
-    sudo apt-get update
-    sudo apt-get install -y nvidia-container-toolkit
+install_nvidia_driver() {
+    echo "Installing nvidia driver"
+    sudo apt -y install linux-headers-$(uname -r)
+    sudo apt-get install -y nvidia-driver-545 nvidia-dkms-545
+    echo "reboot now. Allow/Enroll MOK"
+    exit 1
+}
+
+check_for_nvidia_driver() {
+    if ! nvidia-smi; then
+        echo "Install nvidia drivers first"
+        install_nvidia_driver
+    fi
+}
+
+configure_docker_for_ctk() {
     # configure docker daemon to recognize Nvidia runtime
     sudo nvidia-ctk runtime configure --runtime=docker
     CHECK=$(cat /etc/docker/daemon.json | jq -r .runtimes.nvidia.path)
@@ -129,8 +135,9 @@ setup_nvidia_for_docker_ce() {
     sudo systemctl restart docker
     # Check this
     docker info | grep -i runtimes | grep -i nvidia
+}
 
-    echo "# Test"
+test_docker_via_ctk() {
     F1=/tmp/nvidia-smi.host
     F2=/tmp/nvidia-smi.container
     nvidia-smi | tee $F1
@@ -139,8 +146,9 @@ setup_nvidia_for_docker_ce() {
     # docker run --rm --runtime=nvidia --gpus all nvidia/cuda:11.6.2-base-ubuntu20.04 nvidia-smi # Works
     echo "Show nvidia-smi differences between host and container"
     diff $F1 $F2 || true
+}
 
-
+cleanup_docker_ctk_setup() {
     # Cleanup
     # Get rid of deprecation warnings
     # Per https://itsfoss.com/key-is-stored-in-legacy-trusted-gpg/
@@ -150,6 +158,27 @@ setup_nvidia_for_docker_ce() {
         sudo cp /etc/apt/trusted.gpg /etc/apt/trusted.gpg.d
         sudo apt update
     fi
+}
+
+# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#step-1-install-nvidia-container-toolkit
+setup_nvidia_for_docker_ce() {
+
+    check_for_nvidia_driver
+    install_nvidia_ctk
+    configure_docker_for_ctk
+    test_docker_via_ctk
+    #cleanup_docker_ctk_setup
+
+    #if [ ! -e /etc/cdi/nvidia.yaml ]; then
+    #    sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+    #fi
+    #grep "  name:" /etc/cdi/nvidia.yaml
+
+
+    #distro=$(. /etc/os-release;echo $ID$VERSION_ID)
+    # PopOS is compatible with Ubuntu (packages etc)
+    #distro=$(echo $distro | perl -pe 's/pop/ubuntu/')
+    #curl -s -L https://nvidia.github.io/libnvidia-container/$distro/libnvidia-container.list | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 }
 
 test_gpu() {
