@@ -5,7 +5,7 @@
 ################################################################################
 export EXPORTDIR='/mnt/export/myshareddir'
 
-export SERVER='192.168.3.234'
+export SERVER='192.168.3.202'
 export CIDR='192.168.3.0/255.255.255.0'
 
 # Admin user (has passwordless sudo)
