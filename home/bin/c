@@ -1,13 +1,4 @@
 rm -f ./*~ #&>/dev/null
 rm -f ./*# #&>/dev/null
-find ./ -name "*~" | xargs rm
 
 clear
-
-if uname -a | grep Darwin >/dev/null; then
-  ls -ltr $@
-else
-  ls --color=auto -ltr $@
-fi
-
-
