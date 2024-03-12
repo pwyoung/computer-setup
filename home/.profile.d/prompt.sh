@@ -26,10 +26,13 @@ function set_prompt_mac(){
     # Colors
     # https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
 
-    #export PS1="%B%F{33}% %n%f%b %F{153}%~#%f "
+    #PS1="%B%F{33}% %n%f%b %F{153}%~#%f "
 
     # Like Jetbrains Terminal
-    export PS1="%B%F{28}% %n%f%b %F{33}%~#%f "
+    #PS1="%B%F{28}% %n%f%b %F{33}%~#%f "
+
+    #PS1="%B%F{020}% %n%f%b %F{026}%~#%f "
+    PS1="%B%F{020}% %n%f%b %F{026} %~ # "
 }
 
 if uname -a | grep -i darwin; then

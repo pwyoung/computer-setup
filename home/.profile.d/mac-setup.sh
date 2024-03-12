@@ -45,4 +45,11 @@ if uname | grep Darwin >/dev/null; then
     # snafu...
     alias scp='noglob scp'
 
+    # Stop opening a window...
+    P=/opt/homebrew/bin/emacs
+    if [ -e $P ]; then
+        alias emacs="$P -nw"
+    fi
+
+
 fi
