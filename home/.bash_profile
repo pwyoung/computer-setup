@@ -51,3 +51,7 @@ export PATH=$DEDUPLICATED_ORDER_PRESERVED_PATH
 #
 # Match Jetbrains Terminal
 #export PS1="%B%F{28}% %n%f%b %F{33}%~#%f "
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/pyoung/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)

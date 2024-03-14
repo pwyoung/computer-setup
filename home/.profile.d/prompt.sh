@@ -32,11 +32,28 @@ function set_prompt_mac(){
     #PS1="%B%F{28}% %n%f%b %F{33}%~#%f "
 
     #PS1="%B%F{020}% %n%f%b %F{026}%~#%f "
-    PS1="%B%F{020}% %n%f%b %F{026} %~ # "
+    #PS1="%B%F{020}% %n%f%b %F{026} %~ # "
+}
+
+function set_detailed_prompt(){
+    orange=$(tput setaf 166);
+    yellow=$(tput setaf 228);
+    green=$(tput setaf 71);
+    white=$(tput setaf 15);
+    bold=$(tput bold);
+    reset=$(tput sgr0);
+    PS1="\[${bold}\]";
+    PS1+="\[${orange}\]\u"; # username
+    PS1+="\[${white}\]@";
+    PS1+="\[${yellow}\]\h "; # host
+    PS1+="\[${green}\]\w"; # working directory
+    PS1+="\[${white}\]\$ \[${reset}\]"; # '$' (and reset color)
+    export PS1;
 }
 
 if uname -a | grep -i darwin; then
     set_prompt_mac
+    #set_detailed_prompt
 else
     set_prompt_linux
 fi
