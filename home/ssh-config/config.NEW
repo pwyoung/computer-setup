@@ -1,0 +1,236 @@
+################################################################################
+Host proxmox
+  HostName 192.168.3.115
+  User root
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+
+# Galileo (linux work laptop)
+Host galileo
+  # HostName 192.168.2.253 # wired
+  HostName 192.168.3.198 # wifi
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+  Port 22
+  User pyoung
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+################################################################################
+# Local dev-container
+Host dev
+  HostName 127.0.0.1
+  User dev
+  Port 2222
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+################################################################################
+# DGX2-Iy23!
+# Host nvadmin-dgx2
+#   HostName 10.204.61.15
+#   User nvadmin
+#   Port 22
+#   LogLevel FATAL
+#   UserKnownHostsFile /dev/null
+#   StrictHostKeyChecking no
+#   PasswordAuthentication no
+#   IdentitiesOnly yes
+#   #IdentityFile ~/.ssh/id_ed25519-devops
+#   # Forward my SSH keys into the session so I can SSH to another host
+#   # ForwardAgent yes
+
+# # DGX-2
+# #   pyoung@e4nvda0dgx2
+# #   ssh-copy-id -i /Users/pyoung/.ssh/id_ed25519.pub pyoung@10.204.61.15
+# #Host dgx2-pyoung
+Host pyoung-dgx-2
+  HostName 10.204.61.15
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+  # Forward my SSH keys into the session so I can SSH to another host
+  #ForwardAgent yes
+################################################################################
+
+#pve-popos-dev-vm
+Host dev-popos
+   HostName 192.168.3.155
+   User pyoung
+   Port 22
+   LogLevel FATAL
+   UserKnownHostsFile /dev/null
+   StrictHostKeyChecking no
+   PasswordAuthentication no
+   IdentitiesOnly yes
+   #ForwardAgent no # NOT needed for Proxy connections
+
+# Get into the Docker Container on this box
+#Host dev-on-popos-dev-vm
+#   HostName 192.168.3.155
+#   User pyoung
+#   Port 2222
+#   LogLevel FATAL
+#   UserKnownHostsFile /dev/null
+#   StrictHostKeyChecking no
+#   PasswordAuthentication no
+#   IdentitiesOnly yes
+
+
+# # Proxy through "pve-popos-dev-vm" to the DGX2 as pyoung
+# Host pyoung-dgx2-via-popos
+#   HostName 10.204.61.15 # DGX2
+#   User pyoung
+#   Port 22
+#   LogLevel FATAL
+#   UserKnownHostsFile /dev/null
+#   StrictHostKeyChecking no
+#   PasswordAuthentication no
+#   IdentitiesOnly yes
+#   IdentityFile ~/.ssh/id_ed25519
+#   #
+#   ProxyCommand ssh -q -W %h:%p pve-popos-dev-vm
+
+################################################################################
+# DGXA100
+#   nvadmin@e4nvda0dgxa01
+# Host nvadmin-dgxa100
+#   HostName 10.204.61.94
+#   User nvadmin
+#   Port 22
+#   LogLevel FATAL
+#   UserKnownHostsFile /dev/null
+#   StrictHostKeyChecking no
+#   PasswordAuthentication no
+#   IdentitiesOnly yes
+#   # Forward my SSH keys into the session so I can SSH to another host
+#   # ForwardAgent yes
+
+# DGX-2
+#   ssh nvadmin@10.204.61.94
+#   sudo su -
+#   adduser pyoung
+#   echo "pyoung  ALL=(ALL) NOPASSWD: ALL" | tee /etc/sudoers.d/pyoung
+#   usermod -a -G docker pyoung
+#
+#   ssh-copy-id pyoung@10.204.61.94
+#   ssh pyoung-dgx-a100
+#   sudo ls /root
+Host pyoung-dgx-a100
+  HostName 10.204.61.94
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+  # Forward my SSH keys into the session so I can SSH to another host
+  #ForwardAgent yes
+#
+Host ai
+  HostName 10.204.61.94
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+#
+#
+# K8S: gpu node
+Host pve-9903
+  HostName 192.168.3.191
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+#
+# K8S: control node
+Host pve-9901
+  HostName 192.168.3.201
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+
+
+Host pve-ubuntu-nfs-plex-107
+  HostName 192.168.3.202
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  #IdentitiesOnly yes
+  #IdentityFile ~/.ssh/id_ed25519
+
+################################################################################
+
+Host bcm
+  HostName 192.168.3.6
+  User root
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+
+Host node001
+  HostName 10.141.0.1
+  User root
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  #IdentityFile ~/.ssh/id_ed25519
+
+Host node002
+  HostName 10.141.0.2
+  User root
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  #IdentityFile ~/.ssh/id_ed25519
+
+Host node003
+  HostName 10.141.0.3
+  User root
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  #IdentityFile ~/.ssh/id_ed25519
