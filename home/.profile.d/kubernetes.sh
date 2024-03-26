@@ -41,13 +41,13 @@ fi
 
 echo "End: `date`" | tee -a $LOG
 
-#!/bin/bash
-
-# Do not use this for now
-# Nvidia Continer Toolkit doesn't seem to be supported by it
-#   https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#prerequisites
-#
+# Moved from ~/.bash_profile
 RANCHER_HOME="${HOME}/.rd"
-#if [ -e $RANCHER_HOME ]; then
-#    export PATH=$RANCHER_HOME/bin:$PATH
-#fi
+if [ -e $RANCHER_HOME ]; then
+    export PATH=$RANCHER_HOME/bin:$PATH
+fi
+
+
+# For scripting
+export K8S_NAMESPACE='phil-young'
+export KUBECTL="kubectl -n $K8S_NAMESPACE"

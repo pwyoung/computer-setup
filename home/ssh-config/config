@@ -1,76 +1,5 @@
-# Create an SSH key (using an elliptical key)
-# ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/id_ed25519
-
-# CLI arg testing
-#   ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" dev@127.0.0.1 hostname
-
-#   ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" ubuntu@34.207.172.61
-
-Host galileo
-  #HostName 192.168.3.200 # wired
-  HostName 192.168.3.198 # wired
-  #HostName 100.88.191.25 # tailscale
-  User pyoung
-  IdentityFile ~/.ssh/id_ed25519
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-
-
-# Amazon jump box
-# Test command
-#   ssh -i ~/.ssh/id_ed25519-devops ubuntu@34.229.247.14 hostname
-#
-# Notes
-  #IdentitiesOnly yes # Caused failure on ec2 but not vagrant
-  # Forward my SSH keys into the session so I can SSH to another host
-  #ForwardAgent yes
-  #
-  # This is too slow. Don't bother with X11 (Wayland is gradualy replacing it)
-  # Use SPICE instead.
-  #
-  # For X11 connection forwarding
-  # On the server side
-  #   grep X11Forwarding /etc/ssh/sshd_config # must be yes
-  #   xauth -V # app must be there
-  #ForwardX11 yes
-  # Test X11 forwarding with:
-  #   ssh -v pi 'echo DISPLAY=$DISPLAY' &> /tmp/x
-  #   cat /tmp/x | egrep 'X11|^DISPLAY'
-  # Output should be something like this:
-  #   debug1: Requesting X11 forwarding with authentication spoofing.
-  #   DISPLAY=localhost:11.0
-# JumpBox settings
-Host jb
-  HostName 34.229.247.14
-  User ubuntu
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  #PasswordAuthentication no
-  #IdentitiesOnly yes # Caused failure on ec2 but not vagrant
-  # Forward my SSH keys into the session so I can SSH to another host
-  IdentityFile ~/.ssh/id_ed25519-devops
-  ForwardAgent yes
-
-Host dev
-  HostName 127.0.0.1
-  User dev
-  Port 2222
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-
-# ip a s
-#   eth a4:bb:6d:67:87:3c 192.168.3.231
-#   wifi bc:17:b8:64:28:b4 192.168.2.125
-# ~/.ssh/id_ed25519.pub
-#   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0flXp4pOONJfYpCRgQIMkrxpjNzfHT494myvwVXiaG pyoung@gallifrey
-Host pve
+################################################################################
+Host proxmox
   HostName 192.168.3.115
   User root
   Port 22
@@ -78,109 +7,21 @@ Host pve
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
-
-# ip a s
-#   eth 192.168.3.3/24 fc:34:97:4d:48:dd
-#   wifi 192.168.2.182 48:e7:da:58:40:c3
-# ~/.ssh/id_ed25519.pub
-#   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFBGftdSCXNBhOQukPdbN6D9lVbsSKG0wka3K0l/K7tB pwyoung@tardis
-Host tardis
-  HostName 192.168.3.3
-  User pwyoung
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-
-# 00:ce:39:d1:21:be
-Host mele
-  HostName 192.168.3.6
-  User pyoung
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-# 00:ce:39:d1:21:be
-Host maas-server
-  HostName 192.168.3.6
-  User pyoung
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-
-# 48:21:0B:55:B4:5B
-Host nuc
-  HostName 192.168.3.57 #nuc
-  User ubuntu
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-
-
-# https://login.tailscale.com/admin/machines
-Host pve-popos-dev
-  HostName 192.168.3.234
-  User pyoung
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-# Proxy through "pyoung@192.168.3.143" to 10.204.61.94
-#
-# These work (without pw after installing ssh key)
-#   ssh -J pve-popos-dev pyoung@10.204.61.94 hostname
-#   ssh -o ProxyCommand="ssh -W %h:%p pve-popos-dev" pyoung@10.204.61.94
-Host pyoung-dga100
-  HostName 10.204.61.94
-  User pyoung
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
+  IdentitiesOnly yes
   IdentityFile ~/.ssh/id_ed25519
-  ProxyCommand ssh -W %h:%p pyoung@192.168.3.143
-# Short Host name for the above
-# Also, uses the Host defined here as the jumpbox
-Host ai
-  HostName 10.204.61.94
-  User pyoung
-  Port 22
-  LogLevel FATAL
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
+
+# Galileo (linux work laptop)
+Host galileo
+  # HostName 192.168.2.253 # wired
+  HostName 192.168.3.198 # wifi
   IdentityFile ~/.ssh/id_ed25519
-  ProxyCommand ssh -W %h:%p pve-popos-dev
-
-# https://login.tailscale.com/admin/machines
-Host pve-plex
-  HostName 192.168.3.202
-  User ubuntu
+  IdentitiesOnly yes
   Port 22
+  User pyoung
   LogLevel FATAL
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
-
-################################################################################
-# Example of using SSH-Agent
-# This is used to support decrypting private SSH keys, once per shell/terminal
-# so that they are supplied when needed after that.
-#
-# This is basically built into OSX, and
-# Linux/Gnome (e.g https://wiki.gnome.org/Projects/GnomeKeyring/Ssh)
-#
-#   eval $(ssh-agent)
-#   ssh-add ~/.ssh/id_ed25519-devops
-#   ssh <target-host>
 ################################################################################
 # Local dev-container
 Host dev
@@ -191,7 +32,6 @@ Host dev
   UserKnownHostsFile /dev/null
   StrictHostKeyChecking no
   PasswordAuthentication no
-
 ################################################################################
 # DGX2-Iy23!
 # Host nvadmin-dgx2
@@ -211,29 +51,43 @@ Host dev
 # #   pyoung@e4nvda0dgx2
 # #   ssh-copy-id -i /Users/pyoung/.ssh/id_ed25519.pub pyoung@10.204.61.15
 # #Host dgx2-pyoung
-# Host pyoung-dgx2
-#   HostName 10.204.61.15
-#   User pyoung
-#   Port 22
-#   LogLevel FATAL
-#   UserKnownHostsFile /dev/null
-#   StrictHostKeyChecking no
-#   PasswordAuthentication no
-#   IdentitiesOnly yes
-#   IdentityFile ~/.ssh/id_ed25519
-#   # Forward my SSH keys into the session so I can SSH to another host
-#   #ForwardAgent yes
+Host pyoung-dgx-2
+  HostName 10.204.61.15
+  User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+  # Forward my SSH keys into the session so I can SSH to another host
+  #ForwardAgent yes
 ################################################################################
-# Host pve-popos-dev-vm
-#   HostName 192.168.3.143
+
+#pve-popos-dev-vm
+Host dev-popos
+   HostName 192.168.3.155
+   User pyoung
+   Port 22
+   LogLevel FATAL
+   UserKnownHostsFile /dev/null
+   StrictHostKeyChecking no
+   PasswordAuthentication no
+   IdentitiesOnly yes
+   #ForwardAgent no # NOT needed for Proxy connections
+
+# Get into the Docker Container on this box
+#Host dev-on-popos-dev-vm
+#   HostName 192.168.3.155
 #   User pyoung
-#   Port 22
+#   Port 2222
 #   LogLevel FATAL
 #   UserKnownHostsFile /dev/null
 #   StrictHostKeyChecking no
 #   PasswordAuthentication no
 #   IdentitiesOnly yes
-#   #ForwardAgent no # NOT needed for Proxy connections
+
 
 # # Proxy through "pve-popos-dev-vm" to the DGX2 as pyoung
 # Host pyoung-dgx2-via-popos
@@ -274,7 +128,7 @@ Host dev
 #   ssh-copy-id pyoung@10.204.61.94
 #   ssh pyoung-dgx-a100
 #   sudo ls /root
-Host pyoung-dgxa100
+Host pyoung-dgx-a100
   HostName 10.204.61.94
   User pyoung
   Port 22
@@ -286,11 +140,35 @@ Host pyoung-dgxa100
   IdentityFile ~/.ssh/id_ed25519
   # Forward my SSH keys into the session so I can SSH to another host
   #ForwardAgent yes
-
-
-Host k9
-  HostName 10.200.9.33
+#
+Host ai
+  HostName 10.204.61.94
   User pyoung
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+#
+#
+# K8S: gpu node
+Host pve-9903
+  HostName 192.168.3.191
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+#
+# K8S: control node
+Host pve-9901
+  HostName 192.168.3.201
+  User ubuntu
   Port 22
   LogLevel FATAL
   UserKnownHostsFile /dev/null
@@ -300,3 +178,59 @@ Host k9
   IdentityFile ~/.ssh/id_ed25519
 
 
+Host pve-ubuntu-nfs-plex-107
+  HostName 192.168.3.202
+  User ubuntu
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  #IdentitiesOnly yes
+  #IdentityFile ~/.ssh/id_ed25519
+
+################################################################################
+
+Host bcm
+  HostName 192.168.3.6
+  User root
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+
+Host node001
+  HostName 10.141.0.1
+  User root
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  #IdentityFile ~/.ssh/id_ed25519
+
+Host node002
+  HostName 10.141.0.2
+  User root
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  #IdentityFile ~/.ssh/id_ed25519
+
+Host node003
+  HostName 10.141.0.3
+  User root
+  Port 22
+  LogLevel FATAL
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  #IdentityFile ~/.ssh/id_ed25519
