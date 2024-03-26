@@ -5,6 +5,12 @@
 
 set -e
 
+# Nvidia Driver version
+ND='550'
+# Dynamically get the latest driver available
+#   sudo apt update
+#   ND=$(sudo apt list | egrep 'nvidia-driver-.../' | perl -pe 's/nvidia-driver-(.*?)\/.*/$1/' | sort -u | tail -1)
+
 remember_docker_lessons_learned() {
 
     # Podman is not really supported on Ubuntu/PopOS due to RedHat/Canonical community mutual snubbing.
@@ -115,14 +121,15 @@ install_nvidia_ctk() {
 install_nvidia_driver() {
     echo "Installing nvidia driver"
     sudo apt -y install linux-headers-$(uname -r)
-    sudo apt-get install -y nvidia-driver-545 nvidia-dkms-545
+    sudo apt-get install -y nvidia-driver-$ND nvidia-dkms-$ND
     echo "reboot now. Allow/Enroll MOK"
     exit 1
 }
 
 check_for_nvidia_driver() {
     if ! nvidia-smi; then
-        echo "Install nvidia drivers first"
+        echo "Install nvidia drivers first. This will use driver version $ND"
+        read -p "Hit OK to install nvidia driver"
         install_nvidia_driver
     fi
 }
